@@ -20,9 +20,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/ping', function () {
     return response()->json([
-        'status'  => 'ok',
+        'status' => 'ok',
         'service' => 'sikap-kelompok3',
-        'time'    => now()->toIso8601String(),
+        'time' => now()->toIso8601String(),
     ]);
 });
 
