@@ -128,11 +128,15 @@ Baca [`CONTRIBUTING.md`](CONTRIBUTING.md) sebelum mulai ngoding. Ringkasnya:
 
 ## Tim — Kelompok 3
 
-| Nama                    | Peran        |
-|-------------------------|--------------|
-| Mukhlish Pratama Mulya  | Ketua        |
-| _(lengkapi)_            |              |
-| _(lengkapi)_            |              |
-| _(lengkapi)_            |              |
+| Nama                        | Peran                |
+|-----------------------------|----------------------|
+| Mukhlish Pratama Mulya      | Backend & Database   |
+| Inayah Cikal Nurshabrina    | UI/UX & Frontend     |
+| Lukman Erif Wicaksono       | Backend              |
+| Muhammad Rhafi Hairy Muslim | Backend              |
+| Rahma Aprilliana            | Database             |
+| Rasya Pandu Wicaksono       | Database             |
+| Revo Setyo Kinasih          | Backend              |
+| Rita Yulia Sari             | UI/UX & Frontend     |
 
 **Manajer Proyek:** Wiktasari, S.T., M.Kom.
