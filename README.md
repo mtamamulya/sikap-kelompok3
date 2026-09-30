@@ -132,7 +132,7 @@ Baca [`CONTRIBUTING.md`](CONTRIBUTING.md) sebelum mulai ngoding. Ringkasnya:
 |-----------------------------|----------------------|
 | Mukhlish Pratama Mulya      | Backend & Database   |
 | Inayah Cikal Nurshabrina    | UI/UX & Frontend     |
-| Lukman Erif Wicaksono       | Backend              |
+| Lukman Arif Wicaksono       | Backend              |
 | Muhammad Rhafi Hairy Muslim | Backend              |
 | Rahma Aprilliana            | Database             |
 | Rasya Pandu Wicaksono       | Database             |
