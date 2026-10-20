@@ -10,6 +10,7 @@ class AnggotaKegiatan extends Model
     use HasFactory;
 
     protected $table = 'anggota_kegiatan';
+
     protected $primaryKey = 'id_anggota_kegiatan';
 
     protected $fillable = [
