@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,7 +23,7 @@ class User extends Authenticatable
         'id_role',
         'email',
         'password',
-        'is_active',
+        'aktif_sampai',
     ];
 
     protected $hidden = [
@@ -34,8 +35,29 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'is_active' => 'boolean',
+            'aktif_sampai' => 'date',
         ];
+    }
+
+    /**
+     * Akun tanpa aktif_sampai berlaku selamanya.
+     * Yang terisi masih berlaku sampai akhir hari pada tanggal itu.
+     */
+    public function masihAktif(): bool
+    {
+        return $this->aktif_sampai === null
+            || $this->aktif_sampai->endOfDay()->isFuture();
+    }
+
+    /**
+     * Pakai User::aktif()->get() untuk mengambil akun yang masih berlaku saja.
+     */
+    public function scopeAktif(Builder $query): void
+    {
+        $query->where(function (Builder $q) {
+            $q->whereNull('aktif_sampai')
+                ->orWhereDate('aktif_sampai', '>=', now()->toDateString());
+        });
     }
 
     public function role(): BelongsTo

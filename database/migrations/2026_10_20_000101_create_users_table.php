@@ -15,7 +15,7 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->string('email')->unique();
             $table->string('password');
-            $table->boolean('is_active')->default(true);
+            $table->date('aktif_sampai')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

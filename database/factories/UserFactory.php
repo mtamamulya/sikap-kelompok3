@@ -28,7 +28,7 @@ class UserFactory extends Factory
             'id_role' => 1,
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
-            'is_active' => true,
+            'aktif_sampai' => null,
             'remember_token' => Str::random(10),
         ];
     }
@@ -36,10 +36,10 @@ class UserFactory extends Factory
     /**
      * Indicate that the account is deactivated.
      */
-    public function nonaktif(): static
+    public function kedaluwarsa(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => false,
+            'aktif_sampai' => now()->subDay(),
         ]);
     }
 }
