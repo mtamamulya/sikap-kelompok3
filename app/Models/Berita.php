@@ -10,6 +10,7 @@ class Berita extends Model
     use HasFactory;
 
     protected $table = 'berita';
+
     protected $primaryKey = 'id_berita';
 
     protected $fillable = [
