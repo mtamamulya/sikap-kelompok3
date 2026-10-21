@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('jenis_kegiatan', function (Blueprint $table) {
             $table->id('id_jenis_kegiatan');
+<<<<<<< HEAD
             $table->enum('nama_jenis_kegiatan', [
                 'Kegiatan Mahasiswa',
                 'Kegiatan Prodi',
@@ -17,6 +18,9 @@ return new class extends Migration
                 'Kegiatan Dosen',
             ])->unique();
             $table->timestamps();
+=======
+            $table->string('nama_jenis_kegiatan')->nullable();
+>>>>>>> arinda-dokumen-histori
         });
     }
 
@@ -24,4 +28,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('jenis_kegiatan');
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> arinda-dokumen-histori

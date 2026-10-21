@@ -16,6 +16,11 @@ return new class extends Migration
             $table->string('nama_kategori', 100);
             $table->text('deskripsi')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('id_jenis_kategori')->nullable();
+            $table->string('nama_kategori')->nullable();
+            $table->text('deskripsi')->nullable();
+
+            // Note: Foreign key ke jenis_kategori bisa ditambahkan jika tabel jenis_kategori sudah dibuat terlebih dahulu
         });
     }
 
