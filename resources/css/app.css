@@ -10,6 +10,12 @@
     display: none !important;
 }
 
+/* Judul halaman lebih kecil di layar HP (di bawah 640px) */
+@media (max-width: 639px) {
+    main h1.text-4xl { font-size: 1.875rem; line-height: 2.25rem; }
+    main p.text-2xl  { font-size: 1.125rem; line-height: 1.75rem; }
+}
+
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --color-brand: #1f66e5;
