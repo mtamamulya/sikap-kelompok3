@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('kategori', function (Blueprint $table) {
+            $table->id('id_kategori');
+            $table->foreignId('id_jenis_kegiatan')
+                ->constrained('jenis_kegiatan', 'id_jenis_kegiatan')
+                ->restrictOnDelete();
+            $table->string('nama_kategori', 100);
+            $table->text('deskripsi')->nullable();
+            $table->timestamps();
+            $table->unsignedBigInteger('id_jenis_kategori')->nullable();
+            $table->string('nama_kategori')->nullable();
+            $table->text('deskripsi')->nullable();
+
+            // Note: Foreign key ke jenis_kategori bisa ditambahkan jika tabel jenis_kategori sudah dibuat terlebih dahulu
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('kategori');
+    }
+};
