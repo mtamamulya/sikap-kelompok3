@@ -64,12 +64,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-02-10T14:33:43+00:00",
-            "published-time": "2026-02-10T14:36:13+00:00"
-=======
             "time": "2026-02-10T14:33:43+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -143,12 +138,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-06T14:11:38+00:00",
-            "published-time": "2026-09-06T14:15:00+00:00"
-=======
             "time": "2026-09-06T14:11:38+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "dflydev/dot-access-data",
@@ -223,12 +213,7 @@
                 "issues": "https://github.com/dflydev/dflydev-dot-access-data/issues",
                 "source": "https://github.com/dflydev/dflydev-dot-access-data/tree/v3.0.3"
             },
-<<<<<<< HEAD
-            "time": "2024-07-08T12:26:09+00:00",
-            "published-time": "2024-07-08T12:27:13+00:00"
-=======
             "time": "2024-07-08T12:26:09+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "doctrine/inflector",
@@ -318,12 +303,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-08-10T19:31:58+00:00",
-            "published-time": "2025-08-10T19:33:33+00:00"
-=======
             "time": "2025-08-10T19:31:58+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "doctrine/lexer",
@@ -398,12 +378,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-01T06:59:29+00:00",
-            "published-time": "2026-10-01T07:01:28+00:00"
-=======
             "time": "2026-10-01T06:59:29+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "dragonmantank/cron-expression",
@@ -467,12 +442,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-10-31T18:51:33+00:00",
-            "published-time": "2025-10-31T18:52:36+00:00"
-=======
             "time": "2025-10-31T18:51:33+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "egulias/email-validator",
@@ -539,12 +509,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-03-06T22:45:56+00:00",
-            "published-time": "2025-03-20T21:39:03+00:00"
-=======
             "time": "2025-03-06T22:45:56+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "fruitcake/php-cors",
@@ -615,12 +580,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-12-03T09:33:47+00:00",
-            "published-time": "2025-12-03T09:37:01+00:00"
-=======
             "time": "2025-12-03T09:33:47+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "graham-campbell/result-type",
@@ -682,31 +642,26 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-24T09:06:52+00:00",
-            "published-time": "2026-08-24T09:07:57+00:00"
-=======
             "time": "2026-08-24T09:06:52+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.16.0",
+            "version": "7.15.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "ffb62ec787050ae4fa9449cdd6b80335db69bda2"
+                "reference": "ee80339fd9177ba44c49cdb653ff02a4d1106b9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ffb62ec787050ae4fa9449cdd6b80335db69bda2",
-                "reference": "ffb62ec787050ae4fa9449cdd6b80335db69bda2",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ee80339fd9177ba44c49cdb653ff02a4d1106b9a",
+                "reference": "ee80339fd9177ba44c49cdb653ff02a4d1106b9a",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/promises": "^2.6",
-                "guzzlehttp/psr7": "^2.13.2",
+                "guzzlehttp/promises": "^2.5.3",
+                "guzzlehttp/psr7": "^2.13.1",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.5 || ^3.0",
@@ -799,7 +754,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.16.0"
+                "source": "https://github.com/guzzle/guzzle/tree/7.15.5"
             },
             "funding": [
                 {
@@ -815,25 +770,20 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-18T13:38:36+00:00",
-            "published-time": "2026-10-18T13:40:26+00:00"
-=======
-            "time": "2026-10-18T13:38:36+00:00"
->>>>>>> arinda-dokumen-histori
+            "time": "2026-08-24T09:21:06+00:00"
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "2.6.0",
+            "version": "2.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "3d88c829bd5f13d13847b39067dbf09a60af2154"
+                "reference": "cde49999552d185d64715fe9c1f77a2aadd2f9f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/3d88c829bd5f13d13847b39067dbf09a60af2154",
-                "reference": "3d88c829bd5f13d13847b39067dbf09a60af2154",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/cde49999552d185d64715fe9c1f77a2aadd2f9f1",
+                "reference": "cde49999552d185d64715fe9c1f77a2aadd2f9f1",
                 "shasum": ""
             },
             "require": {
@@ -888,7 +838,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/2.6.0"
+                "source": "https://github.com/guzzle/promises/tree/2.5.3"
             },
             "funding": [
                 {
@@ -904,25 +854,20 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-18T12:46:59+00:00",
-            "published-time": "2026-10-18T12:47:39+00:00"
-=======
-            "time": "2026-10-18T12:46:59+00:00"
->>>>>>> arinda-dokumen-histori
+            "time": "2026-08-24T09:11:28+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.13.2",
+            "version": "2.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "adee536f95101929f262b8c59e8a61472f347d58"
+                "reference": "95e7828100de18b4e269fb1703be530082d5166d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/adee536f95101929f262b8c59e8a61472f347d58",
-                "reference": "adee536f95101929f262b8c59e8a61472f347d58",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/95e7828100de18b4e269fb1703be530082d5166d",
+                "reference": "95e7828100de18b4e269fb1703be530082d5166d",
                 "shasum": ""
             },
             "require": {
@@ -1012,7 +957,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.13.2"
+                "source": "https://github.com/guzzle/psr7/tree/2.13.1"
             },
             "funding": [
                 {
@@ -1028,12 +973,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-17T23:49:46+00:00",
-            "published-time": "2026-10-17T23:51:00+00:00"
-=======
-            "time": "2026-10-17T23:49:46+00:00"
->>>>>>> arinda-dokumen-histori
+            "time": "2026-08-24T09:13:11+00:00"
         },
         {
             "name": "guzzlehttp/uri-template",
@@ -1119,12 +1059,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-24T09:15:32+00:00",
-            "published-time": "2026-08-24T09:15:56+00:00"
-=======
             "time": "2026-08-24T09:15:32+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/framework",
@@ -1346,12 +1281,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-<<<<<<< HEAD
-            "time": "2026-10-13T13:24:10+00:00",
-            "published-time": "2026-10-13T13:26:07+00:00"
-=======
             "time": "2026-10-13T13:24:10+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/prompts",
@@ -1409,12 +1339,7 @@
             "support": {
                 "source": "https://github.com/laravel/prompts/tree/v0.3.26"
             },
-<<<<<<< HEAD
-            "time": "2026-10-09T14:45:13+00:00",
-            "published-time": "2026-10-13T15:18:36+00:00"
-=======
             "time": "2026-10-09T14:45:13+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/sanctum",
@@ -1477,12 +1402,7 @@
                 "issues": "https://github.com/laravel/sanctum/issues",
                 "source": "https://github.com/laravel/sanctum"
             },
-<<<<<<< HEAD
-            "time": "2026-06-23T18:26:55+00:00",
-            "published-time": "2026-07-21T14:35:14+00:00"
-=======
             "time": "2026-06-23T18:26:55+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/serializable-closure",
@@ -1543,12 +1463,7 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-<<<<<<< HEAD
-            "time": "2026-09-22T14:32:34+00:00",
-            "published-time": "2026-09-22T14:33:13+00:00"
-=======
             "time": "2026-09-22T14:32:34+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/tinker",
@@ -1614,25 +1529,20 @@
                 "issues": "https://github.com/laravel/tinker/issues",
                 "source": "https://github.com/laravel/tinker/tree/v2.11.1"
             },
-<<<<<<< HEAD
-            "time": "2026-02-06T14:12:35+00:00",
-            "published-time": "2026-02-10T18:45:37+00:00"
-=======
             "time": "2026-02-06T14:12:35+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "league/commonmark",
-            "version": "2.10.4",
+            "version": "2.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65"
+                "reference": "6efbd9c472b91db0a3350fcd601c8332c2382e1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/40821b7606d8d946bac57dbd2290076c722e3a65",
-                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/6efbd9c472b91db0a3350fcd601c8332c2382e1f",
+                "reference": "6efbd9c472b91db0a3350fcd601c8332c2382e1f",
                 "shasum": ""
             },
             "require": {
@@ -1726,12 +1636,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-17T19:59:50+00:00",
-            "published-time": "2026-10-17T20:02:34+00:00"
-=======
-            "time": "2026-10-17T19:59:50+00:00"
->>>>>>> arinda-dokumen-histori
+            "time": "2026-09-21T13:07:34+00:00"
         },
         {
             "name": "league/config",
@@ -1813,12 +1718,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2022-12-11T20:36:23+00:00",
-            "published-time": "2022-12-11T20:36:45+00:00"
-=======
             "time": "2022-12-11T20:36:23+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "league/flysystem",
@@ -1901,12 +1801,7 @@
                 "issues": "https://github.com/thephpleague/flysystem/issues",
                 "source": "https://github.com/thephpleague/flysystem/tree/3.36.0"
             },
-<<<<<<< HEAD
-            "time": "2026-09-02T08:00:27+00:00",
-            "published-time": "2026-09-02T08:01:40+00:00"
-=======
             "time": "2026-09-02T08:00:27+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "league/flysystem-local",
@@ -1955,12 +1850,7 @@
             "support": {
                 "source": "https://github.com/thephpleague/flysystem-local/tree/3.35.3"
             },
-<<<<<<< HEAD
-            "time": "2026-08-12T13:29:21+00:00",
-            "published-time": "2026-08-22T12:57:18+00:00"
-=======
             "time": "2026-08-12T13:29:21+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "league/mime-type-detection",
@@ -2016,12 +1906,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-07-09T11:49:27+00:00",
-            "published-time": "2026-07-09T11:50:09+00:00"
-=======
             "time": "2026-07-09T11:49:27+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "league/uri",
@@ -2120,12 +2005,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-16T15:19:33+00:00",
-            "published-time": "2026-10-16T15:24:11+00:00"
-=======
             "time": "2026-10-16T15:19:33+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "league/uri-interfaces",
@@ -2209,12 +2089,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-16T15:19:33+00:00",
-            "published-time": "2026-10-16T15:24:18+00:00"
-=======
             "time": "2026-10-16T15:19:33+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "monolog/monolog",
@@ -2319,25 +2194,20 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-29T19:21:12+00:00",
-            "published-time": "2026-09-29T19:21:44+00:00"
-=======
             "time": "2026-09-29T19:21:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "nesbot/carbon",
-            "version": "3.15.0",
+            "version": "3.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CarbonPHP/carbon.git",
-                "reference": "217d38553209bdb44e01590d9e9a2e4df8354cce"
+                "reference": "94cfc34887f07ab5c0efa07914c8f527544e3224"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/217d38553209bdb44e01590d9e9a2e4df8354cce",
-                "reference": "217d38553209bdb44e01590d9e9a2e4df8354cce",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/94cfc34887f07ab5c0efa07914c8f527544e3224",
+                "reference": "94cfc34887f07ab5c0efa07914c8f527544e3224",
                 "shasum": ""
             },
             "require": {
@@ -2347,7 +2217,6 @@
                 "psr/clock": "^1.0",
                 "symfony/clock": "^6.3.12 || ^7.0 || ^8.0",
                 "symfony/polyfill-mbstring": "^1.0",
-                "symfony/polyfill-time": "^1.0",
                 "symfony/translation": "^4.4.18 || ^5.2.1 || ^6.0 || ^7.0 || ^8.0"
             },
             "provide": {
@@ -2430,12 +2299,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-18T18:27:53+00:00",
-            "published-time": "2026-10-18T18:30:13+00:00"
-=======
-            "time": "2026-10-18T18:27:53+00:00"
->>>>>>> arinda-dokumen-histori
+            "time": "2026-10-02T07:26:52+00:00"
         },
         {
             "name": "nette/schema",
@@ -2502,12 +2366,7 @@
                 "issues": "https://github.com/nette/schema/issues",
                 "source": "https://github.com/nette/schema/tree/v1.3.6"
             },
-<<<<<<< HEAD
-            "time": "2026-08-16T21:58:41+00:00",
-            "published-time": "2026-08-17T18:10:19+00:00"
-=======
             "time": "2026-08-16T21:58:41+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "nette/utils",
@@ -2598,12 +2457,7 @@
                 "issues": "https://github.com/nette/utils/issues",
                 "source": "https://github.com/nette/utils/tree/v4.1.5"
             },
-<<<<<<< HEAD
-            "time": "2026-07-17T23:02:45+00:00",
-            "published-time": "2026-07-17T23:06:07+00:00"
-=======
             "time": "2026-07-17T23:02:45+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "nikic/php-parser",
@@ -2660,12 +2514,7 @@
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
                 "source": "https://github.com/nikic/PHP-Parser/tree/v5.9.0"
             },
-<<<<<<< HEAD
-            "time": "2026-09-13T18:51:52+00:00",
-            "published-time": "2026-09-13T18:53:16+00:00"
-=======
             "time": "2026-09-13T18:51:52+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "nunomaduro/termwind",
@@ -2752,12 +2601,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-02-16T23:10:27+00:00",
-            "published-time": "2026-02-16T23:13:10+00:00"
-=======
             "time": "2026-02-16T23:10:27+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpoption/phpoption",
@@ -2832,12 +2676,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-24T00:54:40+00:00",
-            "published-time": "2026-08-24T01:09:05+00:00"
-=======
             "time": "2026-08-24T00:54:40+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/clock",
@@ -2885,12 +2724,7 @@
                 "issues": "https://github.com/php-fig/clock/issues",
                 "source": "https://github.com/php-fig/clock/tree/1.0.0"
             },
-<<<<<<< HEAD
-            "time": "2022-11-25T14:36:26+00:00",
-            "published-time": "2022-11-25T14:59:22+00:00"
-=======
             "time": "2022-11-25T14:36:26+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/container",
@@ -2943,12 +2777,7 @@
                 "issues": "https://github.com/php-fig/container/issues",
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
-<<<<<<< HEAD
-            "time": "2021-11-05T16:47:00+00:00",
-            "published-time": "2021-11-05T16:53:27+00:00"
-=======
             "time": "2021-11-05T16:47:00+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/event-dispatcher",
@@ -2998,12 +2827,7 @@
                 "issues": "https://github.com/php-fig/event-dispatcher/issues",
                 "source": "https://github.com/php-fig/event-dispatcher/tree/1.0.0"
             },
-<<<<<<< HEAD
-            "time": "2019-01-08T18:20:26+00:00",
-            "published-time": "2019-03-25T15:31:44+00:00"
-=======
             "time": "2019-01-08T18:20:26+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/http-client",
@@ -3055,12 +2879,7 @@
             "support": {
                 "source": "https://github.com/php-fig/http-client"
             },
-<<<<<<< HEAD
-            "time": "2023-09-23T14:17:50+00:00",
-            "published-time": "2023-09-23T14:18:12+00:00"
-=======
             "time": "2023-09-23T14:17:50+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/http-factory",
@@ -3115,12 +2934,7 @@
             "support": {
                 "source": "https://github.com/php-fig/http-factory"
             },
-<<<<<<< HEAD
-            "time": "2024-04-15T12:06:14+00:00",
-            "published-time": "2024-05-10T07:32:19+00:00"
-=======
             "time": "2024-04-15T12:06:14+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/http-message",
@@ -3173,12 +2987,7 @@
             "support": {
                 "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
-<<<<<<< HEAD
-            "time": "2023-04-04T09:54:51+00:00",
-            "published-time": "2023-04-04T09:55:35+00:00"
-=======
             "time": "2023-04-04T09:54:51+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/log",
@@ -3228,12 +3037,7 @@
             "support": {
                 "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
-<<<<<<< HEAD
-            "time": "2024-09-11T13:17:53+00:00",
-            "published-time": "2024-09-11T13:21:14+00:00"
-=======
             "time": "2024-09-11T13:17:53+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psr/simple-cache",
@@ -3284,12 +3088,7 @@
             "support": {
                 "source": "https://github.com/php-fig/simple-cache/tree/3.0.0"
             },
-<<<<<<< HEAD
-            "time": "2021-10-29T13:26:27+00:00",
-            "published-time": "2021-10-29T13:27:19+00:00"
-=======
             "time": "2021-10-29T13:26:27+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "psy/psysh",
@@ -3368,12 +3167,7 @@
                 "issues": "https://github.com/bobthecow/psysh/issues",
                 "source": "https://github.com/bobthecow/psysh/tree/v0.12.24"
             },
-<<<<<<< HEAD
-            "time": "2026-06-29T15:41:09+00:00",
-            "published-time": "2026-06-29T15:41:53+00:00"
-=======
             "time": "2026-06-29T15:41:09+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "ralouphie/getallheaders",
@@ -3417,12 +3211,7 @@
                 "issues": "https://github.com/ralouphie/getallheaders/issues",
                 "source": "https://github.com/ralouphie/getallheaders/tree/develop"
             },
-<<<<<<< HEAD
-            "time": "2019-03-08T08:55:37+00:00",
-            "published-time": "2019-03-08T09:01:32+00:00"
-=======
             "time": "2019-03-08T08:55:37+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "ramsey/collection",
@@ -3498,12 +3287,7 @@
                 "issues": "https://github.com/ramsey/collection/issues",
                 "source": "https://github.com/ramsey/collection/tree/2.1.1"
             },
-<<<<<<< HEAD
-            "time": "2025-03-22T05:38:12+00:00",
-            "published-time": "2025-03-22T05:39:22+00:00"
-=======
             "time": "2025-03-22T05:38:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "ramsey/uuid",
@@ -3581,12 +3365,7 @@
                 "issues": "https://github.com/ramsey/uuid/issues",
                 "source": "https://github.com/ramsey/uuid/tree/4.9.4"
             },
-<<<<<<< HEAD
-            "time": "2026-09-16T11:39:30+00:00",
-            "published-time": "2026-09-16T11:41:15+00:00"
-=======
             "time": "2026-09-16T11:39:30+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/clock",
@@ -3664,12 +3443,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-12T14:31:36+00:00",
-            "published-time": "2026-10-14T06:45:48+00:00"
-=======
             "time": "2026-10-12T14:31:36+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/console",
@@ -3767,12 +3541,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-12T18:45:38+00:00",
-            "published-time": "2026-10-14T06:45:30+00:00"
-=======
             "time": "2026-10-12T18:45:38+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/css-selector",
@@ -3841,12 +3610,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-23T10:03:40+00:00",
-            "published-time": "2026-08-30T21:39:29+00:00"
-=======
             "time": "2026-08-23T10:03:40+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -3917,12 +3681,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-06-05T06:23:12+00:00",
-            "published-time": "2026-06-27T21:46:34+00:00"
-=======
             "time": "2026-06-05T06:23:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/error-handler",
@@ -4004,12 +3763,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-22T18:56:40+00:00",
-            "published-time": "2026-09-29T14:07:02+00:00"
-=======
             "time": "2026-09-22T18:56:40+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/event-dispatcher",
@@ -4094,12 +3848,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-21T17:40:08+00:00",
-            "published-time": "2026-08-22T13:44:01+00:00"
-=======
             "time": "2026-08-21T17:40:08+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/event-dispatcher-contracts",
@@ -4179,12 +3928,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-06-05T06:23:12+00:00",
-            "published-time": "2026-06-27T21:46:35+00:00"
-=======
             "time": "2026-06-05T06:23:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/finder",
@@ -4252,12 +3996,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-26T06:31:10+00:00",
-            "published-time": "2026-09-29T14:07:20+00:00"
-=======
             "time": "2026-09-26T06:31:10+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/http-foundation",
@@ -4339,12 +4078,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-08T16:56:12+00:00",
-            "published-time": "2026-10-14T06:45:13+00:00"
-=======
             "time": "2026-10-08T16:56:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/http-kernel",
@@ -4463,12 +4197,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-14T06:44:08+00:00",
-            "published-time": "2026-10-14T06:45:46+00:00"
-=======
             "time": "2026-10-14T06:44:08+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/mailer",
@@ -4552,12 +4281,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-15T06:01:15+00:00",
-            "published-time": "2026-09-15T07:11:41+00:00"
-=======
             "time": "2026-09-15T06:01:15+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/mime",
@@ -4646,12 +4370,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-04T10:45:44+00:00",
-            "published-time": "2026-09-15T07:11:11+00:00"
-=======
             "time": "2026-09-04T10:45:44+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -4734,12 +4453,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-04-10T16:19:22+00:00",
-            "published-time": "2026-04-26T14:44:50+00:00"
-=======
             "time": "2026-04-10T16:19:22+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
@@ -4821,12 +4535,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-25T15:46:47+00:00",
-            "published-time": "2026-09-30T10:23:37+00:00"
-=======
             "time": "2026-09-25T15:46:47+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-intl-idn",
@@ -4913,12 +4622,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-23T14:40:04+00:00",
-            "published-time": "2026-09-30T10:23:39+00:00"
-=======
             "time": "2026-09-23T14:40:04+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
@@ -5003,12 +4707,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-23T22:02:09+00:00",
-            "published-time": "2026-09-30T10:23:47+00:00"
-=======
             "time": "2026-09-23T22:02:09+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -5093,12 +4792,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-24T15:19:04+00:00",
-            "published-time": "2026-09-30T10:23:35+00:00"
-=======
             "time": "2026-09-24T15:19:04+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-php80",
@@ -5182,12 +4876,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-25T15:50:05+00:00",
-            "published-time": "2026-09-30T10:23:35+00:00"
-=======
             "time": "2026-09-25T15:50:05+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-php83",
@@ -5267,12 +4956,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-25T15:50:05+00:00",
-            "published-time": "2026-09-30T10:23:43+00:00"
-=======
             "time": "2026-09-25T15:50:05+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-php84",
@@ -5352,12 +5036,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-23T22:01:09+00:00",
-            "published-time": "2026-09-30T10:23:33+00:00"
-=======
             "time": "2026-09-23T22:01:09+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-php85",
@@ -5437,100 +5116,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-25T15:46:47+00:00",
-            "published-time": "2026-09-30T10:23:32+00:00"
-=======
             "time": "2026-09-25T15:46:47+00:00"
->>>>>>> arinda-dokumen-histori
-        },
-        {
-            "name": "symfony/polyfill-time",
-            "version": "v1.42.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-time.git",
-                "reference": "ac9f1ed802dd58f37e720388130c088434aa09fc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-time/zipball/ac9f1ed802dd58f37e720388130c088434aa09fc",
-                "reference": "ac9f1ed802dd58f37e720388130c088434aa09fc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1"
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/polyfill",
-                    "name": "symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Time\\": ""
-                },
-                "classmap": [
-                    "Resources/stubs"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ignace Philippe Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com"
-                },
-                {
-                    "name": "Tim Düsterhus",
-                    "email": "tim@tideways-gmbh.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill for the Time API added to PHP 8.6",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "duration",
-                "polyfill",
-                "portable",
-                "shim",
-                "time"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-time/tree/v1.42.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-<<<<<<< HEAD
-            "time": "2026-08-07T13:08:13+00:00",
-            "published-time": "2026-08-24T11:45:15+00:00"
-=======
-            "time": "2026-08-07T13:08:13+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/polyfill-uuid",
@@ -5613,12 +5199,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-09-24T05:20:52+00:00",
-            "published-time": "2026-09-30T10:23:49+00:00"
-=======
             "time": "2026-09-24T05:20:52+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/process",
@@ -5683,12 +5264,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-08T16:56:12+00:00",
-            "published-time": "2026-10-14T06:45:44+00:00"
-=======
             "time": "2026-10-08T16:56:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/routing",
@@ -5773,12 +5349,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-11T18:40:59+00:00",
-            "published-time": "2026-10-14T06:45:42+00:00"
-=======
             "time": "2026-10-11T18:40:59+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/service-contracts",
@@ -5865,12 +5436,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-07-27T15:39:01+00:00",
-            "published-time": "2026-08-30T19:56:37+00:00"
-=======
             "time": "2026-07-27T15:39:01+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/string",
@@ -5961,12 +5527,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-03T15:15:30+00:00",
-            "published-time": "2026-10-14T06:45:56+00:00"
-=======
             "time": "2026-10-03T15:15:30+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/translation",
@@ -6066,12 +5627,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-21T17:40:08+00:00",
-            "published-time": "2026-08-22T13:43:09+00:00"
-=======
             "time": "2026-08-21T17:40:08+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/translation-contracts",
@@ -6153,12 +5709,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-06-05T06:23:12+00:00",
-            "published-time": "2026-06-27T21:46:40+00:00"
-=======
             "time": "2026-06-05T06:23:12+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/uid",
@@ -6236,12 +5787,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-12T14:31:36+00:00",
-            "published-time": "2026-10-14T06:45:54+00:00"
-=======
             "time": "2026-10-12T14:31:36+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/var-dumper",
@@ -6328,12 +5874,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-13T05:48:33+00:00",
-            "published-time": "2026-10-14T06:46:26+00:00"
-=======
             "time": "2026-10-13T05:48:33+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -6388,12 +5929,7 @@
                 "issues": "https://github.com/tijsverkoyen/CssToInlineStyles/issues",
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.4.0"
             },
-<<<<<<< HEAD
-            "time": "2025-12-02T11:56:42+00:00",
-            "published-time": "2025-12-11T21:29:16+00:00"
-=======
             "time": "2025-12-02T11:56:42+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "vlucas/phpdotenv",
@@ -6477,12 +6013,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-24T18:07:49+00:00",
-            "published-time": "2026-08-24T18:09:13+00:00"
-=======
             "time": "2026-08-24T18:07:49+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "voku/portable-ascii",
@@ -6556,12 +6087,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-04-26T05:33:54+00:00",
-            "published-time": "2026-04-26T05:43:38+00:00"
-=======
             "time": "2026-04-26T05:33:54+00:00"
->>>>>>> arinda-dokumen-histori
         }
     ],
     "packages-dev": [
@@ -6626,25 +6152,20 @@
                 "issues": "https://github.com/FakerPHP/Faker/issues",
                 "source": "https://github.com/FakerPHP/Faker/tree/v1.24.1"
             },
-<<<<<<< HEAD
-            "time": "2024-11-21T13:46:39+00:00",
-            "published-time": "2024-11-21T13:47:18+00:00"
-=======
             "time": "2024-11-21T13:46:39+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "filp/whoops",
-            "version": "2.18.7",
+            "version": "2.18.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "50670ba239926c50f2073e868f6672f775cd57ec"
+                "reference": "7d0a2cde892089bb09372f4366e9b960eb3001a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/50670ba239926c50f2073e868f6672f775cd57ec",
-                "reference": "50670ba239926c50f2073e868f6672f775cd57ec",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/7d0a2cde892089bb09372f4366e9b960eb3001a9",
+                "reference": "7d0a2cde892089bb09372f4366e9b960eb3001a9",
                 "shasum": ""
             },
             "require": {
@@ -6694,7 +6215,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.18.7"
+                "source": "https://github.com/filp/whoops/tree/2.18.6"
             },
             "funding": [
                 {
@@ -6702,12 +6223,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-18T13:17:38+00:00",
-            "published-time": "2026-10-18T13:33:07+00:00"
-=======
-            "time": "2026-10-18T13:17:38+00:00"
->>>>>>> arinda-dokumen-histori
+            "time": "2026-10-03T17:03:57+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -6762,12 +6278,7 @@
                 "issues": "https://github.com/hamcrest/hamcrest-php/issues",
                 "source": "https://github.com/hamcrest/hamcrest-php/tree/v3.0.0"
             },
-<<<<<<< HEAD
-            "time": "2026-03-17T11:56:53+00:00",
-            "published-time": "2026-06-16T10:52:40+00:00"
-=======
             "time": "2026-03-17T11:56:53+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/pail",
@@ -6847,12 +6358,7 @@
                 "issues": "https://github.com/laravel/pail/issues",
                 "source": "https://github.com/laravel/pail"
             },
-<<<<<<< HEAD
-            "time": "2026-05-20T22:24:57+00:00",
-            "published-time": "2026-05-27T04:00:48+00:00"
-=======
             "time": "2026-05-20T22:24:57+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/pint",
@@ -6922,12 +6428,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-<<<<<<< HEAD
-            "time": "2026-08-05T16:47:22+00:00",
-            "published-time": "2026-08-05T17:06:35+00:00"
-=======
             "time": "2026-08-05T16:47:22+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "laravel/sail",
@@ -6990,12 +6491,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-<<<<<<< HEAD
-            "time": "2026-10-08T20:06:52+00:00",
-            "published-time": "2026-10-13T15:19:18+00:00"
-=======
             "time": "2026-10-08T20:06:52+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "mockery/mockery",
@@ -7077,12 +6573,7 @@
                 "security": "https://github.com/mockery/mockery/security/advisories",
                 "source": "https://github.com/mockery/mockery"
             },
-<<<<<<< HEAD
-            "time": "2026-08-19T19:37:52+00:00",
-            "published-time": "2026-08-19T19:38:57+00:00"
-=======
             "time": "2026-08-19T19:37:52+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "myclabs/deep-copy",
@@ -7142,12 +6633,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-08-11T10:17:44+00:00",
-            "published-time": "2026-08-11T10:29:20+00:00"
-=======
             "time": "2026-08-11T10:17:44+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "nunomaduro/collision",
@@ -7243,12 +6729,7 @@
                     "type": "patreon"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-07-15T19:09:14+00:00",
-            "published-time": "2026-07-15T19:14:08+00:00"
-=======
             "time": "2026-07-15T19:09:14+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phar-io/manifest",
@@ -7315,12 +6796,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-03-03T12:33:53+00:00",
-            "published-time": "2024-03-03T12:39:44+00:00"
-=======
             "time": "2024-03-03T12:33:53+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phar-io/version",
@@ -7371,12 +6847,7 @@
                 "issues": "https://github.com/phar-io/version/issues",
                 "source": "https://github.com/phar-io/version/tree/3.2.1"
             },
-<<<<<<< HEAD
-            "time": "2022-02-21T01:04:05+00:00",
-            "published-time": "2022-02-21T01:04:30+00:00"
-=======
             "time": "2022-02-21T01:04:05+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -7466,12 +6937,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-12-24T07:01:01+00:00",
-            "published-time": "2025-12-24T07:02:33+00:00"
-=======
             "time": "2025-12-24T07:01:01+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -7544,12 +7010,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-02-02T13:52:54+00:00",
-            "published-time": "2026-02-02T13:54:13+00:00"
-=======
             "time": "2026-02-02T13:52:54+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpunit/php-invoker",
@@ -7613,12 +7074,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T05:07:44+00:00",
-            "published-time": "2024-07-03T05:07:59+00:00"
-=======
             "time": "2024-07-03T05:07:44+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpunit/php-text-template",
@@ -7678,12 +7134,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T05:08:43+00:00",
-            "published-time": "2024-07-03T05:08:52+00:00"
-=======
             "time": "2024-07-03T05:08:43+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpunit/php-timer",
@@ -7743,12 +7194,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T05:09:35+00:00",
-            "published-time": "2024-07-03T05:09:48+00:00"
-=======
             "time": "2024-07-03T05:09:35+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "phpunit/phpunit",
@@ -7842,12 +7288,7 @@
                     "type": "other"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-05T05:47:54+00:00",
-            "published-time": "2026-10-05T05:48:42+00:00"
-=======
             "time": "2026-10-05T05:47:54+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/cli-parser",
@@ -7904,12 +7345,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T04:41:36+00:00",
-            "published-time": "2024-07-03T04:42:56+00:00"
-=======
             "time": "2024-07-03T04:41:36+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/code-unit",
@@ -7966,12 +7402,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-03-19T07:56:08+00:00",
-            "published-time": "2025-03-19T07:56:37+00:00"
-=======
             "time": "2025-03-19T07:56:08+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -8027,12 +7458,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T04:45:54+00:00",
-            "published-time": "2024-07-03T04:46:11+00:00"
-=======
             "time": "2024-07-03T04:45:54+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/comparator",
@@ -8124,12 +7550,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-01-24T09:26:40+00:00",
-            "published-time": "2026-01-24T09:27:07+00:00"
-=======
             "time": "2026-01-24T09:26:40+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/complexity",
@@ -8187,12 +7608,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T04:49:50+00:00",
-            "published-time": "2024-07-03T04:50:20+00:00"
-=======
             "time": "2024-07-03T04:49:50+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/diff",
@@ -8259,12 +7675,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T04:53:05+00:00",
-            "published-time": "2024-07-03T04:53:18+00:00"
-=======
             "time": "2024-07-03T04:53:05+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/environment",
@@ -8340,12 +7751,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-05-21T11:55:47+00:00",
-            "published-time": "2025-05-21T11:56:27+00:00"
-=======
             "time": "2025-05-21T11:55:47+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/exporter",
@@ -8435,12 +7841,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-09-24T06:12:51+00:00",
-            "published-time": "2025-09-24T06:14:38+00:00"
-=======
             "time": "2025-09-24T06:12:51+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/global-state",
@@ -8502,12 +7903,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T04:57:36+00:00",
-            "published-time": "2024-07-03T04:57:52+00:00"
-=======
             "time": "2024-07-03T04:57:36+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/lines-of-code",
@@ -8565,12 +7961,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T04:58:38+00:00",
-            "published-time": "2024-07-03T04:58:50+00:00"
-=======
             "time": "2024-07-03T04:58:38+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/object-enumerator",
@@ -8628,12 +8019,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T05:00:13+00:00",
-            "published-time": "2024-07-03T05:00:34+00:00"
-=======
             "time": "2024-07-03T05:00:13+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/object-reflector",
@@ -8689,12 +8075,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-07-03T05:01:32+00:00",
-            "published-time": "2024-07-03T05:01:45+00:00"
-=======
             "time": "2024-07-03T05:01:32+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/recursion-context",
@@ -8770,12 +8151,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-08-13T04:42:22+00:00",
-            "published-time": "2025-08-13T04:42:55+00:00"
-=======
             "time": "2025-08-13T04:42:22+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/type",
@@ -8844,12 +8220,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-08-09T06:55:48+00:00",
-            "published-time": "2025-08-09T07:00:14+00:00"
-=======
             "time": "2025-08-09T06:55:48+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "sebastian/version",
@@ -8903,12 +8274,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-10-09T05:16:32+00:00",
-            "published-time": "2024-10-09T05:17:00+00:00"
-=======
             "time": "2024-10-09T05:16:32+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "staabm/side-effects-detector",
@@ -8960,12 +8326,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2024-10-20T05:08:20+00:00",
-            "published-time": "2024-10-20T05:09:39+00:00"
-=======
             "time": "2024-10-20T05:08:20+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "symfony/yaml",
@@ -9041,12 +8402,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2026-10-12T12:34:30+00:00",
-            "published-time": "2026-10-14T06:46:00+00:00"
-=======
             "time": "2026-10-12T12:34:30+00:00"
->>>>>>> arinda-dokumen-histori
         },
         {
             "name": "theseer/tokenizer",
@@ -9096,12 +8452,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2025-11-17T20:03:58+00:00",
-            "published-time": "2025-11-17T20:04:52+00:00"
-=======
             "time": "2025-11-17T20:03:58+00:00"
->>>>>>> arinda-dokumen-histori
         }
     ],
     "aliases": [],
@@ -9113,9 +8464,5 @@
         "php": "^8.2"
     },
     "platform-dev": {},
-<<<<<<< HEAD
-    "plugin-api-version": "2.11.0"
-=======
     "plugin-api-version": "2.9.0"
->>>>>>> arinda-dokumen-histori
 }
