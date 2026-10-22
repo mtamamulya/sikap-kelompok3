@@ -53,19 +53,41 @@
                 </div>
             </label>
 
-            <label class="flex w-full flex-col gap-2 text-[13px] font-medium text-[#4B5563] sm:w-[200px] sm:shrink-0">
+            {{-- STATUS (dropdown kustom) --}}
+            <div x-data="{
+                     open: false,
+                     value: @js($status),
+                     options: @js(array_merge([''], array_keys($styles))),
+                     pick(v) {
+                         this.value = v;
+                         this.open = false;
+                         this.$nextTick(() => this.$refs.status.form.submit());
+                     }
+                 }"
+                 @click.outside="open = false" @keydown.escape="open = false"
+                 class="relative flex w-full flex-col gap-2 text-[13px] font-medium text-[#4B5563] sm:w-[200px] sm:shrink-0">
                 Status
-                <div class="relative flex min-h-[42px] items-center rounded-lg border border-[#E5E7EB] px-3">
-                    <select name="status" onchange="this.form.submit()" class="w-full appearance-none bg-transparent pr-6 text-sm font-normal text-[#4B5563] outline-none">
-                        <option value="">Semua status</option>
-                        @foreach (array_keys($styles) as $s)
-                            <option value="{{ $s }}" @selected($status === $s)>{{ $s }}</option>
-                        @endforeach
-                    </select>
-                    <i class="ti ti-chevron-down pointer-events-none absolute right-3 text-base text-[#9CA3AF]"></i>
+                <input type="hidden" name="status" x-ref="status" :value="value">
+                <button type="button" @click="open = !open"
+                        :class="open ? 'border-[#2277FF]' : 'border-[#E5E7EB]'"
+                        class="flex min-h-[42px] w-full items-center gap-2 rounded-lg border bg-white px-3 text-left transition">
+                    <span class="min-w-0 flex-1 truncate text-sm font-normal" :class="value ? 'text-[#111827]' : 'text-[#4B5563]'" x-text="value || 'Semua status'"></span>
+                    <i class="ti ti-chevron-down text-base text-[#9CA3AF] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-cloak
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     class="absolute left-0 top-full z-30 mt-2 flex w-full min-w-[200px] flex-col gap-0.5 rounded-lg border border-[#E5E7EB] bg-white p-1.5 shadow-[0_4px_12px_rgba(17,24,39,0.08)]">
+                    <template x-for="o in options" :key="o">
+                        <button type="button" @click="pick(o)"
+                                :class="value === o ? 'bg-[#EFF6FF] text-[#2277FF]' : 'text-[#111827] hover:bg-[#F9FAFB]'"
+                                class="h-9 rounded-lg px-3 text-left text-sm font-normal transition" x-text="o || 'Semua status'"></button>
+                    </template>
                 </div>
-            </label>
+            </div>
 
+            {{-- RENTANG TANGGAL --}}
             <div x-data="{ open: false }" @click.outside="open = false" class="relative flex w-full flex-col gap-2 text-[13px] font-medium text-[#4B5563] sm:w-[260px] sm:shrink-0">
                 Rentang tanggal
                 <button type="button" @click="open = !open" class="flex min-h-[42px] w-full items-center gap-2 rounded-lg border border-[#E5E7EB] px-3 text-left">
