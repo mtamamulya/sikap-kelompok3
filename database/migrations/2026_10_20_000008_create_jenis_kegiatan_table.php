@@ -17,7 +17,6 @@ return new class extends Migration
                 'Kegiatan Dosen',
             ])->unique();
             $table->timestamps();
-            $table->string('nama_jenis_kegiatan')->nullable();
         });
     }
 
