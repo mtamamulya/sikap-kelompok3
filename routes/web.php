@@ -9,7 +9,7 @@ Route::view('/dashboard', 'dashboard')->name('dashboard');
 Route::view('/profil', 'profil.show')->name('profil');
 Route::view('/notifikasi', 'notifikasi.index')->name('notifikasi');
 
-Route::view('/penelitian','penelitian.index')->name('penelitian.index');
+Route::view('/penelitian', 'penelitian.index')->name('penelitian.index');
 Route::view('/penelitian/create', 'penelitian.create')->name('penelitian.create');
 // Detail: harus di bawah /penelitian/create supaya "create" tidak dianggap sebagai {id}
 Route::view('/penelitian/{id}', 'penelitian.show')->whereNumber('id')->name('penelitian.show');
