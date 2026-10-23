@@ -8,20 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('dosen', function (Blueprint $table) {
-            $table->id('id_dosen');
+        Schema::create('akreditasi', function (Blueprint $table) {
+            $table->id('id_akreditasi');
             $table->foreignId('id_user')
-                ->unique()
                 ->constrained('users', 'id_user')
                 ->restrictOnDelete();
-            $table->string('nip', 18)->unique();
-            $table->string('nama');
+            $table->string('keterangan', 50);        // contoh: "Baik Sekali"
+            $table->string('link', 255)->nullable(); // file PDF
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('dosen');
+        Schema::dropIfExists('akreditasi');
     }
 };

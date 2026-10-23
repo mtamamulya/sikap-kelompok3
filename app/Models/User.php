@@ -22,7 +22,8 @@ class User extends Authenticatable
         'id_role',
         'email',
         'password',
-        'is_active',
+        'status',
+        'foto_profil',
     ];
 
     protected $hidden = [
@@ -34,7 +35,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'is_active' => 'boolean',
+            'status' => 'boolean',
         ];
     }
 

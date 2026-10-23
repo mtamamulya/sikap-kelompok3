@@ -13,9 +13,10 @@ return new class extends Migration
             $table->foreignId('id_role')
                 ->constrained('roles', 'id_role')
                 ->restrictOnDelete();
-            $table->string('email')->unique();
+            $table->string('email', 150)->unique();
             $table->string('password');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('status')->default(true);
+            $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

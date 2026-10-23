@@ -13,9 +13,9 @@ return new class extends Migration
             $table->foreignId('id_user')
                 ->unique()
                 ->constrained('users', 'id_user')
-                ->restrictOnDelete();
+                ->cascadeOnDelete();
             $table->string('nim', 20)->unique();
-            $table->string('nama');
+            $table->string('nama', 100);
             $table->year('tahun_masuk');
             $table->timestamps();
         });

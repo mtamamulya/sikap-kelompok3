@@ -8,15 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('kelompok_bidang', function (Blueprint $table) {
-            $table->id('id_kelompok_bidang');
-            $table->string('nama_kelompok_bidang', 100)->unique();
+        Schema::create('prodi', function (Blueprint $table) {
+            $table->id('id_prodi');
+            $table->string('kode_prodi', 20)->unique();
+            $table->string('nama_prodi', 100);
+            $table->enum('jenjang', ['D3', 'D4']);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('kelompok_bidang');
+        Schema::dropIfExists('prodi');
     }
 };

@@ -25,6 +25,10 @@ class Dosen extends Model
 
     public function historiPangkatGolongan(): HasMany
     {
-        return $this->hasMany(HistoriPangkatGolongan::class, 'id_dosen', 'id_dosen');
+        return $this->hasMany(
+            HistoriPangkatGolongan::class,
+            'id_dosen',
+            'id_dosen'
+        );
     }
 }
