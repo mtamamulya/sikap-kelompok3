@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.pengajuan-app')
 @section('title', 'Detail pengajuan')
 @section('content')
 @php

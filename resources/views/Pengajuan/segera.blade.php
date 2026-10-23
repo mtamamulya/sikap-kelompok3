@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.pengajuan-app')
 @section('title', request('menu', 'Halaman'))
 @section('content')
 <div class="flex h-[60vh] items-center justify-center px-6 text-center">

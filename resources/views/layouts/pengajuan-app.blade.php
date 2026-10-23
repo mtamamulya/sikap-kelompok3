@@ -12,10 +12,10 @@
 </head>
 <body class="font-sans antialiased">
 <div class="flex min-h-screen bg-[#F7F7F7] text-[#111827]">
-    @include('layouts.partials.sidebar')
+    @include('layouts.partials.pengajuan-sidebar')
 
     <div class="flex min-w-0 flex-1 flex-col">
-        @include('layouts.partials.header')
+        @include('layouts.partials.pengajuan-header')
 
         <main class="flex-1">
             @if (session('success'))

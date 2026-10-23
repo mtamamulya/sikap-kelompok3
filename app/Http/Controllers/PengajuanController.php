@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PengajuanController extends Controller
@@ -99,6 +100,37 @@ class PengajuanController extends Controller
         return view('pengajuan.show', compact('row', 'steps', 'student', 'files'));
     }
 
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip', 'max:10240'],
+        ], [
+            'file.mimes' => 'Format tidak didukung.',
+            'file.max' => 'Ukuran berkas maksimal 10 MB.',
+            'file.uploaded' => 'Gagal mengunggah. Ukuran melebihi batas server (cek upload_max_filesize di php.ini).',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store('tmp', 'public');
+
+        return response()->json([
+            'path' => $path,
+            'name' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+        ]);
+    }
+
+    public function removeUpload(Request $request)
+    {
+        $path = $request->input('path');
+
+        if (is_string($path) && str_starts_with($path, 'tmp/') && !str_contains($path, '..')) {
+            Storage::disk('public')->delete($path);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
     public function store(Request $request)
     {
         $request->merge(['category' => $request->input('category') ?: 'Lainnya']);
@@ -115,7 +147,12 @@ class PengajuanController extends Controller
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'description' => ['required', 'string', 'max:1000'],
-            'document' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            'documents' => ['required', 'array', 'min:1', 'max:5'],
+            'documents.*' => ['required', 'string', function ($attr, $value, $fail) {
+                if (!str_starts_with($value, 'tmp/') || str_contains($value, '..') || !Storage::disk('public')->exists($value)) {
+                    $fail('Berkas tidak valid, silakan unggah ulang.');
+                }
+            }],
         ];
 
         $specific = match ($request->input('category')) {
@@ -160,8 +197,13 @@ class PengajuanController extends Controller
             $data['members'] = json_decode($data['members'], true);
         }
 
-        $data['document_path'] = $request->file('document')->store('pengajuan', 'public');
-        unset($data['document']);
+        $data['document_paths'] = collect($data['documents'])->map(function ($tmp) {
+            $final = 'pengajuan/'.basename($tmp);
+            Storage::disk('public')->move($tmp, $final);
+
+            return $final;
+        })->all();
+        unset($data['documents']);
 
         // TODO: Submission::create($data + ['user_id' => auth()->id(), 'status' => 'Direview']);
 

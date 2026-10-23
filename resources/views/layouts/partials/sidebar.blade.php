@@ -1,6 +1,6 @@
 @php
     $menu = request('menu');
-    $onSegera = request()->routeIs('segera');
+    $onSegera = request()->routeIs('pengajuan-segera');
     $mhsOpen = $onSegera && in_array($menu, ['Mata kuliah', 'Prestasi mahasiswa']);
     $item = 'flex h-10 items-center gap-2 rounded-lg px-3 text-base tracking-[-0.18px] transition';
     $on = 'bg-[#2277FF] text-white';
@@ -16,7 +16,7 @@
     </div>
 
     <nav class="flex flex-col gap-3 px-3 pb-6">
-        <a href="{{ route('segera', ['menu' => 'Dashboard']) }}" class="{{ $item }} {{ $onSegera && $menu === 'Dashboard' ? $on : $off }}">
+        <a href="{{ route('pengajuan-segera', ['menu' => 'Dashboard']) }}" class="{{ $item }} {{ $onSegera && $menu === 'Dashboard' ? $on : $off }}">
             <i class="{{ $icon }} ti-category {{ $onSegera && $menu === 'Dashboard' ? 'text-white' : 'text-[#2B3F6C]' }}"></i>
             <span class="flex-1">Dashboard</span>
         </a>
@@ -38,7 +38,7 @@
             <div x-show="open" x-cloak class="flex flex-col gap-2">
                 @foreach (['Mata kuliah', 'Prestasi mahasiswa'] as $s)
                     @php $active = $onSegera && $menu === $s; @endphp
-                    <a href="{{ route('segera', ['menu' => $s]) }}"
+                    <a href="{{ route('pengajuan-segera', ['menu' => $s]) }}"
                        class="flex h-10 items-center rounded-xl pl-11 pr-3 text-sm transition {{ $active ? 'bg-[#2277FF] font-medium text-white' : 'bg-[#F0F0F0] text-[#111827] hover:bg-[#E5E7EB]' }}">
                         {{ $s }}
                     </a>
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <a href="{{ route('segera', ['menu' => 'Kegiatan']) }}" class="{{ $item }} {{ $onSegera && $menu === 'Kegiatan' ? $on : $off }}">
+        <a href="{{ route('pengajuan-segera', ['menu' => 'Kegiatan']) }}" class="{{ $item }} {{ $onSegera && $menu === 'Kegiatan' ? $on : $off }}">
             <i class="{{ $icon }} ti-rocket {{ $onSegera && $menu === 'Kegiatan' ? 'text-white' : 'text-[#2B3F6C]' }}"></i>
             <span class="flex-1">Kegiatan</span>
         </a>

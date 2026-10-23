@@ -32,14 +32,14 @@
             </div>
 
             <div class="flex flex-col gap-2 pt-4">
-                <a href="{{ route('segera', ['menu' => 'Profil Saya']) }}" class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-base font-medium text-[#374151] transition hover:bg-[#F3F4F6]">
+                <a href="{{ route('pengajuan-segera', ['menu' => 'Profil Saya']) }}" class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-base font-medium text-[#374151] transition hover:bg-[#F3F4F6]">
                     <svg class="size-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
                     <span>Profil Saya</span>
                 </a>
 
-                <a href="{{ route('segera', ['menu' => 'Keluar']) }}" class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-base font-semibold text-[#E5484D] transition hover:bg-[#FEF2F2]">
+                <a href="{{ route('pengajuan-segera', ['menu' => 'Keluar']) }}" class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-base font-semibold text-[#E5484D] transition hover:bg-[#FEF2F2]">
                     <svg class="size-5 text-[#E5484D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                     </svg>
