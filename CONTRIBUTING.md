@@ -172,3 +172,86 @@ istilah framework (`index`, `store`, `update`, `destroy`).
 
 Jangan diam berhari-hari. Buka issue di GitHub atau tanya di grup. Lebih baik
 bertanya 10 menit daripada salah arah 3 hari.
+
+---
+
+## 9. Pemasangan wajib di laptop masing-masing
+
+Dijalankan **sekali saja** setelah clone, lalu dilupakan:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Setelah itu, setiap kali kamu `git commit`, dua hal diperiksa otomatis:
+
+1. **Sisa penanda konflik Git.** Kalau ada file yang masih mengandung baris
+   penanda konflik, commit ditolak.
+2. **Format kode (Pint).** Kalau ada file PHP yang formatnya belum sesuai,
+   commit ditolak dan kamu diberi tahu perintah perbaikannya.
+
+Tujuannya supaya kesalahan ketahuan di laptopmu dalam dua detik, bukan lima
+menit kemudian di GitHub.
+
+Kalau commit ditolak karena format, perbaiki dengan:
+
+```bash
+vendor/bin/pint
+git add -A
+git commit
+```
+
+---
+
+## 10. Cara menyelesaikan konflik dengan benar
+
+Konflik itu normal dan tidak perlu ditakuti. Yang berbahaya adalah
+menyelesaikannya asal-asalan.
+
+**Jangan pakai tombol "Accept Both Changes" di VS Code** kecuali kamu benar-benar
+paham isi kedua sisinya. Untuk file seperti `composer.lock`, tombol itu membuat
+seluruh penanda konflik ikut tersimpan dan filenya rusak total — ini pernah
+terjadi dan membuat CI merah berjam-jam.
+
+Langkah yang benar:
+
+1. Buka file yang konflik, baca kedua versinya
+2. Pilih salah satu, atau gabungkan secara sadar
+3. Hapus semua baris penanda konflik
+4. Periksa tidak ada yang tersisa:
+
+```bash
+git diff --check
+```
+
+5. Baru `git add` dan lanjutkan
+
+**Khusus `composer.lock`:** jangan diselesaikan manual. Ambil versi dari
+`develop`, lalu bangun ulang:
+
+```bash
+git checkout origin/develop -- composer.lock
+composer install
+```
+
+---
+
+## 11. Aturan merge
+
+`develop` dan `main` dilindungi ruleset GitHub. Artinya:
+
+- Tidak bisa push langsung, semua lewat Pull Request
+- **PR dengan CI merah tidak bisa di-merge.** Ini dipaksa oleh GitHub, bukan
+  sekadar imbauan
+- Branch harus terbarui dengan `develop` sebelum bisa di-merge — klik tombol
+  **Update branch** di halaman PR
+- Force push diblokir, jadi riwayat kontribusi tidak bisa terhapus
+
+Kalau PR-mu merah, **jangan dipaksa**. Baca lognya, perbaiki, push lagi. PR yang
+sama akan diuji ulang otomatis.
+
+### Urutan merge untuk migration
+
+Migration punya urutan wajib karena foreign key. Tabel induk harus ada lebih
+dulu. **Yang menentukan urutan merge adalah ketua.** Kalau PR-mu sudah hijau tapi
+belum di-merge, kemungkinan sedang menunggu tabel induknya masuk duluan.
