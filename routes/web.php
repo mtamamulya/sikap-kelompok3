@@ -36,3 +36,4 @@ Route::view('/kegiatan/{id}/edit', 'kegiatan.edit')->whereNumber('id')->name('ke
 // Pengajuan (submenu dropdown)
 Route::view('/pengajuan/dosen', 'pengajuan.dosen')->name('pengajuan.dosen');
 Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
+require __DIR__.'/pengajuan.php';
