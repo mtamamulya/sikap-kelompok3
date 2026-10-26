@@ -76,8 +76,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cek sisa penanda konflik Git
+        run: |
+          if git grep -nE '^<<<<<<< |^>>>>>>> ' -- . ':!.githooks/'; then
+            echo "::error::Masih ada sisa penanda konflik Git pada file di atas. Selesaikan konfliknya, jangan pakai Accept Both Changes."
+            exit 1
+          fi
+          echo "Bersih, tidak ada sisa penanda konflik."
+
+      - name: Cek file yang tidak boleh ikut ter-commit
+        run: |
+          if git ls-files | grep -E '^(\.env$|\.env\.local$|composer-setup\.php$|vendor/|node_modules/)'; then
+            echo "::error::File di atas tidak boleh masuk repo."
+            exit 1
+          fi
+          echo "Bersih, tidak ada file terlarang."
+
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+
       - run: composer install --prefer-dist --no-interaction --no-progress
+
       - run: ./vendor/bin/pint --test
