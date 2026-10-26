@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -25,21 +26,22 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'id_role' => 1,
+            'id_role' => Role::query()->value('id_role') ?? 1,
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
-            'is_active' => true,
+            'status' => true,
+            'foto_profil' => null,
             'remember_token' => Str::random(10),
         ];
     }
 
     /**
-     * Indicate that the account is deactivated.
+     * Akun yang dinonaktifkan.
      */
     public function nonaktif(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => false,
+            'status' => false,
         ]);
     }
 }
