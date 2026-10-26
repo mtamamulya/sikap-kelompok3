@@ -6,7 +6,7 @@
     // DATA TIRUAN. $id berasal dari alamat (/pengabdian/{id}/edit).
     // Nanti diganti data pengabdian dari controller / database oleh tim backend.
     $p = [
-        'nomor_sk'              => '4389/UN/KP/2026',
+        'nomor_sk'              => '39/SK-REK/SP/1/2022',
         'tanggal_sk'            => '2026-06-04',
         'dana_dikti'            => '1.000.000',
         'dana_perguruan_tinggi' => '1.000.000',
@@ -303,7 +303,7 @@
                     <div class="flex flex-col gap-4 p-3.5">
                         <div class="flex flex-col gap-2">
                             <span class="{{ $labelClass }}">File</span>
-                            <label class="relative flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
+                            <label class="flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
                                 <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
                                        x-on:change="pilihFile($event, d)">
@@ -371,6 +371,11 @@
 
         {{-- TOMBOL --}}
         <div class="flex flex-wrap items-center justify-end gap-3">
+            <template x-if="tersimpan">
+                <p role="status" class="mr-auto rounded-lg border border-green-200 bg-green-50 px-3.5 py-2.5 text-sm text-green-800">
+                    Perubahan tersimpan (simulasi). Data belum masuk database.
+                </p>
+            </template>
             <a href="{{ route('pengabdian.index') }}"
                class="flex h-11 items-center rounded-md bg-red-500 px-6 text-base text-white hover:bg-red-600">Batal</a>
             <button type="submit"
@@ -385,7 +390,7 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('formEditPengabdian', () => ({
             // Nilai awal = data pengabdian yang sedang diedit (data tiruan)
-            judul: 'Deteksi hoaks dengan ML', afiliasi: 'Jurusan Teknik Elektro',
+            judul: 'Seminar Nasional AI', afiliasi: 'Jurusan Teknik Elektro',
             skim: 'Pengabdian Kemitraan Masyarakat', bidang: 'Energi', sebelumnya: '',
             lokasi: 'Kabupaten Kendal', mitra: '', tahunKe: '1', lama: '1',
 
@@ -463,7 +468,7 @@
 
             // Simpan (simulasi)
             tersimpan: false,
-            simpan() { this.tersimpan = true; this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Perubahan berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' }); },
+            simpan() { this.tersimpan = true; },
         }));
     });
 </script>

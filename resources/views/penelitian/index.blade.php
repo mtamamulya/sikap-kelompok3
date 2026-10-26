@@ -113,9 +113,9 @@
                                        class="flex size-8 items-center justify-center rounded-lg bg-orange-100 text-orange-400 hover:bg-orange-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
                                     </a>
-                                    {{-- Hapus: membuka modal konfirmasi (components/modal-hapus). action '#' nanti diganti route hapus dari backend. --}}
+                                    {{-- Hapus: nanti jadi <form method="POST"> dengan @csrf dan @method('DELETE') --}}
                                     <button type="button" aria-label="Hapus {{ $p['judul'] }}"
-                                            x-on:click="$dispatch('minta-hapus', { jenis: 'penelitian', nama: @js($p['judul']), action: '#' })"
+                                            onclick="confirm('Hapus penelitian ini?')"
                                             class="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-red-100 text-red-500 hover:bg-red-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5"/></svg>
                                     </button>
@@ -148,7 +148,5 @@
             </a>
         </nav>
     </section>
-
-    <x-modal-hapus />
 
 @endsection
