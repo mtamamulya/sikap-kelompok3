@@ -83,9 +83,6 @@
         </main>
     </div>
 
-    {{-- Alert / callout global: lihat components/alert.blade.php --}}
-    <x-alert />
-
 </div>
 
 @stack('scripts')
