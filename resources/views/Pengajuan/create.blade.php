@@ -1,11 +1,17 @@
 @extends('layouts.pengajuan-app')
-@section('title', 'Pengajuan Kegiatan Baru')
+@section('title', $item ? 'Edit Pengajuan' : 'Pengajuan Kegiatan Baru')
 @section('content')
 @php
+    $d = $item['data'] ?? [];
+    $v = fn ($k, $def = '') => old($k, $d[$k] ?? $def);
     $input = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13px] outline-none placeholder:text-[#9CA3AF] focus:border-[#2277FF]';
     $select = $input.' appearance-none pr-9';
     $defaultMembers = [['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota'], ['name' => 'Anisa Aulia Nurusyifa', 'role' => 'Anggota']];
-    $members = old('members') ? json_decode(old('members'), true) : $defaultMembers;
+    $members = old('members') ? json_decode(old('members'), true) : ($d['members'] ?? $defaultMembers);
+    $initialUploads = collect($item['documents'] ?? [])->map(fn ($f, $i) => [
+        'id' => 'old'.$i, 'name' => $f['name'], 'size' => $f['size'], 'progress' => 100,
+        'status' => 'done', 'path' => $f['path'], 'error' => '',
+    ])->all();
     $categories = ['Lomba', 'Volunteer', 'Magang', 'Lainnya'];
     $docLabels = [
         'Lomba' => 'Surat Tugas / Bukti Keikutsertaan',
@@ -23,17 +29,19 @@
     $scopes = ['Kampus', 'Regional', 'Nasional', 'Internasional'];
     $roles = ['Peserta', 'Panitia', 'Narasumber', 'Lainnya'];
     $exts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'zip'];
+    $cancelUrl = $item ? route('pengajuan.show', $item['id']) : route('pengajuan.index');
 @endphp
 <div class="flex flex-col gap-6 px-4 pb-10 pt-7 sm:px-6 lg:px-12"
      x-data="{
-         category: @js(old('category', '')),
-         participation: @js(old('participation', 'Tim')),
-         level: @js(old('level', '')),
+         category: @js($v('category', '')),
+         participation: @js($v('participation', 'Tim')),
+         level: @js($v('level', '')),
          members: @js($members),
          newMember: '', newRole: '',
          docLabels: @js($docLabels),
          locLabels: @js($locLabels),
-         uploads: [],
+         uploads: @js($initialUploads),
+                  legacy: @js($item && $item['documents'] === null),
          uploadNote: '',
          maxFiles: 5,
          maxSize: 10 * 1024 * 1024,
@@ -95,13 +103,12 @@
          check() {
              const f = this.$refs.form;
              const v = n => ((f.elements[n] && f.elements[n].value) || '').toString().trim();
-             const need = ({ Lomba: ['title', 'organizer', 'level'], Volunteer: ['title', 'organizer', 'role'], Magang: ['role', 'organizer', 'duration_months'] })[this.category] || ['title', 'organizer', 'scope', 'role'];
+             const need = ({ Lomba: ['title', 'organizer', 'level'], Volunteer: ['title', 'organizer', 'role'], Magang: ['role', 'organizer', 'duration_months'], Lainnya: ['title', 'organizer', 'scope', 'role'] })[this.category] || [];
              const hasTeam = this.category === 'Lomba' || this.category === '' || this.category === 'Lainnya';
-             let ok = need.every(n => v(n)) && ['location', 'start_date', 'end_date', 'description'].every(n => v(n));
+             let ok = Boolean(this.category) && need.every(n => v(n)) && ['location', 'start_date', 'end_date', 'description'].every(n => v(n));
              if (ok && v('end_date') < v('start_date')) ok = false;
              if (ok && hasTeam && this.participation === 'Tim' && this.members.length < 1) ok = false;
-             if (ok && !this.uploads.some(u => u.status === 'done')) ok = false;
-             if (ok && this.uploads.some(u => u.status === 'uploading')) ok = false;
+             if (ok && !this.legacy && !this.uploads.some(u => u.status === 'done')) ok = false;             if (ok && this.uploads.some(u => u.status === 'uploading')) ok = false;
              this.ok = ok;
          }
      }"
@@ -110,24 +117,25 @@
         <div class="flex flex-wrap gap-2.5 text-[13px]">
             <a href="{{ route('pengajuan.index') }}" class="text-[#6B7280]">Kegiatan</a>
             <span class="text-[#9CA3AF]">/</span>
-            <span class="text-[#6B7280]">Pengajuan Baru</span>
+            <span class="text-[#6B7280]">{{ $item ? 'Edit Pengajuan' : 'Pengajuan Baru' }}</span>
             <span class="text-[#9CA3AF]">/</span>
             <span class="font-semibold text-[#2277FF]" x-text="category || 'Umum'"></span>
         </div>
         <div class="flex flex-col gap-2">
-            <h1 class="text-[26px] font-bold leading-9">Pengajuan Kegiatan Baru</h1>
-            <p class="text-[13px] leading-5 text-[#6B7280]">Lengkapi formulir berikut untuk mengajukan kegiatan baru.</p>
+            <h1 class="text-[26px] font-bold leading-9">{{ $item ? 'Edit Pengajuan' : 'Pengajuan Kegiatan Baru' }}</h1>
+            <p class="text-[13px] leading-5 text-[#6B7280]">{{ $item ? 'Perbarui isian pengajuan Anda, lalu simpan perubahan.' : 'Lengkapi formulir berikut untuk mengajukan kegiatan baru.' }}</p>
         </div>
     </div>
 
-    <form method="POST" action="{{ route('pengajuan.store') }}" x-ref="form"
+    <form method="POST" action="{{ $item ? route('pengajuan.update', $item['id']) : route('pengajuan.store') }}" x-ref="form"
           @input="check()" @change="check()"
           @submit="if (!ok) { $event.preventDefault(); } else { submitting = true; }"
           class="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]">
         @csrf
+        @if ($item) @method('PUT') @endif
         <div class="flex flex-col gap-5 p-5 sm:p-7">
 
-            <x-pengajuan.field label="Kategori" hint="Pilih kategori kegiatan yang paling sesuai, atau lewati untuk pengajuan umum." name="category">
+            <x-pengajuan.field label="Kategori" hint="Pilih kategori kegiatan yang paling sesuai. Pilih Lainnya untuk kegiatan umum." name="category">
                 <div class="relative">
                     <select name="category" x-model="category" class="{{ $select }}">
                         <option value="">Pilih kategori</option>
@@ -137,14 +145,15 @@
                     </select>
                     <i class="ti ti-chevron-down pointer-events-none absolute right-3 top-3 text-base"></i>
                 </div>
-                <p class="text-xs leading-[18px] text-[#6B7280]" x-text="category ? 'Kategori terpilih: ' + category + '.' : 'Belum ada kategori dipilih. Isian umum ditampilkan di bawah.'"></p>
+                <p class="text-xs leading-[18px] text-[#6B7280]" x-text="category ? 'Kategori terpilih: ' + category + '.' : 'Pilih kategori untuk menampilkan isian pengajuan.'"></p>
             </x-pengajuan.field>
 
+            <div x-show="category !== ''" x-cloak class="flex flex-col gap-5">
             {{-- LOMBA --}}
             <template x-if="category === 'Lomba'">
                 <div class="flex flex-col gap-5">
                     <x-pengajuan.field label="Judul Kegiatan" required hint="Judul harus singkat, jelas, dan mudah dipahami." name="title">
-                        <input name="title" value="{{ old('title') }}" class="{{ $input }}" placeholder="Masukkan judul kegiatan...">
+                        <input name="title" value="{{ $v('title') }}" class="{{ $input }}" placeholder="Masukkan judul kegiatan...">
                     </x-pengajuan.field>
 
                     @include('pengajuan.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Lomba'])
@@ -165,16 +174,16 @@
                             @error('level')<p class="text-xs text-[#FF3F3F]">{{ $message }}</p>@enderror
                         </div>
                         <x-pengajuan.field class="flex-1" label="Penyelenggara Lomba" required hint="Masukkan penyelenggara lomba." name="organizer">
-                            <input name="organizer" value="{{ old('organizer') }}" class="{{ $input }}" placeholder="Nama lembaga / instansi">
+                            <input name="organizer" value="{{ $v('organizer') }}" class="{{ $input }}" placeholder="Nama lembaga / instansi">
                         </x-pengajuan.field>
                     </div>
 
                     <x-pengajuan.field label="Link Visual/Website Lomba" optional hint="Cantumkan tautan poster atau situs resmi lomba." name="info_url">
-                        <input name="info_url" value="{{ old('info_url') }}" class="{{ $input }}" placeholder="https://...">
+                        <input name="info_url" value="{{ $v('info_url') }}" class="{{ $input }}" placeholder="https://...">
                     </x-pengajuan.field>
 
                     <x-pengajuan.field label="Dosen Pembimbing" optional name="advisor">
-                        <input name="advisor" value="{{ old('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pembimbing">
+                        <input name="advisor" value="{{ $v('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pembimbing">
                     </x-pengajuan.field>
                 </div>
             </template>
@@ -183,13 +192,13 @@
             <template x-if="category === 'Volunteer'">
                 <div class="flex flex-col gap-5">
                     <x-pengajuan.field label="Nama Program Relawan" required hint="Tuliskan nama program yang akan Anda ikuti." name="title">
-                        <input name="title" value="{{ old('title') }}" class="{{ $input }}" placeholder="Masukkan nama program relawan...">
+                        <input name="title" value="{{ $v('title') }}" class="{{ $input }}" placeholder="Masukkan nama program relawan...">
                     </x-pengajuan.field>
                     <x-pengajuan.field label="Komunitas / Organisasi Penyelenggara" required hint="Gunakan nama resmi penyelenggara program relawan." name="organizer">
-                        <input name="organizer" value="{{ old('organizer') }}" class="{{ $input }}" placeholder="Masukkan nama komunitas atau organisasi">
+                        <input name="organizer" value="{{ $v('organizer') }}" class="{{ $input }}" placeholder="Masukkan nama komunitas atau organisasi">
                     </x-pengajuan.field>
                     <x-pengajuan.field label="Peran / Divisi Relawan" required hint="Tuliskan peran Anda dalam pelaksanaan program." name="role">
-                        <input name="role" value="{{ old('role') }}" class="{{ $input }}" placeholder="Masukkan peran atau divisi relawan">
+                        <input name="role" value="{{ $v('role') }}" class="{{ $input }}" placeholder="Masukkan peran atau divisi relawan">
                     </x-pengajuan.field>
                 </div>
             </template>
@@ -198,33 +207,33 @@
             <template x-if="category === 'Magang'">
                 <div class="flex flex-col gap-5">
                     <x-pengajuan.field label="Posisi / Role Magang" required hint="Tuliskan posisi yang akan dijalani selama magang." name="role">
-                        <input name="role" value="{{ old('role') }}" class="{{ $input }}" placeholder="Masukkan posisi atau peran magang...">
+                        <input name="role" value="{{ $v('role') }}" class="{{ $input }}" placeholder="Masukkan posisi atau peran magang...">
                     </x-pengajuan.field>
                     <x-pengajuan.field label="Nama Perusahaan / Instansi" required hint="Gunakan nama resmi perusahaan atau instansi penerima." name="organizer">
-                        <input name="organizer" value="{{ old('organizer') }}" class="{{ $input }}" placeholder="Masukkan nama perusahaan / instansi">
+                        <input name="organizer" value="{{ $v('organizer') }}" class="{{ $input }}" placeholder="Masukkan nama perusahaan / instansi">
                     </x-pengajuan.field>
                     <x-pengajuan.field label="Durasi Magang (Bulan)" required hint="Masukkan durasi dalam bulan." name="duration_months">
-                        <input type="number" min="1" max="60" name="duration_months" value="{{ old('duration_months') }}" class="{{ $input }}" placeholder="Contoh: 6">
+                        <input type="number" min="1" max="60" name="duration_months" value="{{ $v('duration_months') }}" class="{{ $input }}" placeholder="Contoh: 6">
                     </x-pengajuan.field>
                 </div>
             </template>
 
             {{-- UMUM / LAINNYA --}}
-            <template x-if="category === '' || category === 'Lainnya'">
+            <template x-if="category === 'Lainnya'">
                 <div class="flex flex-col gap-5">
                     <x-pengajuan.field label="Judul Kegiatan" required hint="Tuliskan nama kegiatan secara singkat dan jelas." name="title">
-                        <input name="title" value="{{ old('title') }}" class="{{ $input }}" placeholder="Masukkan judul kegiatan">
+                        <input name="title" value="{{ $v('title') }}" class="{{ $input }}" placeholder="Masukkan judul kegiatan">
                     </x-pengajuan.field>
 
                     <div class="flex flex-col gap-5 md:flex-row">
                         <x-pengajuan.field class="flex-1" label="Penyelenggara / Instansi" required name="organizer">
-                            <input name="organizer" value="{{ old('organizer') }}" class="{{ $input }}" placeholder="Nama lembaga, organisasi, atau perusahaan">
+                            <input name="organizer" value="{{ $v('organizer') }}" class="{{ $input }}" placeholder="Nama lembaga, organisasi, atau perusahaan">
                         </x-pengajuan.field>
                         <x-pengajuan.field class="flex-1" label="Cakupan Kegiatan" required hint="Pilihan: Kampus, Regional, Nasional, Internasional." name="scope">
                             <div class="relative">
                                 <select name="scope" class="{{ $select }}">
                                     <option value="">Pilih...</option>
-                                    @foreach ($scopes as $o)<option @selected(old('scope') === $o)>{{ $o }}</option>@endforeach
+                                    @foreach ($scopes as $o)<option @selected($v('scope') === $o)>{{ $o }}</option>@endforeach
                                 </select>
                                 <i class="ti ti-chevron-down pointer-events-none absolute right-3 top-3 text-base"></i>
                             </div>
@@ -235,7 +244,7 @@
                         <div class="relative">
                             <select name="role" class="{{ $select }}">
                                 <option value="">Pilih...</option>
-                                @foreach ($roles as $o)<option @selected(old('role') === $o)>{{ $o }}</option>@endforeach
+                                @foreach ($roles as $o)<option @selected($v('role') === $o)>{{ $o }}</option>@endforeach
                             </select>
                             <i class="ti ti-chevron-down pointer-events-none absolute right-3 top-3 text-base"></i>
                         </div>
@@ -244,11 +253,11 @@
                     @include('pengajuan.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Tim'])
 
                     <x-pengajuan.field label="Tautan Informasi Kegiatan" optional hint="Tautan situs resmi, poster, atau halaman pendaftaran." name="info_url">
-                        <input name="info_url" value="{{ old('info_url') }}" class="{{ $input }}" placeholder="https://...">
+                        <input name="info_url" value="{{ $v('info_url') }}" class="{{ $input }}" placeholder="https://...">
                     </x-pengajuan.field>
 
                     <x-pengajuan.field label="Dosen Pembimbing / Pendamping" optional name="advisor">
-                        <input name="advisor" value="{{ old('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pendamping">
+                        <input name="advisor" value="{{ $v('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pendamping">
                     </x-pengajuan.field>
                 </div>
             </template>
@@ -258,7 +267,7 @@
                 <label class="text-[13px] font-semibold leading-5 text-[#374151]">
                     <span x-text="locLabels[category || 'Lainnya']"></span> <span class="text-[#FF3F3F]">*</span>
                 </label>
-                <input name="location" value="{{ old('location') }}" class="{{ $input }}"
+                <input name="location" value="{{ $v('location') }}" class="{{ $input }}"
                        x-bind:placeholder="category === 'Magang' ? 'Kota atau alamat penempatan magang' : 'Nama tempat, kota, atau platform daring'">
                 <p class="text-xs leading-[18px] text-[#6B7280]">Tuliskan nama tempat, kota, atau platform daring tempat kegiatan berlangsung.</p>
                 @error('location')<p class="text-xs text-[#FF3F3F]">{{ $message }}</p>@enderror
@@ -266,15 +275,15 @@
 
             <div class="flex flex-col gap-5 md:flex-row">
                 <x-pengajuan.field class="flex-1" label="Tanggal Mulai" required hint="Pilih tanggal mulai pelaksanaan kegiatan." name="start_date">
-                    <input type="date" name="start_date" value="{{ old('start_date') }}" class="{{ $input }}">
+                    <input type="date" name="start_date" value="{{ $v('start_date') }}" class="{{ $input }}">
                 </x-pengajuan.field>
                 <x-pengajuan.field class="flex-1" label="Tanggal Selesai" required hint="Pilih tanggal selesai pelaksanaan kegiatan." name="end_date">
-                    <input type="date" name="end_date" value="{{ old('end_date') }}" class="{{ $input }}">
+                    <input type="date" name="end_date" value="{{ $v('end_date') }}" class="{{ $input }}">
                 </x-pengajuan.field>
             </div>
 
             <x-pengajuan.field label="Deskripsi Singkat" required hint="Jelaskan secara singkat tujuan dan manfaat kegiatan." name="description">
-                <textarea name="description" maxlength="1000" placeholder="Tuliskan deskripsi kegiatan" class="h-24 w-full resize-none rounded-lg border border-[#E5E7EB] bg-white p-2 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#2277FF]">{{ old('description') }}</textarea>
+                <textarea name="description" maxlength="1000" placeholder="Tuliskan deskripsi kegiatan" class="h-24 w-full resize-none rounded-lg border border-[#E5E7EB] bg-white p-2 text-sm outline-none placeholder:text-[#9CA3AF] focus:border-[#2277FF]">{{ $v('description') }}</textarea>
             </x-pengajuan.field>
 
             {{-- LAMPIRAN --}}
@@ -292,7 +301,10 @@
                 </label>
 
                 <template x-for="f in uploads.filter(u => u.status === 'done')" :key="f.id">
-                    <input type="hidden" name="documents[]" :value="f.path">
+                    <span class="hidden">
+                        <input type="hidden" name="documents[]" :value="f.path">
+                        <input type="hidden" name="document_names[]" :value="f.name">
+                    </span>
                 </template>
 
                 <div class="flex flex-col gap-2">
@@ -325,16 +337,17 @@
                 @error('documents')<p class="text-xs text-[#FF3F3F]">{{ $message }}</p>@enderror
                 @error('documents.*')<p class="text-xs text-[#FF3F3F]">{{ $message }}</p>@enderror
             </div>
+            </div>
         </div>
 
         <div class="flex flex-wrap items-center justify-end gap-2 border-t border-[#E5E7EB] px-5 py-5 sm:px-7">
             <p class="min-w-[200px] flex-1 text-xs leading-[18px]"
                :class="ok ? 'text-[#6B7280]' : 'text-[#B45309]'"
-               x-text="ok ? 'Semua isian wajib sudah lengkap. Periksa kembali data sebelum mengirim.' : (uploads.some(u => u.status === 'uploading') ? 'Menunggu berkas selesai diunggah...' : 'Lengkapi semua isian wajib (*) dan unggah minimal satu dokumen untuk mengirim.')"></p>
-            <a href="{{ route('pengajuan.index') }}" class="flex h-10 items-center rounded-lg border border-[#E5E7EB] bg-white px-5 text-[13px] font-semibold text-[#374151]">Batal</a>
+               x-text="ok ? 'Semua isian wajib sudah lengkap. Periksa kembali data sebelum menyimpan.' : (uploads.some(u => u.status === 'uploading') ? 'Menunggu berkas selesai diunggah...' : 'Lengkapi semua isian wajib (*) dan unggah minimal satu dokumen.')"></p>
+            <a href="{{ $cancelUrl }}" class="flex h-10 items-center rounded-lg border border-[#E5E7EB] bg-white px-5 text-[13px] font-semibold text-[#374151]">Batal</a>
             <button type="submit" :disabled="!ok || submitting"
                     class="flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-5 text-[13px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50">
-                <span x-text="submitting ? 'Mengirim...' : 'Kirim Pengajuan'"></span>
+                <span x-text="submitting ? 'Menyimpan...' : '{{ $item ? 'Simpan Perubahan' : 'Kirim Pengajuan' }}'"></span>
                 <i class="ti text-xs" :class="submitting ? 'ti-loader-2 animate-spin' : 'ti-arrow-right'"></i>
             </button>
         </div>

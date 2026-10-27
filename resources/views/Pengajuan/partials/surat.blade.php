@@ -89,8 +89,8 @@
             <div class="w-[300px]">
                 <div>Semarang, {{ $tgl->translatedFormat('d F Y') }}</div>
                 <div class="mt-1">POLITEKNIK NEGERI SEMARANG</div>
-                <div>Ketua Program Studi</div>
                 <div>Jurusan Teknik Elektro,</div>
+                <div>Ketua Program Studi</div>
                 <div>Teknologi Rekaysa Komputer,</div>
                 <div class="my-3 flex size-24 items-center justify-center border border-dashed border-black/50 text-[11px] text-black/50">QR / TTD</div>
                 <div>Kuwat Santoso, S.T., M.Kom.</div>

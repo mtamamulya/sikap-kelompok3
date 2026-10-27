@@ -9,4 +9,6 @@ Route::post('/pengajuan/upload', [PengajuanController::class, 'upload'])->name('
 Route::delete('/pengajuan/upload', [PengajuanController::class, 'removeUpload'])->name('pengajuan.upload.remove');
 Route::post('/pengajuan', [PengajuanController::class, 'store'])->name('pengajuan.store');
 Route::get('/pengajuan/{id}', [PengajuanController::class, 'show'])->whereNumber('id')->name('pengajuan.show');
+Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->whereNumber('id')->name('pengajuan.edit');
+Route::put('/pengajuan/{id}', [PengajuanController::class, 'update'])->whereNumber('id')->name('pengajuan.update');
 Route::view('/pengajuan-segera', 'pengajuan.segera')->name('pengajuan-segera');

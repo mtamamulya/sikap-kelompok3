@@ -5,9 +5,10 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-<<<<<<< HEAD
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-brand: #1f66e5;
+    --color-page: #f5f5f6;
 }
 
 html {
@@ -18,9 +19,6 @@ input, select, textarea, button {
     font-family: inherit;
 }
 
-[x-cloak] { display: none !important; }
-=======
-/* sembunyikan elemen Alpine (x-cloak) sampai Alpine siap */
 [x-cloak] {
     display: none !important;
 }
@@ -30,10 +28,3 @@ input, select, textarea, button {
     main h1.text-4xl { font-size: 1.875rem; line-height: 2.25rem; }
     main p.text-2xl  { font-size: 1.125rem; line-height: 1.75rem; }
 }
-
-@theme {
-    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --color-brand: #1f66e5;
-    --color-page: #f5f5f6;
-}
->>>>>>> origin/develop

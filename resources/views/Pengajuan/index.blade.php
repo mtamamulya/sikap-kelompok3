@@ -3,6 +3,7 @@
 @section('content')
 @php
     $styles = [
+        'Diajukan' => ['badge' => 'bg-[#DBEAFE] text-[#1D4ED8]', 'note' => 'Pengajuan telah dikirim dan menunggu ditinjau.'],
         'Disetujui' => ['badge' => 'bg-[#ECFDF5] text-[#047857]', 'note' => 'Pengajuan telah disetujui oleh tim administrasi.'],
         'Direview' => ['badge' => 'bg-[#FFE1A0] text-[#B96300]', 'note' => 'Pengajuan sedang direview oleh tim administrasi.'],
         'Selesai' => ['badge' => 'bg-[#F3F4F6] text-[#6B7280]', 'note' => 'Pengajuan telah selesai diproses.'],
@@ -10,10 +11,10 @@
         'Perlu revisi' => ['badge' => 'bg-[#FFEDD5] text-[#B45309]', 'note' => 'Pengajuan perlu diperbaiki sebelum diproses.'],
     ];
     $cards = [
-        ['TOTAL PENGAJUAN', $all->count(), 'bg-[#2277FF] text-white', 'text-[#DBEAFE]'],
-        ['DISETUJUI', $counts['Disetujui'] ?? 0, 'bg-[#E6F3D3] text-[#111827]', ''],
-        ['DIREVIEW', $counts['Direview'] ?? 0, 'bg-[#FF9B29] text-[#111827]', ''],
-        ['SELESAI', $counts['Selesai'] ?? 0, 'bg-[#F3F4F6] text-[#111827]', 'text-[#4B5563]'],
+        ['TOTAL PENGAJUAN', $all->count(), 'bg-[#2277FF]'],
+        ['DISETUJUI', $counts['Disetujui'] ?? 0, 'bg-[#8BC34A]'],
+        ['DIREVIEW', ($counts['Direview'] ?? 0) + ($counts['Diajukan'] ?? 0), 'bg-[#FF9B29]'],
+        ['SELESAI', $counts['Selesai'] ?? 0, 'bg-[#9CA3AF]'],
     ];
     $guide = [
         'Pastikan semua dokumen pendukung sudah lengkap.',
@@ -28,20 +29,38 @@
     $btn = 'flex h-9 items-center justify-center gap-1.5 rounded-lg border border-[#E5E7EB] px-3 text-[13px]';
     $dateInput = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13px] outline-none focus:border-[#2277FF]';
 @endphp
-<div class="flex flex-col gap-8 px-4 py-8 sm:px-6 lg:px-12">
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        @foreach ($cards as [$label, $value, $cls, $lc])
-            <div class="flex flex-col gap-1 rounded-2xl border border-[#E5E7EB] p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] {{ $cls }}">
-                <div class="text-sm font-semibold sm:text-base {{ $lc }}">{{ $label }}</div>
-                <div class="text-[32px] font-bold">{{ $value }}</div>
+<div class="flex flex-col gap-6 px-3 py-5 sm:px-5 sm:py-6 lg:px-8 lg:py-7">
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        @foreach ($cards as [$label, $value, $accent])
+            <div
+                x-data="{
+                    rotateX: 0,
+                    rotateY: 0,
+                    hovered: false,
+                    tilt(event) {
+                        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                        const bounds = this.$el.getBoundingClientRect();
+                        this.rotateX = ((event.clientY - bounds.top) / bounds.height - 0.5) * -10;
+                        this.rotateY = ((event.clientX - bounds.left) / bounds.width - 0.5) * 10;
+                    }
+                }"
+                @mousemove="tilt($event)"
+                @mouseenter="hovered = true"
+                @mouseleave="hovered = false; rotateX = 0; rotateY = 0"
+                :style="`transform: perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${hovered ? '-4px' : '0'})`"
+                class="relative flex flex-col gap-0 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-2 pl-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_14px_28px_rgba(0,0,0,0.14)] motion-reduce:transition-none lg:min-h-[108px] lg:justify-center lg:gap-1 lg:p-5 lg:pl-6"
+            >
+                <span aria-hidden="true" class="absolute inset-y-0 left-0 w-2 {{ $accent }}"></span>
+                <div class="text-xs font-semibold text-[#4B5563] lg:text-base">{{ $label }}</div>
+                <div class="text-[28px] font-bold leading-8 text-[#111827] lg:text-4xl lg:leading-10">{{ $value }}</div>
             </div>
         @endforeach
     </div>
 
-    <div class="flex flex-col gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+    <div class="flex flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] lg:p-4">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="text-xl font-bold">Daftar pengajuan</h2>
-            <a href="{{ route('pengajuan.create') }}" class="rounded-lg bg-[#EFF6FF] px-4 py-2.5 text-sm font-semibold text-[#2563EB]">Tambah pengajuan</a>
+            <h2 class="text-lg font-bold lg:text-xl">Daftar pengajuan</h2>
+            <a href="{{ route('pengajuan.create') }}" class="rounded-lg bg-[#EFF6FF] px-3.5 py-2 text-sm font-semibold text-[#2563EB] lg:px-4 lg:py-2.5">Tambah pengajuan</a>
         </div>
 
         <form method="GET" action="{{ route('pengajuan.index') }}" class="flex flex-wrap items-end gap-4 xl:flex-nowrap">
@@ -112,7 +131,36 @@
         </form>
 
         <div class="flex flex-col gap-5">
-            <div class="overflow-x-auto rounded-xl border border-[#E5E7EB]">
+            <div class="flex flex-col gap-3 lg:hidden">
+                @forelse ($rows as $r)
+                    @php $st = $styles[$r['status']] ?? $styles['Direview']; @endphp
+                    <article class="rounded-xl border border-[#E5E7EB] bg-white p-3">
+                        <div class="flex items-start gap-3">
+                            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2563EB]">{{ $rows->firstItem() + $loop->index }}</span>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="break-words text-[13px] font-semibold">{{ $r['title'] }}</h3>
+                                <p class="mt-0.5 text-xs text-[#6B7280]">{{ $r['category'] }} <span aria-hidden="true">·</span> {{ $r['submitted_at']->copy()->locale('id')->translatedFormat('d M Y') }}</p>
+                                <span class="mt-2 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold {{ $st['badge'] }}">{{ $r['status'] }}</span>
+                                <p class="mt-1 text-xs leading-5 text-[#6B7280]">{{ $st['note'] }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-center justify-end gap-3 border-t border-[#E5E7EB] pt-2">
+                            @if ($r['editable'])
+                                <a href="{{ route('pengajuan.edit', $r['id']) }}" class="flex h-8 items-center gap-1.5 rounded-lg bg-[#EFF6FF] px-2.5 text-xs font-semibold text-[#2563EB]">
+                                    <i class="ti ti-pencil"></i>Edit
+                                </a>
+                            @endif
+                            <a href="{{ route('pengajuan.show', $r['id']) }}" class="flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-[#2563EB]">
+                                Lihat detail<i class="ti ti-chevron-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                @empty
+                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-8 text-center text-sm text-[#6B7280]">Tidak ada pengajuan.</div>
+                @endforelse
+            </div>
+
+            <div class="hidden overflow-x-auto rounded-xl border border-[#E5E7EB] lg:block">
                 <div class="min-w-[860px]">
                     <div class="grid grid-cols-[1fr_115px_235px_156px] gap-4 bg-[#F9FAFB] px-4 py-1 text-sm font-semibold text-[#6B7280]">
                         <div>Nama pengajuan / jenis dokumen</div>
@@ -122,20 +170,33 @@
                     </div>
                     @forelse ($rows as $r)
                         @php $st = $styles[$r['status']] ?? $styles['Direview']; @endphp
-                        <div class="grid min-h-20 grid-cols-[1fr_115px_235px_156px] items-center gap-4 border-b border-[#E5E7EB] px-4 py-1">
+                        <div class="grid min-h-16 grid-cols-[1fr_105px_215px_140px] items-center gap-3 border-b border-[#E5E7EB] px-3 py-1">
                             <div class="flex items-center gap-3">
-                                <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-[13px] font-bold text-[#2563EB]">{{ $rows->firstItem() + $loop->index }}</div>
+                                <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2563EB]">{{ $rows->firstItem() + $loop->index }}</div>
                                 <div class="flex flex-col gap-[5px]">
-                                    <div class="text-sm font-semibold">{{ $r['title'] }}</div>
-                                    <div class="text-[13px] text-[#6B7280]">{{ $r['category'] }}</div>
+                                    <div class="text-[13px] font-semibold">{{ $r['title'] }}</div>
+                                    <div class="text-xs text-[#6B7280]">{{ $r['category'] }}</div>
                                 </div>
                             </div>
-                            <div class="text-[13px] text-[#6B7280]">{{ $r['submitted_at']->copy()->locale('id')->translatedFormat('d M Y') }}</div>
+                            <div class="text-xs text-[#6B7280]">{{ $r['submitted_at']->copy()->locale('id')->translatedFormat('d M Y') }}</div>
                             <div class="flex flex-col items-start gap-[5px]">
-                                <span class="rounded-full px-2.5 py-1.5 text-xs font-semibold {{ $st['badge'] }}">{{ $r['status'] }}</span>
-                                <span class="text-[13px] text-[#6B7280]">{{ $st['note'] }}</span>
+                                <span class="rounded-full px-2.5 py-1 text-[11px] font-semibold {{ $st['badge'] }}">{{ $r['status'] }}</span>
+                                <span class="text-xs text-[#6B7280]">{{ $st['note'] }}</span>
                             </div>
-                            <a href="{{ route('pengajuan.show', $r['id']) }}" class="text-right text-[13px] font-semibold text-[#2563EB]">Lihat detail</a>
+                            <div class="flex items-center justify-end gap-3">
+                                @if ($r['editable'])
+                                    <a href="{{ route('pengajuan.edit', $r['id']) }}" title="Edit pengajuan" aria-label="Edit pengajuan"
+                                       class="flex size-7 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB] transition hover:bg-[#DBEAFE]">
+                                        <i class="ti ti-pencil text-base"></i>
+                                    </a>
+                                @else
+                                    <span title="Pengajuan dengan status {{ $r['status'] }} tidak dapat diedit" aria-disabled="true"
+                                          class="flex size-7 cursor-not-allowed items-center justify-center rounded-lg bg-[#F3F4F6] text-[#9CA3AF]">
+                                        <i class="ti ti-pencil text-base"></i>
+                                    </span>
+                                @endif
+                                <a href="{{ route('pengajuan.show', $r['id']) }}" class="text-xs font-semibold text-[#2563EB]">Lihat detail</a>
+                            </div>
                         </div>
                     @empty
                         <div class="p-8 text-center text-sm text-[#6B7280]">Tidak ada pengajuan.</div>
@@ -143,8 +204,8 @@
                 </div>
             </div>
 
-            <div class="rounded-xl border border-[#E5E7EB] bg-white p-4">
-                <div class="mb-4 text-base font-bold">Panduan Pengajuan</div>
+            <div class="rounded-xl border border-[#E5E7EB] bg-white p-3">
+                <div class="mb-3 text-sm font-bold">Panduan Pengajuan</div>
                 <div class="flex flex-col gap-3">
                     @foreach ($guide as $g)
                         <div class="flex items-start gap-2 text-[13px] text-[#4B5563]">
