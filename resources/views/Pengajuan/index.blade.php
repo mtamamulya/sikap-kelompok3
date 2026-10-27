@@ -136,7 +136,7 @@
                     @php $st = $styles[$r['status']] ?? $styles['Direview']; @endphp
                     <article class="rounded-xl border border-[#E5E7EB] bg-white p-3">
                         <div class="flex items-start gap-3">
-                            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2563EB]">{{ $rows->firstItem() + $loop->index }}</span>
+                            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs fo                            .\vendor\bin\pint --testnt-bold text-[#2563EB]">{{ $rows->firstItem() + $loop->index }}</span>
                             <div class="min-w-0 flex-1">
                                 <h3 class="break-words text-[13px] font-semibold">{{ $r['title'] }}</h3>
                                 <p class="mt-0.5 text-xs text-[#6B7280]">{{ $r['category'] }} <span aria-hidden="true">·</span> {{ $r['submitted_at']->copy()->locale('id')->translatedFormat('d M Y') }}</p>
