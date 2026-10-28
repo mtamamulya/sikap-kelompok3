@@ -1,10 +1,8 @@
 import './bootstrap';
-import { initializeDashboardSort } from './dashboard-sort';
-import { initializeTableSort } from './table-sort';
+import { initializeDosenTables } from './dosen-tables';
 
 function initializeSorting() {
-    initializeDashboardSort();
-    initializeTableSort();
+    initializeDosenTables();
 }
 
 if (document.readyState === 'loading') {
