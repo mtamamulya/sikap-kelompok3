@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\MahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect halaman utama langsung ke dashboard
@@ -8,8 +7,13 @@ Route::redirect('/', '/dashboard');
 
 // --- Halaman Utama (Langsung memanggil file di root folder resources/views) ---
 Route::view('/dashboard', 'dashboard')->name('dashboard');
+<<<<<<< HEAD
 Route::view('/kegiatan', 'kegiatan')->name('kegiatan.index');
 Route::view('/profil', 'profil')->name('profil');
+=======
+// Verifikasi kegiatan (tombol mata di Dashboard). Angka = id kegiatan.
+Route::view('/verifikasi/{id}', 'verifikasi.show')->whereNumber('id')->name('verifikasi.show');
+>>>>>>> de7ce8142a7cef2d03c1a04b8f5470b1c127f847
 
 // Alias pendukung agar tidak error nama route di komponen sidebar lain
 Route::view('/kegiatan-page', 'kegiatan')->name('kegiatan');
@@ -44,7 +48,10 @@ Route::view('/kegiatan/{id}/edit', 'Kegiatan.edit')->whereNumber('id')->name('ke
 
 // --- Pengajuan ---
 Route::view('/pengajuan/dosen', 'pengajuan.dosen')->name('pengajuan.dosen');
+// Detail pengajuan dosen (angka = id pengajuan). Halaman yang sama dengan detail pengajuan, tombol Kembali ke daftar Dosen.
+Route::view('/pengajuan/dosen/{id}', 'pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('pengajuan.dosen.show');
 Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
+<<<<<<< HEAD
 
 // --- Mahasiswa Controller ---
 Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
@@ -62,3 +69,9 @@ Route::put('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prest
 // --- Auth Dummy ---
 Route::post('/logout', fn () => redirect()->route('profil'))->name('logout');
 Route::post('/password/otp', fn () => back())->name('password.otp.send');
+=======
+// Detail pengajuan mahasiswa (angka = id pengajuan)
+Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
+// Tinjau / detail pengajuan (angka = id pengajuan)
+Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
+>>>>>>> de7ce8142a7cef2d03c1a04b8f5470b1c127f847

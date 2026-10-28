@@ -69,7 +69,7 @@
     {{-- Judul halaman + tombol --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-4xl font-bold tracking-tight">Profil</h1>
+            <h1 class="text-3xl font-bold tracking-tight">Profil</h1>
             <p class="text-2xl text-gray-400">Dashboard / Profil</p>
         </div>
         <div class="mt-2 flex items-center gap-3">
@@ -158,22 +158,28 @@
 
     {{-- Aktivitas dosen: tab berpindah dengan Alpine.js --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-5 shadow-sm"
-             x-data="{ tab: 'Penelitian', data: @js($aktivitas) }">
+            x-data="{ tab: 'Penelitian', data: @js($aktivitas) }">
         <h2 class="text-2xl font-medium">Aktivitas Dosen</h2>
 
-        <div role="tablist" aria-label="Jenis aktivitas" class="flex flex-wrap gap-x-2 border-b border-gray-200">
-            @foreach (array_keys($aktivitas) as $nama)
-                <button type="button" role="tab" id="tab-{{ $nama }}"
-                        x-on:click="tab = '{{ $nama }}'"
-                        :aria-selected="tab === '{{ $nama }}'"
-                        :class="tab === '{{ $nama }}' ? 'border-brand text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-700'"
-                        class="-mb-px flex cursor-pointer items-center gap-2 border-b-2 px-3 py-2.5 text-sm">
-                    {{ $nama }}
-                    <span x-show="tab === '{{ $nama }}'" x-cloak
-                          class="flex size-5 items-center justify-center rounded-full bg-brand text-xs text-white"
-                          x-text="data['{{ $nama }}'].length"></span>
-                </button>
-            @endforeach
+        <!-- Container Tab dengan Scroll Horizontal -->
+        <div class="w-full border-b border-gray-200">
+            <div role="tablist" aria-label="Jenis aktivitas" 
+                class="flex overflow-x-auto whitespace-nowrap gap-4 no-scrollbar">
+                @foreach (array_keys($aktivitas) as $nama)
+                    <button type="button" role="tab" id="tab-{{ $nama }}"
+                            x-on:click="tab = '{{ $nama }}'"
+                            :aria-selected="tab === '{{ $nama }}'"
+                            :class="tab === '{{ $nama }}' ? 'border-brand text-gray-900 font-medium' : 'border-transparent text-gray-400 hover:text-gray-700'"
+                            class="-mb-px flex shrink-0 cursor-pointer items-center gap-2 border-b-2 pb-3 pt-1 text-sm transition-colors">
+                        <span>{{ $nama }}</span>
+                        
+                        {{-- Badge Angka --}}
+                        <span x-show="tab === '{{ $nama }}'" x-cloak
+                            class="flex size-5 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white"
+                            x-text="data['{{ $nama }}'].length"></span>
+                    </button>
+                @endforeach
+            </div>
         </div>
 
         <ul role="tabpanel" :aria-labelledby="`tab-${tab}`" class="flex flex-col">
