@@ -9,6 +9,9 @@
 
     $navItem = 'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-white/10';
     $navIcon = 'size-5 shrink-0';
+    
+    // Cek apakah sedang berada di halaman Dashboard
+    $isDashboard = request()->is('/') || request()->is('dashboard*');
 @endphp
 
 {{-- ================= SIDEBAR (ASIDE) ================= --}}
@@ -16,7 +19,7 @@
 
     <!-- Logo & Brand Header -->
     <a href="{{ url('/') }}" class="flex items-center gap-2.5 px-2">
-        <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0" onerror="this.src='https://api.builder.io/api/v1/image/assets/TEMP/89ec6d5eff0263da1bc98643370f3576302d902a?width=92'">
+        <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0" onerror="this.onerror=null; this.src='https://api.builder.io/api/v1/image/assets/TEMP/89ec6d5eff0263da1bc98643370f3576302d902a?width=92';">
         <span class="text-[13px] font-bold leading-[1.3] text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
     </a>
 
@@ -24,8 +27,8 @@
     <nav class="flex flex-col gap-1.5 text-[15px] text-white">
         
         <!-- Dashboard -->
-        <a href="{{ url('/') }}" 
-           class="{{ $navItem }} {{ request()->is('/') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
+        <a href="{{ url('/dashboard') }}" 
+           class="{{ $navItem }} {{ $isDashboard ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
             <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h6v6h-6z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6h-6z"/><path d="M14 14h6v6h-6z"/>
             </svg>
@@ -72,7 +75,6 @@
                 @endforeach
             </div>
         </div>
-        {{-- ===== Akhir Grup Mahasiswa ===== --}}
 
         <!-- Kegiatan -->
         <a href="{{ url('/kegiatan') }}" 

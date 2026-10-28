@@ -11,6 +11,25 @@
         <!-- Layer Animasi Warna Biru (Meluncur Masuk dari Kiri, Keluar ke Kiri) -->
         <div class="pointer-events-none absolute inset-0 z-0 bg-gradient-to-r from-[#2277FF] to-[#1D4ED8] opacity-0 transition-all duration-500 ease-in-out [transform-origin:left_center] scale-x-0 group-hover:scale-x-100 group-hover:opacity-100"></div>
 
+<<<<<<< HEAD
+        <div class="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <!-- Informasi Utama Profil -->
+            <div class="flex items-center gap-6">
+                <!-- Avatar Profil dengan Auto-Sync -->
+                <div class="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#DCE7FB] text-3xl font-bold text-[#00235C] shadow-sm border-2 border-white transition-colors duration-500 group-hover:border-white/20"
+                     x-data="{ dashAvatar: localStorage.getItem('user_avatar') || null }"
+                     x-init="
+                        window.addEventListener('avatar-updated', (e) => dashAvatar = e.detail);
+                        window.addEventListener('storage', () => dashAvatar = localStorage.getItem('user_avatar'));
+                     ">
+                    <template x-if="dashAvatar">
+                        <img :src="dashAvatar" class="absolute inset-0 z-10 h-full w-full object-cover">
+                    </template>
+                    <template x-if="!dashAvatar">
+                        <span>A</span>
+                    </template>
+                </div>
+=======
 @php
     // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
     $stats = [
@@ -19,6 +38,7 @@
         ['label' => 'Pengabdian',          'value' => 32, 'aria' => 'Buka pengabdian',                   'alert' => false],
         ['label' => 'Menunggu Verifikasi', 'value' => 24, 'aria' => 'Buka kegiatan menunggu verifikasi', 'alert' => true],
     ];
+>>>>>>> de7ce8142a7cef2d03c1a04b8f5470b1c127f847
 
     $perTahun = ['2022' => 8, '2023' => 17, '2024' => 9, '2025' => 20, '2026' => 14, '2027' => 16, '2028' => 7];
     $max   = 20;
@@ -39,6 +59,28 @@
         <p class="text-2xl text-gray-400">Ringkasan kegiatan Anda</p>
     </div>
 
+<<<<<<< HEAD
+    <!-- Grid 3 Card Ringkasan Statistik (Style Seperti di Halaman Kegiatan) -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <!-- Card 1: Total Pengajuan -->
+        <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#D1D5DB]">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#2563EB] transition-all duration-300 group-hover:w-2"></div>
+            <div class="flex items-center justify-between pl-2">
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider transition-colors duration-300 group-hover:text-[#111827]">TOTAL PENGAJUAN</span>
+                        <span class="rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10px] font-semibold text-[#2563EB]">Bulan ini</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-3xl font-bold text-[#111827] leading-none">12</span>
+                        <span class="text-[11px] font-medium text-[#9CA3AF]">Dokumen</span>
+                    </div>
+                </div>
+                <div class="flex size-11 items-center justify-center rounded-xl bg-[#EFF6FF] transition-transform duration-300 group-hover:scale-110">
+                    <svg class="size-5 text-[#2563EB] transition-transform duration-300 group-hover:rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+=======
     {{-- Kartu ringkasan --}}
     <div class="flex flex-wrap gap-6">
         @foreach ($stats as $s)
@@ -99,28 +141,52 @@
                             <span class="max-sm:hidden">{{ $tahun }}</span>
                         </div>
                     @endforeach
+>>>>>>> de7ce8142a7cef2d03c1a04b8f5470b1c127f847
                 </div>
-                <span class="text-3xl font-bold text-[#2277FF]">12</span>
             </div>
         </div>
 
-        <div class="flex items-center justify-between rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="text-[13px] font-semibold text-[#6B7280]">Total kegiatan</span>
-                    <span class="rounded-md bg-[#FEF3C7] px-2 py-0.5 text-[11px] font-semibold text-[#D97706]">3 kegiatan</span>
+        <!-- Card 2: Total Kegiatan -->
+        <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#D1D5DB]">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#F59E0B] transition-all duration-300 group-hover:w-2"></div>
+            <div class="flex items-center justify-between pl-2">
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider transition-colors duration-300 group-hover:text-[#111827]">TOTAL KEGIATAN</span>
+                        <span class="rounded-md bg-[#FFFBEB] px-2 py-0.5 text-[10px] font-semibold text-[#D97706]">3 kegiatan</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-3xl font-bold text-[#111827] leading-none">3</span>
+                        <span class="text-[11px] font-medium text-[#9CA3AF]">Kegiatan</span>
+                    </div>
                 </div>
-                <span class="text-3xl font-bold text-[#D97706]">3</span>
+                <div class="flex size-11 items-center justify-center rounded-xl bg-[#FFFBEB] transition-transform duration-300 group-hover:scale-110">
+                    <svg class="size-5 text-[#D97706] transition-transform duration-300 group-hover:rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center justify-between rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                    <span class="text-[13px] font-semibold text-[#6B7280]">Prestasi mahasiswa</span>
-                    <span class="rounded-md bg-[#ECFDF5] px-2 py-0.5 text-[11px] font-semibold text-[#059669]">Semester ini</span>
+        <!-- Card 3: Prestasi Mahasiswa -->
+        <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#D1D5DB]">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#10B981] transition-all duration-300 group-hover:w-2"></div>
+            <div class="flex items-center justify-between pl-2">
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider transition-colors duration-300 group-hover:text-[#111827]">PRESTASI MAHASISWA</span>
+                        <span class="rounded-md bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-semibold text-[#059669]">Semester ini</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-3xl font-bold text-[#111827] leading-none">2</span>
+                        <span class="text-[11px] font-medium text-[#9CA3AF]">Penghargaan</span>
+                    </div>
                 </div>
-                <span class="text-3xl font-bold text-[#059669]">2</span>
+                <div class="flex size-11 items-center justify-center rounded-xl bg-[#ECFDF5] transition-transform duration-300 group-hover:scale-110">
+                    <svg class="size-5 text-[#059669] transition-transform duration-300 group-hover:rotate-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
