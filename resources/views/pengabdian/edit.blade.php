@@ -25,7 +25,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-4xl font-bold tracking-tight">Edit Pengabdian</h1>
+        <h1 class="text-3xl font-bold tracking-tight">Edit Pengabdian</h1>
         <p class="text-2xl text-gray-400">Dashboard / Pengabdian / Edit Pengabdian</p>
     </div>
 

@@ -32,7 +32,7 @@
     {{-- Judul halaman + tombol tambah --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-4xl font-bold tracking-tight">Prestasi</h1>
+            <h1 class="text-3xl font-bold tracking-tight">Prestasi</h1>
             <p class="text-2xl text-gray-400">Dashboard / Prestasi</p>
         </div>
         <a href="{{ route('prestasi.create') }}" class="mt-2 flex h-11 items-center gap-2 rounded-md bg-brand px-4 text-base font-medium text-white hover:bg-blue-700">
@@ -54,7 +54,7 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-52">
+            <div class="relative w-full sm:w-46">
                 <label for="tingkat" class="sr-only">Filter tingkat prestasi</label>
                 <select id="tingkat" name="tingkat" class="{{ $selectClass }}">
                     <option value="">Tingkat Prestasi</option>

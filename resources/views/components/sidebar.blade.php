@@ -43,8 +43,8 @@
             'href'   => '#',
             'active' => request()->routeIs('pengajuan.*'),
             'children' => [
-                ['label' => 'Dosen',     'href' => route('pengajuan.dosen'),     'active' => request()->routeIs('pengajuan.dosen')],
-                ['label' => 'Mahasiswa', 'href' => route('pengajuan.mahasiswa'), 'active' => request()->routeIs('pengajuan.mahasiswa')],
+                ['label' => 'Dosen',     'href' => route('pengajuan.dosen'),     'active' => request()->routeIs('pengajuan.dosen*')],
+                ['label' => 'Mahasiswa', 'href' => route('pengajuan.mahasiswa'), 'active' => request()->routeIs('pengajuan.mahasiswa*')],
             ],
             'icon'   => '<path d="M13.0815 18.1953L17.4592 21.0095C18.1248 21.4373 19 20.9595 19 20.1683V7C19 4.79086 17.2091 3 15 3H9C6.79086 3 5 4.79086 5 7V20.1683C5 20.9595 5.87525 21.4373 6.54076 21.0095L10.9185 18.1953C11.5773 17.7717 12.4227 17.7717 13.0815 18.1953Z" stroke="currentColor" stroke-width="1.5"/><path d="M9 8.5H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
         ],
@@ -57,21 +57,34 @@
      meluncur dari kiri, dibuka lewat tombol menu di header ($menu / "menu" ada di layouts/app). --}}
 <nav id="menu-utama" aria-label="Menu utama"
      :data-open="menu ? 'true' : 'false'"
-     class="flex w-60 shrink-0 flex-col justify-between overflow-y-auto bg-white p-3
+     class="flex w-60 shrink-0 flex-col justify-between overflow-y-auto bg-linear-to-b from-brand from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% p-3 text-white
             max-lg:invisible max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-40 max-lg:w-64 max-lg:-translate-x-full max-lg:shadow-xl max-lg:transition-transform
             max-lg:data-[open=true]:visible max-lg:data-[open=true]:translate-x-0">
     <div class="flex flex-col gap-3">
-        {{-- Tombol tutup: hanya tampil di layar kecil --}}
-        <button type="button" x-on:click="menu = false" aria-label="Tutup menu"
-                class="-mb-1 flex size-10 cursor-pointer items-center justify-center self-end rounded-lg hover:bg-gray-100 lg:hidden">
-            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
-        </button>
+        {{-- Logo: klik untuk ke Dashboard. Taruh file logo di public/images/logo_trk.png.
+             Kalau file belum ada, tampil kotak "TI" sementara. Tombol tutup hanya tampil di layar kecil. --}}
+        <div class="flex items-center justify-between gap-2 px-1 pb-5">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" aria-label="Teknologi Rekayasa Komputer, ke Dashboard">
+                @if (file_exists(public_path('images/logo_trk.png')))
+                    <img src="{{ asset('images/logo_trk.png') }}" alt="" class="h-10 w-auto shrink-0">
+                @else
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-md bg-red-700 text-base font-bold text-white" aria-hidden="true">TI</span>
+                @endif
+                <span class="text-[13px] leading-[1.15] font-bold tracking-tight text-white uppercase">
+                    Teknologi<br>Rekayasa Komputer
+                </span>
+            </a>
+            <button type="button" x-on:click="menu = false" aria-label="Tutup menu"
+                    class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-lg hover:bg-white/15 lg:hidden">
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+            </button>
+        </div>
         @foreach ($menu as $item)
             @if (! empty($item['children']))
                 {{-- Menu dropdown (Pengajuan). Terbuka otomatis kalau salah satu anaknya sedang aktif. --}}
                 <details @if ($item['active']) open @endif>
-                    <summary class="{{ $linkBase }} cursor-pointer list-none select-none hover:bg-gray-100 [&::-webkit-details-marker]:hidden {{ $item['active'] ? 'font-medium' : '' }}">
-                        <svg class="size-[22px] shrink-0 {{ $item['active'] ? 'text-brand' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <summary class="{{ $linkBase }} cursor-pointer list-none select-none hover:bg-white/10 [&::-webkit-details-marker]:hidden {{ $item['active'] ? 'bg-white/15 font-semibold' : '' }}">
+                        <svg class="size-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             {!! $item['icon'] !!}
                         </svg>
                         <span class="flex-1">{{ $item['label'] }}</span>
@@ -83,7 +96,7 @@
                         @foreach ($item['children'] as $child)
                             <a href="{{ $child['href'] }}"
                                @if ($child['active']) aria-current="page" @endif
-                               class="flex h-10 items-center rounded-lg px-3.5 text-[15px] {{ $child['active'] ? 'bg-brand text-white' : 'text-gray-900 hover:bg-gray-100' }}">
+                               class="flex h-10 items-center rounded-lg px-3.5 text-[15px] {{ $child['active'] ? 'bg-white font-semibold text-brand shadow-sm' : 'text-white hover:bg-white/10' }}">
                                 {{ $child['label'] }}
                             </a>
                         @endforeach
@@ -92,7 +105,7 @@
             @else
                 <a href="{{ $item['href'] }}"
                    @if ($item['active']) aria-current="page" @endif
-                   class="{{ $linkBase }} {{ $item['active'] ? 'bg-brand text-white' : 'text-gray-900 hover:bg-gray-100' }}">
+                   class="{{ $linkBase }} {{ $item['active'] ? 'bg-white font-semibold text-brand shadow-sm' : 'text-white hover:bg-white/10' }}">
                     <svg class="size-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         {!! $item['icon'] !!}
                     </svg>
@@ -103,10 +116,10 @@
     </div>
 
     {{-- Keluar: nanti jadi form POST logout. Sekarang cukup tautan. --}}
-    <a href="#" class="{{ $linkBase }} text-gray-900 hover:bg-gray-100">
+    <!-- <a href="#" class="{{ $linkBase }} text-white hover:bg-white/10">
         <svg class="size-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2H9M14 8l4 4-4 4M18 12H9"/>
         </svg>
         Keluar
-    </a>
+    </a> -->
 </nav>
