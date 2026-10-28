@@ -81,7 +81,7 @@
 
         {{-- Tabel --}}
         <div class="overflow-x-auto rounded-md border border-gray-300">
-            <table class="w-full min-w-[900px] table-fixed border-collapse text-sm">
+            <table data-quick-sort class="w-full min-w-[900px] table-fixed border-collapse text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th scope="col" class="w-1/6 border-b border-gray-300 px-2 py-3 font-medium">Judul</th>

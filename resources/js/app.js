@@ -1,4 +1,17 @@
 import './bootstrap';
+import { initializeDashboardSort } from './dashboard-sort';
+import { initializeTableSort } from './table-sort';
+
+function initializeSorting() {
+    initializeDashboardSort();
+    initializeTableSort();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSorting, { once: true });
+} else {
+    initializeSorting();
+}
 
 const liveSearchTimers = new WeakMap();
 
