@@ -29,6 +29,12 @@ Route::view('/pengajaran/create', 'pengajaran.create')->name('pengajaran.create'
 Route::view('/pengajaran/{id}', 'pengajaran.show')->whereNumber('id')->name('pengajaran.show');
 Route::view('/pengajaran/{id}/edit', 'pengajaran.edit')->whereNumber('id')->name('pengajaran.edit');
 
+Route::view('/prestasi', 'prestasi.index')->name('prestasi.index');
+Route::view('/prestasi/create', 'prestasi.create')->name('prestasi.create');
+// Detail: harus di bawah /prestasi/create supaya "create" tidak dianggap sebagai {id}
+Route::view('/prestasi/{id}', 'prestasi.show')->whereNumber('id')->name('prestasi.show');
+Route::view('/prestasi/{id}/edit', 'prestasi.edit')->whereNumber('id')->name('prestasi.edit');
+
 Route::view('/kegiatan', 'kegiatan.index')->name('kegiatan.index');
 Route::view('/kegiatan/create', 'kegiatan.create')->name('kegiatan.create');
 // Detail: harus di bawah /kegiatan/create supaya "create" tidak dianggap sebagai {id}
