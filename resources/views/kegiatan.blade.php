@@ -72,30 +72,30 @@
     ];
 
     $page1 = [
-        ['id' => 1, 'name' => 'FKBSE 2025', 'type' => 'Pengabdian', 'date' => '12 Nov 2025', 'raw_date' => '2025-11-12', 'status' => 'done', 'note' => 'Terima kasih atas kontribusi anda.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Himpunan Mahasiswa TRK', 'file_name' => 'sertifikat-fkbse-2025.pdf', 'file_size' => '1.4 MB'],
-        ['id' => 2, 'name' => 'KMIPN VIII 2026', 'type' => 'Lomba', 'date' => '10 Sept 2026', 'raw_date' => '2026-09-10', 'status' => 'done', 'note' => 'Selamat atas pencapaiannya.', 'action' => 'Lihat detail', 'capaian' => 'Finalis', 'tingkat' => 'Nasional', 'penyelenggara' => 'Politeknik Negeri', 'file_name' => 'sertifikat-kmipn-viii-2026.pdf', 'file_size' => '2.1 MB'],
-        ['id' => 3, 'name' => 'IMAKEN Progress In Action 2026', 'type' => 'Volunteer', 'date' => '30 Nov 2026', 'raw_date' => '2026-11-30', 'status' => 'done', 'note' => 'Kegiatan telah selesai dilaksanakan.', 'action' => 'Lihat detail', 'capaian' => 'Panitia', 'tingkat' => 'Wilayah', 'penyelenggara' => 'IMAKEN', 'file_name' => 'sertifikat-imaken-2026.pdf', 'file_size' => '1.1 MB'],
-        ['id' => 4, 'name' => 'Google Singapura', 'type' => 'Kunjungan Industri', 'date' => '06 Mar 2027', 'raw_date' => '2027-03-06', 'status' => 'done', 'note' => 'Kunjungan industri telah diselesaikan.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Internasional', 'penyelenggara' => 'Google Asia Pacific', 'file_name' => 'sertifikat-google-singapura.pdf', 'file_size' => '3.0 MB'],
-        ['id' => 5, 'name' => 'KKL Schneider Electric', 'type' => 'Kuliah Kerja Lapangan', 'date' => '04 Agu 2027', 'raw_date' => '2027-08-04', 'status' => 'done', 'note' => 'Laporan KKL disetujui.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Schneider Electric Indonesia', 'file_name' => 'sertifikat-kkl-schneider.pdf', 'file_size' => '1.8 MB'],
-        ['id' => 6, 'name' => 'Amazon Web Service', 'type' => 'Magang', 'date' => '01 Sept 2027', 'raw_date' => '2027-09-01', 'status' => 'done', 'note' => 'Program magang selesai.', 'action' => 'Lihat detail', 'capaian' => 'Intern', 'tingkat' => 'Internasional', 'penyelenggara' => 'Amazon Web Services', 'file_name' => 'sertifikat-aws-internship.pdf', 'file_size' => '2.5 MB'],
+        ['id' => 1, 'name' => 'FKBSE 2025', 'type' => 'Pengabdian', 'date' => '12 Nov 2025', 'raw_date' => '2025-11-12', 'status' => 'done', 'note' => 'Terima kasih atas kontribusi anda.', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Himpunan Mahasiswa TRK', 'file_name' => 'sertifikat-fkbse-2025.pdf', 'file_size' => '1.4 MB'],
+        ['id' => 2, 'name' => 'KMIPN VIII 2026', 'type' => 'Lomba', 'date' => '10 Sept 2026', 'raw_date' => '2026-09-10', 'status' => 'done', 'note' => 'Selamat atas pencapaiannya.', 'capaian' => 'Finalis', 'tingkat' => 'Nasional', 'penyelenggara' => 'Politeknik Negeri', 'file_name' => 'sertifikat-kmipn-viii-2026.pdf', 'file_size' => '2.1 MB'],
+        ['id' => 3, 'name' => 'IMAKEN Progress In Action 2026', 'type' => 'Volunteer', 'date' => '30 Nov 2026', 'raw_date' => '2026-11-30', 'status' => 'done', 'note' => 'Kegiatan telah selesai dilaksanakan.', 'capaian' => 'Panitia', 'tingkat' => 'Wilayah', 'penyelenggara' => 'IMAKEN', 'file_name' => 'sertifikat-imaken-2026.pdf', 'file_size' => '1.1 MB'],
+        ['id' => 4, 'name' => 'Google Singapura', 'type' => 'Kunjungan Industri', 'date' => '06 Mar 2027', 'raw_date' => '2027-03-06', 'status' => 'done', 'note' => 'Kunjungan industri telah diselesaikan.', 'capaian' => 'Peserta', 'tingkat' => 'Internasional', 'penyelenggara' => 'Google Asia Pacific', 'file_name' => 'sertifikat-google-singapura.pdf', 'file_size' => '3.0 MB'],
+        ['id' => 5, 'name' => 'KKL Schneider Electric', 'type' => 'Kuliah Kerja Lapangan', 'date' => '04 Agu 2027', 'raw_date' => '2027-08-04', 'status' => 'done', 'note' => 'Laporan KKL disetujui.', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Schneider Electric Indonesia', 'file_name' => 'sertifikat-kkl-schneider.pdf', 'file_size' => '1.8 MB'],
+        ['id' => 6, 'name' => 'Amazon Web Service', 'type' => 'Magang', 'date' => '01 Sept 2027', 'raw_date' => '2027-09-01', 'status' => 'done', 'note' => 'Program magang selesai.', 'capaian' => 'Intern', 'tingkat' => 'Internasional', 'penyelenggara' => 'Amazon Web Services', 'file_name' => 'sertifikat-aws-internship.pdf', 'file_size' => '2.5 MB'],
     ];
 
     $page2 = [
-        ['id' => 7, 'name' => 'Hackathon Nasional 2025', 'type' => 'Lomba', 'date' => '15 Jan 2025', 'raw_date' => '2025-01-15', 'status' => 'done', 'note' => 'Juara 2 Kategori Software.', 'action' => 'Lihat detail', 'capaian' => 'Juara 2', 'tingkat' => 'Nasional', 'penyelenggara' => 'Kementerian Kominfo', 'file_name' => 'sertifikat-hackathon-2025.pdf', 'file_size' => '1.9 MB'],
-        ['id' => 8, 'name' => 'Workshop IoT & Embedded System', 'type' => 'Pelatihan', 'date' => '22 Feb 2025', 'raw_date' => '2025-02-22', 'status' => 'done', 'note' => 'Sertifikat kompetensi terbit.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Lab Embedded TRK', 'file_name' => 'sertifikat-workshop-iot.pdf', 'file_size' => '1.2 MB'],
-        ['id' => 9, 'name' => 'Studi Independen AI Micro-Credential', 'type' => 'Magang', 'date' => '10 Jun 2025', 'raw_date' => '2025-06-10', 'status' => 'done', 'note' => 'Selesai dengan nilai A.', 'action' => 'Lihat detail', 'capaian' => 'Lulus', 'tingkat' => 'Nasional', 'penyelenggara' => 'Kampus Merdeka x AI Center', 'file_name' => 'sertifikat-studi-independen-ai.pdf', 'file_size' => '2.8 MB'],
-        ['id' => 10, 'name' => 'Pengabdian Desa Digital Banyumanik', 'type' => 'Pengabdian', 'date' => '18 Agu 2025', 'raw_date' => '2025-08-18', 'status' => 'done', 'note' => 'Selesai dilaksanakan.', 'action' => 'Lihat detail', 'capaian' => 'Tim Pelaksana', 'tingkat' => 'Kabupaten/Kota', 'penyelenggara' => 'Jurusan Elektro Polines', 'file_name' => 'sertifikat-pengabdian-banyumanik.pdf', 'file_size' => '1.5 MB'],
-        ['id' => 11, 'name' => 'Seminar International TRK Tech', 'type' => 'Seminar', 'date' => '05 Okt 2025', 'raw_date' => '2025-10-05', 'status' => 'done', 'note' => 'Peserta Aktif.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Internasional', 'penyelenggara' => 'TRK Polines', 'file_name' => 'sertifikat-seminar-international.pdf', 'file_size' => '1.3 MB'],
-        ['id' => 12, 'name' => 'Lomba Karya Tulis Ilmiah 2025', 'type' => 'Penelitian', 'date' => '12 Des 2025', 'raw_date' => '2025-12-12', 'status' => 'done', 'note' => 'Finalis 10 Besar.', 'action' => 'Lihat detail', 'capaian' => 'Finalis', 'tingkat' => 'Nasional', 'penyelenggara' => 'Universitas Indonesia', 'file_name' => 'sertifikat-lkti-2025.pdf', 'file_size' => '1.7 MB'],
+        ['id' => 7, 'name' => 'Hackathon Nasional 2025', 'type' => 'Lomba', 'date' => '15 Jan 2025', 'raw_date' => '2025-01-15', 'status' => 'done', 'note' => 'Juara 2 Kategori Software.', 'capaian' => 'Juara 2', 'tingkat' => 'Nasional', 'penyelenggara' => 'Kementerian Kominfo', 'file_name' => 'sertifikat-hackathon-2025.pdf', 'file_size' => '1.9 MB'],
+        ['id' => 8, 'name' => 'Workshop IoT & Embedded System', 'type' => 'Pelatihan', 'date' => '22 Feb 2025', 'raw_date' => '2025-02-22', 'status' => 'done', 'note' => 'Sertifikat kompetensi terbit.', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Lab Embedded TRK', 'file_name' => 'sertifikat-workshop-iot.pdf', 'file_size' => '1.2 MB'],
+        ['id' => 9, 'name' => 'Studi Independen AI Micro-Credential', 'type' => 'Magang', 'date' => '10 Jun 2025', 'raw_date' => '2025-06-10', 'status' => 'done', 'note' => 'Selesai dengan nilai A.', 'capaian' => 'Lulus', 'tingkat' => 'Nasional', 'penyelenggara' => 'Kampus Merdeka x AI Center', 'file_name' => 'sertifikat-studi-independen-ai.pdf', 'file_size' => '2.8 MB'],
+        ['id' => 10, 'name' => 'Pengabdian Desa Digital Banyumanik', 'type' => 'Pengabdian', 'date' => '18 Agu 2025', 'raw_date' => '2025-08-18', 'status' => 'done', 'note' => 'Selesai dilaksanakan.', 'capaian' => 'Tim Pelaksana', 'tingkat' => 'Kabupaten/Kota', 'penyelenggara' => 'Jurusan Elektro Polines', 'file_name' => 'sertifikat-pengabdian-banyumanik.pdf', 'file_size' => '1.5 MB'],
+        ['id' => 11, 'name' => 'Seminar International TRK Tech', 'type' => 'Seminar', 'date' => '05 Okt 2025', 'raw_date' => '2025-10-05', 'status' => 'done', 'note' => 'Peserta Aktif.', 'capaian' => 'Peserta', 'tingkat' => 'Internasional', 'penyelenggara' => 'TRK Polines', 'file_name' => 'sertifikat-seminar-international.pdf', 'file_size' => '1.3 MB'],
+        ['id' => 12, 'name' => 'Lomba Karya Tulis Ilmiah 2025', 'type' => 'Penelitian', 'date' => '12 Des 2025', 'raw_date' => '2025-12-12', 'status' => 'done', 'note' => 'Finalis 10 Besar.', 'capaian' => 'Finalis', 'tingkat' => 'Nasional', 'penyelenggara' => 'Universitas Indonesia', 'file_name' => 'sertifikat-lkti-2025.pdf', 'file_size' => '1.7 MB'],
     ];
 
     $page3 = [
-        ['id' => 13, 'name' => 'Lomba CTF Cyber Security 2024', 'type' => 'Lomba', 'date' => '10 Mar 2024', 'raw_date' => '2024-03-10', 'status' => 'done', 'note' => 'Peringkat 5 Nasional.', 'action' => 'Lihat detail', 'capaian' => 'Peringkat 5', 'tingkat' => 'Nasional', 'penyelenggara' => 'BSSN', 'file_name' => 'sertifikat-ctf-2024.pdf', 'file_size' => '2.0 MB'],
-        ['id' => 14, 'name' => 'Pelatihan Cloud Architecture AWS', 'type' => 'Pelatihan', 'date' => '14 Mei 2024', 'raw_date' => '2024-05-14', 'status' => 'done', 'note' => 'Sertifikat AWS re:Start.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Internasional', 'penyelenggara' => 'AWS Educate', 'file_name' => 'sertifikat-aws-restart.pdf', 'file_size' => '1.6 MB'],
-        ['id' => 15, 'name' => 'Volunteer Mengajar AI Sekolah Dasar', 'type' => 'Volunteer', 'date' => '20 Jul 2024', 'raw_date' => '2024-07-20', 'status' => 'done', 'note' => 'Piagam Penghargaan.', 'action' => 'Lihat detail', 'capaian' => 'Relawan', 'tingkat' => 'Kabupaten/Kota', 'penyelenggara' => 'Komunitas AI Semarang', 'file_name' => 'sertifikat-volunteer-ai.pdf', 'file_size' => '1.1 MB'],
-        ['id' => 16, 'name' => 'Bootcamp Fullstack Web Developer', 'type' => 'Pelatihan', 'date' => '11 Sep 2024', 'raw_date' => '2024-09-11', 'status' => 'done', 'note' => 'Lulus Capstone Project.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Dicoding Indonesia', 'file_name' => 'sertifikat-fullstack-dev.pdf', 'file_size' => '2.2 MB'],
-        ['id' => 17, 'name' => 'Kunjungan Industri Telkomsel Digital', 'type' => 'Kunjungan Industri', 'date' => '02 Nov 2024', 'raw_date' => '2024-11-02', 'status' => 'done', 'note' => 'Selesai diikuti.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Telkomsel Smart Office', 'file_name' => 'sertifikat-telkomsel-visit.pdf', 'file_size' => '1.4 MB'],
-        ['id' => 18, 'name' => 'Kompetisi Robotics & Automation', 'type' => 'Lomba', 'date' => '18 Des 2024', 'raw_date' => '2024-12-18', 'status' => 'done', 'note' => 'Juara Harapan 1.', 'action' => 'Lihat detail', 'capaian' => 'Juara Harapan 1', 'tingkat' => 'Nasional', 'penyelenggara' => 'ITB Robotics Club', 'file_name' => 'sertifikat-robotics-2024.pdf', 'file_size' => '1.8 MB'],
+        ['id' => 13, 'name' => 'Lomba CTF Cyber Security 2024', 'type' => 'Lomba', 'date' => '10 Mar 2024', 'raw_date' => '2024-03-10', 'status' => 'done', 'note' => 'Peringkat 5 Nasional.', 'capaian' => 'Peringkat 5', 'tingkat' => 'Nasional', 'penyelenggara' => 'BSSN', 'file_name' => 'sertifikat-ctf-2024.pdf', 'file_size' => '2.0 MB'],
+        ['id' => 14, 'name' => 'Pelatihan Cloud Architecture AWS', 'type' => 'Pelatihan', 'date' => '14 Mei 2024', 'raw_date' => '2024-05-14', 'status' => 'done', 'note' => 'Sertifikat AWS re:Start.', 'capaian' => 'Peserta', 'tingkat' => 'Internasional', 'penyelenggara' => 'AWS Educate', 'file_name' => 'sertifikat-aws-restart.pdf', 'file_size' => '1.6 MB'],
+        ['id' => 15, 'name' => 'Volunteer Mengajar AI Sekolah Dasar', 'type' => 'Volunteer', 'date' => '20 Jul 2024', 'raw_date' => '2024-07-20', 'status' => 'done', 'note' => 'Piagam Penghargaan.', 'capaian' => 'Relawan', 'tingkat' => 'Kabupaten/Kota', 'penyelenggara' => 'Komunitas AI Semarang', 'file_name' => 'sertifikat-volunteer-ai.pdf', 'file_size' => '1.1 MB'],
+        ['id' => 16, 'name' => 'Bootcamp Fullstack Web Developer', 'type' => 'Pelatihan', 'date' => '11 Sep 2024', 'raw_date' => '2024-09-11', 'status' => 'done', 'note' => 'Lulus Capstone Project.', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Dicoding Indonesia', 'file_name' => 'sertifikat-fullstack-dev.pdf', 'file_size' => '2.2 MB'],
+        ['id' => 17, 'name' => 'Kunjungan Industri Telkomsel Digital', 'type' => 'Kunjungan Industri', 'date' => '02 Nov 2024', 'raw_date' => '2024-11-02', 'status' => 'done', 'note' => 'Selesai diikuti.', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Telkomsel Smart Office', 'file_name' => 'sertifikat-telkomsel-visit.pdf', 'file_size' => '1.4 MB'],
+        ['id' => 18, 'name' => 'Kompetisi Robotics & Automation', 'type' => 'Lomba', 'date' => '18 Des 2024', 'raw_date' => '2024-12-18', 'status' => 'done', 'note' => 'Juara Harapan 1.', 'capaian' => 'Juara Harapan 1', 'tingkat' => 'Nasional', 'penyelenggara' => 'ITB Robotics Club', 'file_name' => 'sertifikat-robotics-2024.pdf', 'file_size' => '1.8 MB'],
     ];
     
     $allActivities = array_merge($page1, $page2, $page3);
@@ -128,7 +128,7 @@
         @endforeach
     </div>
 
-    <!-- Grafik Kegiatan per Semester (Dengan Efek Hover Fokus & Zoom Card) -->
+    <!-- Grafik Kegiatan per Semester -->
     <section class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:scale-[1.01] hover:shadow-lg hover:border-[#D1D5DB]">
         <div class="flex flex-col gap-0.5">
             <h2 class="text-xl font-bold text-[#111827]">Kegiatan per semester</h2>
@@ -170,7 +170,6 @@
     <section class="flex flex-col gap-4 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div class="flex items-center justify-between">
             <h2 class="text-xl font-bold text-[#111827]">Daftar kegiatan</h2>
-            <!-- Button Lihat Semua / Batasi Tampilan -->
             <button @click="showAll = !showAll; page = 1" 
                     class="rounded-lg bg-[#EFF6FF] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-blue-100 transition">
                 <span x-text="showAll ? 'Batasi tampilan' : 'Lihat semua'"></span>
@@ -270,10 +269,10 @@
         <div class="overflow-x-auto rounded-xl border border-[#E5E7EB]">
             <div class="min-w-[760px]">
                 <div class="flex gap-4 bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#6B7280] uppercase tracking-wider border-b border-[#E5E7EB]">
-                    <div class="flex-1">Nama Kegiatan/Jenis Kegiatan</div>
+                    <div class="flex-1">NAMA KEGIATAN/JENIS KEGIATAN</div>
                     <div class="w-[115px]">TANGGAL</div>
                     <div class="w-[235px]">STATUS KEGIATAN</div>
-                    <div class="w-[195px] text-right">DOKUMENTASI/SERTIFIKAT</div>
+                    <div class="w-[120px] text-right">AKSI</div>
                 </div>
 
                 <div x-show="paginatedData.length === 0" x-cloak class="flex items-center justify-center p-8 text-sm text-[#6B7280]">
@@ -296,7 +295,7 @@
                             </span>
                             <span x-show="a.note" class="text-[11px] text-[#6B7280]" x-text="a.note"></span>
                         </div>
-                        <div class="w-[195px] flex justify-end">
+                        <div class="w-[120px] flex justify-end">
                             <button @click="openModal(a)" class="flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] hover:underline">
                                 <span>Lihat detail</span>
                                 <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -340,7 +339,7 @@
         </div>
     </section>
 
-    <!-- Modal Detail Bukti Prestasi -->
+    <!-- Modal Detail Kegiatan Kompak (Tanpa Space Kosong berlebih) -->
     <div x-show="isModalOpen" 
          x-cloak
          x-transition:enter="transition ease-out duration-300"
@@ -354,97 +353,161 @@
         <div @click.outside="closeModal()" 
              x-show="isModalOpen"
              x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0"
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             class="relative w-full max-w-4xl rounded-2xl bg-white p-6 shadow-2xl my-8">
+             x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+             class="relative w-full max-w-3xl rounded-2xl bg-[#F9FAFB] p-5 shadow-2xl my-4 max-h-[90vh] overflow-y-auto">
             
-            <div class="flex items-start justify-between border-b border-[#F3F4F6] pb-4">
-                <div>
-                    <span class="text-xs font-semibold text-[#6B7280]">Bukti prestasi</span>
-                    <h3 class="text-xl font-bold text-[#111827]" x-text="activeItem?.name"></h3>
-                </div>
-                <button @click="closeModal()" class="rounded-lg p-1 text-[#9CA3AF] hover:bg-gray-100 hover:text-[#111827] transition">
-                    <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <!-- Header Modal -->
+            <div class="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+                <button @click="closeModal()" class="flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] hover:underline">
+                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <span>Kembali ke daftar kegiatan</span>
                 </button>
+                <div class="flex items-center gap-2">
+                    <button @click="downloadFile(activeItem)" class="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-[#374151] hover:bg-gray-50 transition shadow-xs">
+                        <svg class="size-3.5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <span>Preview</span>
+                    </button>
+                    <button @click="downloadFile(activeItem)" class="flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition shadow-xs">
+                        <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Unduh</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-12">
-                <div class="lg:col-span-7 flex flex-col gap-3">
-                    <div class="flex items-center gap-2">
-                        <button @click="activeTab = 'sertifikat'" 
-                                :class="activeTab === 'sertifikat' ? 'bg-[#2563EB] text-white font-semibold' : 'bg-white text-[#6B7280] hover:bg-gray-100'"
-                                class="rounded-lg px-3.5 py-1.5 text-xs transition border border-[#E5E7EB]">
-                            Dokumen 1 • Sertifikat
-                        </button>
-                        <button @click="activeTab = 'foto'" 
-                                :class="activeTab === 'foto' ? 'bg-[#2563EB] text-white font-semibold' : 'bg-white text-[#6B7280] hover:bg-gray-100'"
-                                class="rounded-lg px-3.5 py-1.5 text-xs transition border border-[#E5E7EB]">
-                            Dokumen 2 • Foto kegiatan
-                        </button>
+            <!-- Banner Utama & Identitas -->
+            <div class="mt-3 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-xs">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-[#111827]" x-text="activeItem?.name"></h2>
+                        <p class="text-xs text-[#6B7280] mt-0.5">
+                            Dilaksanakan pada <span x-text="activeItem?.date"></span> • <span x-text="activeItem?.type"></span>
+                        </p>
                     </div>
+                    <span class="shrink-0 rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-xs font-semibold text-[#047857]">
+                        Selesai
+                    </span>
+                </div>
 
-                    <div class="relative flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 text-center">
-                        <div x-show="activeTab === 'sertifikat'" class="w-full flex flex-col items-center">
-                            <div class="w-full max-w-md rounded-lg border-2 border-[#D97706] bg-white p-6 shadow-sm flex flex-col items-center text-center gap-2">
-                                <span class="text-[10px] font-bold tracking-widest text-[#1E3A8A] uppercase">FORUM INOVASI TEKNOLOGI</span>
-                                <h4 class="text-sm font-black tracking-wider text-[#1E3A8A] uppercase">SERTIFIKAT PENGHARGAAN</h4>
-                                <span class="text-[10px] text-[#6B7280] mt-2">Diberikan kepada</span>
-                                <span class="text-base font-bold text-[#111827] border-b border-[#E5E7EB] pb-0.5 px-4">Arya Bima</span>
-                                <p class="text-[10px] text-[#4B5563] mt-1 max-w-[280px]">
-                                    sebagai <span class="font-semibold text-[#111827]" x-text="activeItem?.capaian || 'Peserta'"></span> pada <span class="font-semibold text-[#111827]" x-text="activeItem?.name"></span> tingkat <span class="font-semibold text-[#111827]" x-text="activeItem?.tingkat || 'Nasional'"></span>
-                                </p>
-                                <div class="mt-4 flex w-full justify-between items-end text-[9px] text-[#6B7280]">
-                                    <span x-text="activeItem?.date"></span>
-                                    <span class="border-t border-[#9CA3AF] pt-0.5 px-2">Penyelenggara</span>
+                <div class="mt-3 flex items-center justify-between rounded-lg bg-[#F9FAFB] p-2.5 border border-[#F3F4F6]">
+                    <div class="flex items-center gap-2.5">
+                        <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#E0E7FF] text-xs font-bold text-[#2563EB]">
+                            A
+                        </div>
+                        <div class="flex flex-col text-xs">
+                            <span class="font-bold text-[#111827]">Arya Bima</span>
+                            <span class="text-[11px] text-[#6B7280]">NIM 43325115 • TRK</span>
+                        </div>
+                    </div>
+                    <span class="rounded-full bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-semibold text-[#2563EB]">
+                        Mahasiswa
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content Grid 2 Kolom Padat -->
+            <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                <!-- Kolom Kiri: Riwayat & Dokumen Utama -->
+                <div class="flex flex-col gap-3">
+                    <!-- Card Riwayat -->
+                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-xs flex flex-col gap-3">
+                        <h3 class="text-xs font-bold text-[#111827] uppercase tracking-wider">Riwayat Pelaksanaan</h3>
+                        
+                        <div class="flex flex-col gap-3 pl-1">
+                            <div class="relative flex items-start gap-2.5 pb-2 border-l-2 border-[#2563EB] pl-3">
+                                <div class="absolute -left-[7px] top-0.5 size-3 rounded-full bg-[#2563EB]"></div>
+                                <div class="flex flex-col text-xs">
+                                    <span class="font-bold text-[#111827]">Kegiatan Terdaftar</span>
+                                    <span class="text-[10px] text-[#6B7280]" x-text="`${activeItem?.date} • Arya Bima`"></span>
                                 </div>
                             </div>
-                            <span class="mt-3 text-[11px] text-[#9CA3AF]">Pratinjau contoh. File asli akan tampil di sini setelah diunggah.</span>
-                        </div>
 
-                        <div x-show="activeTab === 'foto'" class="w-full flex flex-col items-center justify-center min-h-[220px]">
-                            <svg class="size-12 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="mt-2 text-xs font-semibold text-[#4B5563]">Dokumentasi Foto Kegiatan</span>
-                            <span class="text-[11px] text-[#9CA3AF]">Foto saat kegiatan berlangsung</span>
+                            <div class="relative flex items-start gap-2.5 pl-3 border-l-2 border-[#10B981]">
+                                <div class="absolute -left-[7px] top-0.5 size-3 rounded-full bg-[#10B981]"></div>
+                                <div class="flex flex-col text-xs">
+                                    <span class="font-bold text-[#111827]">Selesai & Diverifikasi</span>
+                                    <span class="text-[10px] text-[#047857] font-medium" x-text="activeItem?.note || 'Verifikasi selesai.'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Sertifikat Utama -->
+                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-xs flex flex-col gap-2">
+                        <h3 class="text-xs font-bold text-[#111827] uppercase tracking-wider">Sertifikat Utama</h3>
+                        
+                        <div class="flex items-center justify-between rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] p-2.5">
+                            <div class="flex items-center gap-2">
+                                <svg class="size-4 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <div class="flex flex-col text-xs truncate">
+                                    <span class="font-semibold text-[#111827] truncate" x-text="activeItem?.file_name"></span>
+                                    <span class="text-[10px] text-[#6B7280]" x-text="`No. 0${activeItem?.id || 1}/TRK/SK/2026`"></span>
+                                </div>
+                            </div>
+                            <button @click="downloadFile(activeItem)" class="shrink-0 rounded-md bg-[#2563EB] px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-blue-700 transition">
+                                Preview
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 flex flex-col justify-between gap-4">
-                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4">
-                        <h4 class="text-xs font-bold text-[#111827] mb-3">Detail prestasi</h4>
-                        <div class="flex flex-col gap-2 text-xs">
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Capaian</span><span class="font-semibold text-[#111827]" x-text="activeItem?.capaian || 'Juara 2'"></span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Tingkat</span><span class="font-semibold text-[#111827]" x-text="activeItem?.tingkat || 'Nasional'"></span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Jenis</span><span class="font-semibold text-[#111827]">Akademik</span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Bentuk</span><span class="font-semibold text-[#111827]">Tim</span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Kategori</span><span class="font-semibold text-[#111827]" x-text="activeItem?.type"></span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Penyelenggara</span><span class="font-semibold text-[#111827] text-right" x-text="activeItem?.penyelenggara || 'Forum Inovasi Teknologi'"></span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Tanggal</span><span class="font-semibold text-[#111827]" x-text="activeItem?.date"></span></div>
-                            <div class="flex justify-between"><span class="text-[#6B7280]">Kegiatan terkait</span><span class="font-semibold text-[#111827] text-right" x-text="activeItem?.name"></span></div>
+                <!-- Kolom Kanan: Detail Informasi & Lampiran -->
+                <div class="flex flex-col gap-3">
+                    <!-- Detail Kegiatan -->
+                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-xs flex flex-col gap-2">
+                        <h3 class="text-xs font-bold text-[#111827] uppercase tracking-wider">Detail Informasi</h3>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+                            <div>
+                                <span class="text-[10px] text-[#6B7280]">Jenis</span>
+                                <p class="font-semibold text-[#111827]" x-text="activeItem?.type"></p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6B7280]">Capaian</span>
+                                <p class="font-semibold text-[#111827]" x-text="activeItem?.capaian || 'Peserta'"></p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6B7280]">Tingkat</span>
+                                <p class="font-semibold text-[#111827]" x-text="activeItem?.tingkat || 'Nasional'"></p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-[#6B7280]">Penyelenggara</span>
+                                <p class="font-semibold text-[#111827] truncate" x-text="activeItem?.penyelenggara || 'Politeknik Negeri'"></p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4 flex flex-col gap-3">
-                        <h4 class="text-xs font-bold text-[#111827]">Dokumen</h4>
-                        <div class="flex flex-col gap-0.5">
-                            <span class="text-[11px] text-[#6B7280]">Sertifikat</span>
-                            <span class="text-xs font-semibold text-[#111827] break-all" x-text="activeItem?.file_name || 'sertifikat-kegiatan.pdf'"></span>
-                            <span class="text-[10px] text-[#9CA3AF]" x-text="activeItem?.file_size || '1.2 MB'"></span>
-                        </div>
+                    <!-- Dokumen Lampiran Padat -->
+                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-xs flex flex-col gap-2">
+                        <h3 class="text-xs font-bold text-[#111827] uppercase tracking-wider">Dokumen Lampiran</h3>
                         
-                        <button @click="downloadFile(activeItem)" class="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#2277FF] text-xs font-bold text-white hover:bg-blue-600 transition shadow-xs">
-                            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            <span>Unduh Sertifikat</span>
-                        </button>
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex items-center justify-between rounded-lg bg-[#F9FAFB] p-2 border border-[#F3F4F6] text-xs">
+                                <div class="flex items-center gap-2 truncate">
+                                    <svg class="size-3.5 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <span class="font-medium text-[#111827] truncate" x-text="activeItem?.file_name"></span>
+                                </div>
+                                <span class="text-[10px] text-[#6B7280] shrink-0" x-text="activeItem?.file_size"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between rounded-lg bg-[#F9FAFB] p-2 border border-[#F3F4F6] text-xs">
+                                <div class="flex items-center gap-2 truncate">
+                                    <svg class="size-3.5 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span class="font-medium text-[#111827] truncate">Dokumentasi_Foto.jpg</span>
+                                </div>
+                                <span class="text-[10px] text-[#6B7280] shrink-0">840 KB</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end border-t border-[#F3F4F6] pt-4">
-                <button @click="closeModal()" class="rounded-xl border border-[#E5E7EB] bg-white px-5 py-2 text-xs font-semibold text-[#374151] hover:bg-gray-50 transition">
+            <!-- Footer Modal -->
+            <div class="mt-4 flex justify-end border-t border-[#E5E7EB] pt-3">
+                <button @click="closeModal()" class="rounded-lg border border-[#E5E7EB] bg-white px-4 py-1.5 text-xs font-semibold text-[#374151] hover:bg-gray-50 transition">
                     Tutup
                 </button>
             </div>
@@ -476,7 +539,6 @@ document.addEventListener('alpine:init', () => {
 
         isModalOpen: false,
         activeItem: null,
-        activeTab: 'sertifikat',
 
         init() {
             this.$watch('searchQuery', () => { this.page = 1; });
@@ -487,7 +549,6 @@ document.addEventListener('alpine:init', () => {
 
         openModal(item) {
             this.activeItem = item;
-            this.activeTab = 'sertifikat';
             this.isModalOpen = true;
         },
 
