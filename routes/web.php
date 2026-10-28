@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/dashboard');
 
 Route::view('/dashboard', 'dashboard')->name('dashboard');
+// Verifikasi kegiatan (tombol mata di Dashboard). Angka = id kegiatan.
+Route::view('/verifikasi/{id}', 'verifikasi.show')->whereNumber('id')->name('verifikasi.show');
 
 Route::view('/profil', 'profil.show')->name('profil');
 Route::view('/notifikasi', 'notifikasi.index')->name('notifikasi');
@@ -35,11 +37,10 @@ Route::view('/kegiatan/{id}/edit', 'kegiatan.edit')->whereNumber('id')->name('ke
 
 // Pengajuan (submenu dropdown)
 Route::view('/pengajuan/dosen', 'pengajuan.dosen')->name('pengajuan.dosen');
+// Detail pengajuan dosen (angka = id pengajuan). Halaman yang sama dengan detail pengajuan, tombol Kembali ke daftar Dosen.
+Route::view('/pengajuan/dosen/{id}', 'pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('pengajuan.dosen.show');
 Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
+// Detail pengajuan mahasiswa (angka = id pengajuan)
+Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 // Tinjau / detail pengajuan (angka = id pengajuan)
 Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
-
-// Route halaman Pengajuan mahasiswa (daftar, form, upload, detail) ada di routes/pengajuan.php.
-// Route detail tim (/pengajuan/{id} dengan nama pengajuan.show) tidak dipakai karena bentrok
-// dengan pengajuan.show milik controller di file tersebut.
-require __DIR__.'/pengajuan.php';
