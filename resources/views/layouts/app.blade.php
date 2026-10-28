@@ -15,7 +15,7 @@
     {{-- Alpine.js: untuk interaksi kecil (dropdown, tambah/hapus baris, dll.) --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 </head>
-<body class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
+<body data-dosen-tables class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
 {{-- menu = status menu samping di layar kecil (HP / tablet). Di layar lebar menu selalu tampil. --}}
 <div class="flex h-full" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
 

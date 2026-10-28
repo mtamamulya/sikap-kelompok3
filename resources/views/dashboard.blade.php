@@ -107,19 +107,13 @@
             <a href="{{ route('pengajuan.dosen') }}" class="px-3 py-2 text-[15px] text-brand hover:underline">Lihat semua</a>
         </div>
 
-        <p id="urutan-kegiatan" role="status" aria-live="polite" class="text-sm text-gray-600">Urutan: Tanggal Diajukan, terbaru lebih dulu.</p>
-
-        <div class="overflow-x-auto rounded-md border border-gray-300">
-            <table data-dashboard-sort aria-describedby="urutan-kegiatan" class="w-full min-w-[640px] table-fixed border-collapse text-sm">
+<div class="overflow-x-auto rounded-md border border-gray-300">
+            <table class="w-full min-w-[640px] table-fixed border-collapse text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         @foreach (['nama' => 'Nama Kegiatan', 'jenis' => 'Jenis', 'tanggal' => 'Tanggal Diajukan'] as $kolom => $label)
                             <th scope="col" aria-sort="{{ $kolom === 'tanggal' ? 'descending' : 'none' }}" class="border-b border-gray-300 px-2 py-2.5 font-medium">
-                                <button type="button" data-sort-key="{{ $kolom }}" data-sort-label="{{ $label }}"
-                                        class="flex w-full cursor-pointer items-center gap-2 rounded text-left hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
-                                    {{ $label }}
-                                    <span data-sort-icon aria-hidden="true">{{ $kolom === 'tanggal' ? '↓' : '↕' }}</span>
-                                </button>
+                                {{ $label }}
                             </th>
                         @endforeach
                         <th scope="col" class="border-b border-gray-300 px-2 py-2.5 font-medium">Aksi</th>
@@ -130,7 +124,7 @@
                         <tr data-nama="{{ $k['nama'] }}" data-jenis="{{ $k['jenis'] }}" data-tanggal="{{ $k['tanggal_urut'] }}" class="border-b border-gray-300 last:border-b-0">
                             <td class="px-2 py-2">{{ $k['nama'] }}</td>
                             <td class="px-2 py-2">{{ $k['jenis'] }}</td>
-                            <td class="px-2 py-2">{{ $k['tanggal'] }}</td>
+                            <td data-sort-value="{{ $k['tanggal_urut'] }}" class="px-2 py-2">{{ $k['tanggal'] }}</td>
                             <td class="px-2 py-1">
                                 {{-- Semua baris sementara membuka contoh Detail Pengajuan Dosen kondisi Direview (id 2). Nanti diganti id kegiatan yang sebenarnya. --}}
                                 <a href="{{ route('pengajuan.dosen.show', 2) }}" aria-label="Lihat detail {{ $k['nama'] }}"

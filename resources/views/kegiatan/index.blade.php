@@ -47,32 +47,18 @@
 
     {{-- Tab status + pencarian + tabel. Tab dan pencarian memfilter data tiruan lewat Alpine.js.
          Kalau backend sudah ada, tab bisa diganti tautan ?status=... dan pencarian jadi form GET. --}}
-    <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
-             x-data="kegiatan(@js($kegiatan), @js($jumlah))">
+    <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm">
 
-        {{-- Tab --}}
-        <div role="tablist" aria-label="Status kegiatan" class="flex gap-x-2 overflow-x-auto border-b border-gray-200 pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <template x-for="t in tab" :key="t">
-                <button type="button" role="tab" :aria-selected="aktif === t" x-on:click="aktif = t"
-                        :class="aktif === t ? 'border-brand text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-700'"
-                        class="-mb-px flex shrink-0 cursor-pointer items-center gap-2 border-b-2 px-3 py-2.5 text-sm">
-                    <span x-text="t"></span>
-                    <span x-show="aktif === t" x-cloak
-                          class="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-xs text-white"
-                          x-text="jumlah[t]"></span>
-                </button>
-            </template>
-        </div>
-
-        {{-- Pencarian --}}
-        <div class="relative">
-            <label for="q" class="sr-only">Cari nama kegiatan</label>
-            <svg class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/>
-            </svg>
-            <input id="q" name="q" type="search" x-model="cari" placeholder="Cari nama kegiatan..."
-                   class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
-        </div>
+        <form method="GET" action="#" class="flex flex-wrap gap-4">
+            <label class="text-sm">Status kegiatan
+                <select name="status" class="ml-2 rounded border border-gray-300 px-3 py-2">
+                    <option value="">Semua Status</option>
+                    @foreach (['Diajukan', 'Direvisi', 'Disetujui', 'Ditolak'] as $status)
+                        <option value="{{ $status }}">{{ $status }}</option>
+                    @endforeach
+                </select>
+            </label>
+        </form>
 
         {{-- Tabel --}}
         <div class="overflow-x-auto rounded-md border border-gray-300">
@@ -88,36 +74,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template x-for="(k, i) in tampil" :key="k.nama + i">
+                    @foreach ($kegiatan as $k)
                         <tr class="border-b border-gray-300 last:border-b-0 hover:bg-gray-50">
-                            <td class="truncate px-2.5 py-3" :title="k.nama" x-text="k.nama"></td>
-                            <td class="truncate px-2.5 py-3" x-text="k.kategori"></td>
-                            <td class="truncate px-2.5 py-3" x-text="k.jenis"></td>
-                            <td class="px-2.5 py-3" x-text="k.tanggal"></td>
+                            <td class="truncate px-2.5 py-3" title="{{ $k['nama'] }}">{{ $k['nama'] }}</td>
+                            <td class="truncate px-2.5 py-3"  >{{ $k['kategori'] }}</td>
+                            <td class="truncate px-2.5 py-3"  >{{ $k['jenis'] }}</td>
+                            <td class="px-2.5 py-3"  >{{ $k['tanggal'] }}</td>
                             <td class="px-2.5 py-3">
-                                <span :class="warna[k.status]" class="inline-block rounded-md border px-2 py-0.5 text-[13px]" x-text="k.status"></span>
+                                <span class="inline-block rounded-md border px-2 py-0.5 text-[13px] {{ match ($k['status']) { 'Diajukan' => 'border-blue-200 bg-blue-100 text-blue-700', 'Direvisi' => 'border-orange-200 bg-orange-100 text-orange-700', 'Disetujui' => 'border-green-200 bg-green-100 text-green-700', default => 'border-red-200 bg-red-100 text-red-600' } }}">{{ $k['status'] }}</span>
                             </td>
                             <td class="px-2.5 py-2">
                                 <div class="flex items-center gap-3">
-                                    <a :href="`{{ url('/kegiatan') }}/${k.id}`" :aria-label="`Lihat detail ${k.nama}`"
+                                    <a href="{{ route('kegiatan.show', $k['id']) }}" aria-label="Lihat detail {{ $k['nama'] }}"
                                        class="flex size-8 items-center justify-center rounded-lg bg-blue-100 text-brand hover:bg-blue-200">
                                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </a>
-                                    <a :href="`{{ url('/kegiatan') }}/${k.id}/edit`" :aria-label="`Edit ${k.nama}`"
+                                    <a href="{{ route('kegiatan.edit', $k['id']) }}" aria-label="Edit {{ $k['nama'] }}"
                                        class="flex size-8 items-center justify-center rounded-lg bg-orange-100 text-orange-400 hover:bg-orange-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
                                     </a>
                                 </div>
                             </td>
                         </tr>
-                    </template>
+                    @endforeach
                 </tbody>
             </table>
-
-            {{-- Kosong --}}
-            <p x-show="tampil.length === 0" x-cloak class="px-4 py-10 text-center text-sm text-gray-500">
-                Tidak ada kegiatan yang cocok dengan filter ini.
-            </p>
         </div>
 
         {{-- Pagination (tampilan saja; nanti diganti $kegiatan->links() dari Laravel) --}}
@@ -143,33 +124,3 @@
     </section>
 
 @endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('kegiatan', (daftar, jumlah) => ({
-            daftar: daftar,
-            jumlah: jumlah,
-            tab: ['Semua', 'Diajukan', 'Direvisi', 'Disetujui', 'Ditolak'],
-            aktif: 'Semua',
-            cari: '',
-
-            // warna badge status
-            warna: {
-                Diajukan:  'border-blue-200 bg-blue-100 text-blue-700',
-                Direvisi:  'border-orange-200 bg-orange-100 text-orange-700',
-                Disetujui: 'border-green-200 bg-green-100 text-green-700',
-                Ditolak:   'border-red-200 bg-red-100 text-red-600',
-            },
-
-            get tampil() {
-                const q = this.cari.trim().toLowerCase();
-                return this.daftar.filter(k =>
-                    (this.aktif === 'Semua' || k.status === this.aktif) &&
-                    (q === '' || k.nama.toLowerCase().includes(q))
-                );
-            },
-        }));
-    });
-</script>
-@endpush
