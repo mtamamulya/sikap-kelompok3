@@ -13,7 +13,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-3xl font-bold tracking-tight">Tambah Penelitian</h1>
+        <h1 class="text-4xl font-bold tracking-tight">Tambah Penelitian</h1>
         <p class="text-2xl text-gray-400">Dashboard / Penelitian / Tambah</p>
     </div>
 
@@ -267,6 +267,11 @@
 
         {{-- TOMBOL --}}
         <div class="flex flex-wrap items-center justify-end gap-3">
+            <template x-if="tersimpan">
+                <p role="status" class="mr-auto rounded-lg border border-green-200 bg-green-50 px-3.5 py-2.5 text-sm text-green-800">
+                    Tersimpan (simulasi). Data belum masuk database.
+                </p>
+            </template>
             <a href="{{ route('penelitian.index') }}"
                class="flex h-11 items-center rounded-md bg-red-500 px-6 text-base text-white hover:bg-red-600">Batal</a>
             <button type="submit"
@@ -330,7 +335,7 @@
 
             // Simpan (simulasi)
             tersimpan: false,
-            simpan() { this.tersimpan = true; this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Data berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' }); },
+            simpan() { this.tersimpan = true; },
         }));
     });
 </script>
