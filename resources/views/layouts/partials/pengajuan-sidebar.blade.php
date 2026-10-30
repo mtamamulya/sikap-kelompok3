@@ -6,13 +6,16 @@
     $dashboardActive = request()->routeIs('mahasiswa.dashboard');
     $mhsActive = request()->routeIs('mahasiswa.index', 'mahasiswa.mata-kuliah*', 'mahasiswa.prestasi*', 'mahasiswa.kegiatan', 'mahasiswa.profil');
     $mhsOpen = $mhsActive;
+    $pengajuanOpen = request()->routeIs('pengajuan.*');
+    $kegiatanActive = request()->routeIs('pengajuan.index', 'pengajuan.create', 'pengajuan.show', 'pengajuan.edit', 'pengajuan.store', 'pengajuan.update');
+    $beritaActive = request()->routeIs('pengajuan.berita.*');
     $navItem = 'flex min-h-12 items-center gap-4 rounded-lg px-4 py-3 text-lg transition-colors hover:bg-white/10';
     $activeItem = 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white';
     $icon = 'size-5 shrink-0';
 @endphp
 <aside class="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-7 overflow-y-auto bg-linear-to-b from-[#1f66e5] from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% px-3 py-6 text-white lg:flex">
     <a href="{{ route('pengajuan.index') }}" aria-label="Teknologi Rekayasa Komputer, ke Pengajuan" class="flex items-center gap-2.5 px-1">
-        <img src="{{ asset('images/logo_trk.png') }}" alt="" class="h-10 w-auto shrink-0" />
+        <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0" />
         <span class="text-[13px] font-bold leading-[1.15] tracking-tight text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
     </a>
 
@@ -25,13 +28,33 @@
             <span class="flex-1">Dashboard</span>
         </a>
 
-        <a href="{{ route('pengajuan.index') }}" @if (request()->routeIs('pengajuan.*')) aria-current="page" @endif
-           class="{{ $navItem }} {{ request()->routeIs('pengajuan.*') ? $activeItem : '' }}">
-            <svg class="{{ $icon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/>
-            </svg>
-            <span class="flex-1">Pengajuan</span>
-        </a>
+        <div x-data="{ open: @js($pengajuanOpen) }" class="flex flex-col gap-2">
+            <div class="flex items-center rounded-lg transition-colors {{ $pengajuanOpen ? 'bg-white/15 text-white' : '' }}">
+                <button type="button" x-on:click="open = !open" :aria-expanded="open"
+                        class="flex min-h-12 flex-1 items-center gap-4 rounded-l-lg px-4 py-3 text-left text-lg tracking-[-0.18px] text-white transition-colors hover:bg-white/10">
+                    <svg class="{{ $icon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/>
+                    </svg>
+                    <span class="flex-1">Pengajuan</span>
+                </button>
+                <button type="button" x-on:click="open = !open" :aria-expanded="open" aria-label="Buka atau tutup submenu Pengajuan"
+                        class="flex min-h-12 items-center rounded-r-lg px-4 py-3 text-white hover:bg-white/10">
+                    <svg class="size-4 transition-transform duration-200" x-bind:class="open ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6l6-6"/>
+                    </svg>
+                </button>
+            </div>
+            <div x-show="open" x-cloak class="flex flex-col gap-2">
+                <a href="{{ route('pengajuan.index') }}" @if ($kegiatanActive) aria-current="page" @endif
+                   class="rounded-lg py-3 pl-16 pr-4 text-base transition-colors {{ $kegiatanActive ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
+                    Kegiatan Mahasiswa
+                </a>
+                <a href="{{ route('pengajuan.berita.index') }}" @if ($beritaActive) aria-current="page" @endif
+                   class="rounded-lg py-3 pl-16 pr-4 text-base transition-colors {{ $beritaActive ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
+                    Berita
+                </a>
+            </div>
+        </div>
 
         <div x-data="{ open: @js($mhsOpen) }" class="flex flex-col gap-2">
             <div class="flex items-center rounded-lg transition-colors {{ $mhsActive ? 'bg-white/15 text-white' : '' }}">

@@ -17,9 +17,9 @@
         ['SELESAI', $counts['Selesai'] ?? 0, 'bg-[#9CA3AF]'],
     ];
     $guide = [
-        'Pastikan semua dokumen pendukung sudah lengkap.',
-        'Gunakan format PDF dengan ukuran maksimal 5 MB.',
-        'Gunakan nama file yang jelas dan relevan.',
+        'Dokumen pendukung bersifat opsional.',
+        'Lampirkan tautan yang dapat diakses oleh tim peninjau.',
+        'Gunakan nama dokumen dan jenis yang sesuai.',
     ];
     $fmt = fn ($d) => \Carbon\Carbon::parse($d)->locale('id')->translatedFormat('d M Y');
     $rangeLabel = $from && $to ? $fmt($from).' - '.$fmt($to) : ($from ? 'Mulai '.$fmt($from) : ($to ? 'Sampai '.$fmt($to) : 'Semua tanggal'));
@@ -62,6 +62,10 @@
             <h2 class="text-lg font-bold lg:text-xl">Daftar pengajuan</h2>
             <a href="{{ route('pengajuan.create') }}" class="rounded-lg bg-[#EFF6FF] px-3.5 py-2 text-sm font-semibold text-[#2563EB] lg:px-4 lg:py-2.5">Tambah pengajuan</a>
         </div>
+
+        @if (session('success'))
+            <div role="status" class="rounded-lg bg-[#ECFDF5] px-4 py-3 text-sm text-[#047857]">{{ session('success') }}</div>
+        @endif
 
         <form method="GET" action="{{ route('pengajuan.index') }}" class="flex flex-wrap items-end gap-4 xl:flex-nowrap">
             <label class="flex w-full min-w-0 flex-col gap-2 text-[13px] font-medium text-[#4B5563] md:min-w-[260px] md:flex-1">

@@ -35,7 +35,7 @@
     {{-- Judul halaman + tombol tambah --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-3xl font-bold tracking-tight">Pengajaran</h1>
+            <h1 class="text-4xl font-bold tracking-tight">Pengajaran</h1>
             <p class="text-2xl text-gray-400">Dashboard / Pengajaran</p>
         </div>
         <a href="{{ route('pengajaran.create') }}" class="mt-2 flex h-11 items-center gap-2 rounded-md bg-brand px-4 text-base font-medium text-white hover:bg-blue-700">
@@ -57,7 +57,7 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-full sm:w-46">
+            <div class="relative w-46">
                 <label for="kelas" class="sr-only">Filter kelas</label>
                 <select id="kelas" name="kelas" class="{{ $selectClass }}">
                     <option value="">Semua Kelas</option>
@@ -68,7 +68,7 @@
                 {!! $chevron !!}
             </div>
 
-            <div class="relative w-full sm:w-46">
+            <div class="relative w-46">
                 <label for="tahun" class="sr-only">Filter tahun akademik</label>
                 <select id="tahun" name="tahun" class="{{ $selectClass }}">
                     <option value="">Tahun Akademik</option>
@@ -79,7 +79,7 @@
                 {!! $chevron !!}
             </div>
 
-            <div class="relative w-full sm:w-46">
+            <div class="relative w-46">
                 <label for="semester" class="sr-only">Filter semester</label>
                 <select id="semester" name="semester" class="{{ $selectClass }}">
                     <option value="">Semua Semester</option>
@@ -93,7 +93,7 @@
 
         {{-- Tabel --}}
         <div class="overflow-x-auto rounded-md border border-gray-300">
-            <table data-quick-sort class="w-full min-w-[900px] table-fixed border-collapse text-sm">
+            <table class="w-full min-w-[900px] table-fixed border-collapse text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th scope="col" class="w-1/5 border-b border-gray-300 px-2 py-3 font-medium">Mata Kuliah</th>

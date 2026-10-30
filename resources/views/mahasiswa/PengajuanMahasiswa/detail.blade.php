@@ -25,7 +25,7 @@
     ][$status] ?? 'Dokumen hasil akan tersedia setelah pengajuan selesai diproses.';
     $card = 'rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.05)] sm:p-7';
 @endphp
-<div class="flex flex-col gap-6 px-4 pb-10 pt-7 sm:px-6 lg:px-12" x-data="{ preview: @js((bool) session('preview')) }" @keydown.escape.window="preview = false">
+<div class="flex flex-col gap-6 px-4 pb-10 pt-7 sm:px-6 lg:px-12">
     <div class="flex flex-col gap-[18px]">
         <a href="{{ route('pengajuan.index') }}" class="flex w-fit items-center gap-2 text-sm font-semibold text-[#2563EB]">
             <span class="flex size-8 items-center justify-center rounded-full bg-[#EFF6FF]"><i class="ti ti-chevron-left text-base"></i></span>
@@ -36,9 +36,14 @@
                 <h1 class="text-[26px] font-bold leading-9">Detail pengajuan</h1>
                 <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $badge[$status] }}">{{ $status }}</span>
                 <div class="ml-auto flex flex-wrap items-center gap-2">
-                    <button type="button" @click="preview = true" class="flex h-10 items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 text-sm font-semibold text-[#2563EB]">
-                        <i class="ti ti-file-description text-base"></i>Preview surat
-                    </button>
+                    <form method="POST" action="{{ route('pengajuan.destroy', $row['id']) }}"
+                          onsubmit="return confirm('Yakin ingin menghapus pengajuan ini? Tindakan ini tidak dapat dibatalkan.')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="flex h-10 items-center gap-2 rounded-lg border border-[#FECACA] bg-white px-4 text-sm font-semibold text-[#B91C1C] hover:bg-[#FEF2F2]">
+                            <i class="ti ti-trash text-base"></i>Hapus pengajuan
+                        </button>
+                    </form>
                     @if ($row['editable'])
                         <a href="{{ route('pengajuan.edit', $row['id']) }}" class="flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-4 text-sm font-semibold text-white">
                             <i class="ti ti-pencil text-base"></i>Edit pengajuan
@@ -108,21 +113,6 @@
                 @if ($footnote)<p class="text-[13px] text-[#6B7280]">{{ $footnote }}</p>@endif
             </div>
 
-            <div class="{{ $card }} flex flex-col gap-4">
-                <h2 class="text-xl font-bold">Surat pengajuan</h2>
-                <p class="text-[13px] text-[#6B7280]">Surat dibuat otomatis dari data yang Anda isi. Perubahan pada pengajuan akan ikut memperbarui isi surat.</p>
-                <div class="flex flex-wrap items-center gap-3 rounded-xl bg-[#F9FAFB] p-4">
-                    <i class="ti ti-file-description text-2xl text-[#2563EB]"></i>
-                    <div class="min-w-0 flex-1">
-                        <div class="truncate text-sm font-semibold">Surat_Pengajuan_{{ $student['name'] }}.pdf</div>
-                        <div class="text-[13px] text-[#6B7280]">Nomor {{ sprintf('%03d/DST/PL4.7.1/HK.07.00/%s', $item['id'], $row['submitted_at']->year) }}</div>
-                    </div>
-                    <button type="button" @click="preview = true" class="flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-4 text-sm font-semibold text-white">
-                        <i class="ti ti-eye text-base"></i>Preview surat
-                    </button>
-                </div>
-            </div>
-
             @if ($status === 'Ditolak')
                 <div class="{{ $card }} flex flex-col gap-4">
                     <h2 class="text-xl font-bold">Alasan penolakan</h2>
@@ -174,8 +164,8 @@
 
             <div class="{{ $card }} flex flex-col gap-4">
                 <h2 class="text-xl font-bold">Dokumen lampiran</h2>
-                @foreach ($files as $f)
-                    <a href="{{ $f['url'] ?? '#' }}" @if (!empty($f['url'])) target="_blank" @endif class="flex items-center gap-3 rounded-xl bg-[#F9FAFB] p-4 transition hover:bg-[#F3F4F6]">
+                @forelse ($files as $f)
+                    <a href="{{ $f['url'] ?? '#' }}" @if (!empty($f['url'])) target="_blank" rel="noopener noreferrer" @endif class="flex items-center gap-3 rounded-xl bg-[#F9FAFB] p-4 transition hover:bg-[#F3F4F6]">
                         <i class="ti ti-file-text text-xl text-[#2563EB]"></i>
                         <div class="min-w-0 flex-1">
                             <div class="truncate text-sm font-semibold">{{ $f['name'] }}</div>
@@ -183,7 +173,9 @@
                         </div>
                         <i class="ti ti-paperclip text-lg text-[#6B7280]"></i>
                     </a>
-                @endforeach
+                @empty
+                    <p class="text-[13px] text-[#6B7280]">Tidak ada dokumen pendukung.</p>
+                @endforelse
             </div>
 
             <div class="{{ $card }} flex flex-col gap-4">
@@ -209,7 +201,6 @@
             </div>
         </div>
     </div>
-
     {{-- MODAL PREVIEW SURAT --}}
     <div x-show="preview" x-cloak @click.self="preview = false"
          class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-3 sm:p-6">

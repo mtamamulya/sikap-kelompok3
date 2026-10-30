@@ -62,12 +62,12 @@
             max-lg:invisible max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-40 max-lg:w-64 max-lg:-translate-x-full max-lg:shadow-xl max-lg:transition-transform
             max-lg:data-[open=true]:visible max-lg:data-[open=true]:translate-x-0">
     <div class="flex flex-col gap-3">
-        {{-- Logo: klik untuk ke Dashboard. Taruh file logo di public/images/logo_trk.png.
+        {{-- Logo: klik untuk ke Dashboard.
              Kalau file belum ada, tampil kotak "TI" sementara. Tombol tutup hanya tampil di layar kecil. --}}
         <div class="flex items-center justify-between gap-2 px-1 pb-5">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" aria-label="Teknologi Rekayasa Komputer, ke Dashboard">
-                @if (file_exists(public_path('images/logo_trk.png')))
-                    <img src="{{ asset('images/logo_trk.png') }}" alt="" class="h-10 w-auto shrink-0">
+                @if (file_exists(public_path('images/logo-trk.png')))
+                    <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0">
                 @else
                     <span class="flex size-10 shrink-0 items-center justify-center rounded-md bg-red-700 text-base font-bold text-white" aria-hidden="true">TI</span>
                 @endif

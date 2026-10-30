@@ -13,7 +13,7 @@
 @endphp
 <aside class="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-6 overflow-y-auto border-r border-[#E5E7EB] bg-white pt-4 lg:flex">
     <div class="flex items-center gap-2.5 px-1">
-        <img src="{{ asset('images/logo_trk.png') }}" alt="" class="h-10 w-auto shrink-0" />
+        <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0" />
         <div class="text-[13px] font-bold leading-[1.15] tracking-tight text-[#003385]">
             TEKNOLOGI<br />REKAYASA KOMPUTER
         </div>

@@ -32,7 +32,7 @@
     {{-- Judul halaman + tombol tambah --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-3xl font-bold tracking-tight">Pengabdian</h1>
+            <h1 class="text-4xl font-bold tracking-tight">Pengabdian</h1>
             <p class="text-2xl text-gray-400">Dashboard / Pengabdian</p>
         </div>
         <a href="{{ route('pengabdian.create') }}" class="mt-2 flex h-11 items-center gap-2 rounded-md bg-brand px-4 text-base font-medium text-white hover:bg-blue-700">
@@ -54,7 +54,7 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-full sm:w-46">
+            <div class="relative w-46">
                 <label for="tahun" class="sr-only">Filter tahun</label>
                 <select id="tahun" name="tahun" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>
@@ -68,7 +68,7 @@
 
         {{-- Tabel --}}
         <div class="overflow-x-auto rounded-md border border-gray-300">
-            <table data-quick-sort class="w-full min-w-[900px] table-fixed border-collapse text-sm">
+            <table class="w-full min-w-[900px] table-fixed border-collapse text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th scope="col" class="w-1/5 border-b border-gray-300 px-2 py-3 font-medium">Nomor SK</th>
@@ -96,9 +96,9 @@
                                        class="flex size-8 items-center justify-center rounded-lg bg-orange-100 text-orange-400 hover:bg-orange-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
                                     </a>
-                                    {{-- Hapus: membuka modal konfirmasi (components/modal-hapus). action '#' nanti diganti route hapus dari backend. --}}
+                                    {{-- Hapus: nanti jadi <form method="POST"> dengan @csrf dan @method('DELETE') --}}
                                     <button type="button" aria-label="Hapus {{ $p['judul'] }}"
-                                            x-on:click="$dispatch('minta-hapus', { jenis: 'pengabdian', nama: @js($p['judul']), action: '#' })"
+                                            onclick="confirm('Hapus pengabdian ini?')"
                                             class="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-red-100 text-red-500 hover:bg-red-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5"/></svg>
                                     </button>
@@ -131,7 +131,5 @@
             </a>
         </nav>
     </section>
-
-    <x-modal-hapus />
 
 @endsection

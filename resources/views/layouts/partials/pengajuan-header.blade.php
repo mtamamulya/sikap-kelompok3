@@ -64,10 +64,24 @@
                class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm transition {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-white font-semibold text-[#1f66e5]' : 'text-white hover:bg-white/10' }}">
                 <i class="ti ti-category text-lg"></i>Dashboard
             </a>
-            <a @click="open = false" href="{{ route('pengajuan.index') }}"
-               class="flex h-10 items-center gap-3 rounded-lg px-3 text-sm transition {{ request()->routeIs('pengajuan.*') ? 'bg-white font-semibold text-[#1f66e5]' : 'text-white hover:bg-white/10' }}">
-                <i class="ti ti-book text-lg"></i>Pengajuan
-            </a>
+            <div x-data="{ openSubmenu: {{ request()->routeIs('pengajuan.*') ? 'true' : 'false' }} }" class="flex flex-col gap-1">
+                <button type="button" @click="openSubmenu = !openSubmenu" :aria-expanded="openSubmenu"
+                        class="flex h-10 items-center gap-3 rounded-lg px-3 text-left text-sm transition {{ request()->routeIs('pengajuan.*') ? 'bg-white/10 font-semibold text-white' : 'text-white hover:bg-white/10' }}">
+                    <i class="ti ti-book text-lg"></i>
+                    <span class="flex-1">Pengajuan</span>
+                    <i class="ti ti-chevron-down transition-transform" :class="openSubmenu ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="openSubmenu" x-cloak class="flex flex-col gap-1 pl-10">
+                    <a @click="open = false" href="{{ route('pengajuan.index') }}"
+                       class="flex h-9 items-center rounded-lg px-3 text-sm transition {{ request()->routeIs('pengajuan.index', 'pengajuan.create', 'pengajuan.show', 'pengajuan.edit', 'pengajuan.store', 'pengajuan.update') ? 'bg-white font-semibold text-[#1f66e5]' : 'text-white hover:bg-white/10' }}">
+                        Kegiatan Mahasiswa
+                    </a>
+                    <a @click="open = false" href="{{ route('pengajuan.berita.index') }}"
+                       class="flex h-9 items-center rounded-lg px-3 text-sm transition {{ request()->routeIs('pengajuan.berita.*') ? 'bg-white font-semibold text-[#1f66e5]' : 'text-white hover:bg-white/10' }}">
+                        Berita
+                    </a>
+                </div>
+            </div>
             <div x-data="{ openMhs: @js(request()->routeIs('mahasiswa.index', 'mahasiswa.mata-kuliah*', 'mahasiswa.prestasi*', 'mahasiswa.kegiatan', 'mahasiswa.profil')) }" class="flex flex-col gap-1">
                 <div class="flex items-center rounded-lg bg-white/10">
                     <a @click="open = false" href="{{ route('mahasiswa.index') }}"

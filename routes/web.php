@@ -72,10 +72,10 @@ Route::view('/pengajuan/mahasiswa', 'dosen.pengajuan.mahasiswa')->name('pengajua
 // Detail pengajuan mahasiswa (angka = id pengajuan)
 Route::view('/pengajuan/mahasiswa/{id}', 'dosen.pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 // Pengajuan berita dosen (angka = id berita). Admin yang mereview dikerjakan terpisah.
-Route::view('/pengajuan/berita', 'dosen.berita.index')->name('berita.index');
-Route::view('/pengajuan/berita/create', 'dosen.berita.create')->name('berita.create');
-// Detail: harus di bawah /pengajuan/berita/create supaya "create" tidak dianggap sebagai {id}
-Route::view('/pengajuan/berita/{id}', 'dosen.berita.show')->whereNumber('id')->name('berita.show');
-Route::view('/pengajuan/berita/{id}/edit', 'dosen.berita.edit')->whereNumber('id')->name('berita.edit');
+// Berita dosen menggunakan URL tersendiri; /pengajuan/berita dipakai alur berita mahasiswa.
+Route::view('/berita', 'dosen.berita.index')->name('berita.index');
+Route::view('/berita/create', 'dosen.berita.create')->name('berita.create');
+Route::view('/berita/{id}/edit', 'dosen.berita.edit')->whereNumber('id')->name('berita.edit');
+Route::view('/berita/{id}', 'dosen.berita.show')->whereNumber('id')->name('berita.show');
 
 require __DIR__.'/pengajuan.php';

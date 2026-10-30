@@ -6,8 +6,8 @@
     // DATA TIRUAN. $id berasal dari alamat (/pengajaran/{id}/edit).
     // Nanti diganti data pengajaran dari controller / database oleh tim backend.
     $daftarTahunAkademik = ['2025/2026 Ganjil', '2025/2026 Genap', '2024/2025 Ganjil', '2024/2025 Genap'];
-    $daftarProdi  = ['D3 Teknik Informatika', 'D4 Teknik Informatika', 'Teknologi Rekayasa Komputer', 'D3 Teknik Elektronika', 'D4 Teknik Telekomunikasi'];
-    $daftarKelas  = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
+    $daftarProdi  = ['D3 Teknik Informatika', 'D4 Teknik Informatika', 'D4 Teknologi Rekayasa Komputer', 'D3 Teknik Elektronika', 'D4 Teknik Telekomunikasi'];
+    $daftarKelas  = ['TI-1A', 'TI-1B', 'TI-1C', 'TI-2A', 'TI-2B', 'TI-2C', 'TI-3A', 'TI-3B', 'TI-3C'];
     $daftarMatkul = ['Kecerdasan Buatan', 'Jaringan Komputer', 'Sistem Basis Data', 'Internet of Things', 'Computer Vision', 'Sistem Operasi'];
 
     // Dosen pengampu = akun yang login. Nanti diganti nama user dari backend.
@@ -25,7 +25,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-3xl font-bold tracking-tight">Edit Pengajaran</h1>
+        <h1 class="text-4xl font-bold tracking-tight">Edit Pengajaran</h1>
         <p class="text-2xl text-gray-400">Dashboard / Pengajaran / Edit Pengajaran</p>
     </div>
 
@@ -160,7 +160,7 @@
                     <div class="flex flex-col gap-4 p-3.5">
                         <div class="flex flex-col gap-2">
                             <span class="{{ $labelClass }}">File</span>
-                            <label class="relative flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
+                            <label class="flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
                                 <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
                                        x-on:change="pilihFile($event, d)">
@@ -227,6 +227,11 @@
 
         {{-- TOMBOL --}}
         <div class="flex flex-wrap items-center justify-end gap-3 pt-4">
+            <template x-if="tersimpan">
+                <p role="status" class="mr-auto rounded-lg border border-green-200 bg-green-50 px-3.5 py-2.5 text-sm text-green-800">
+                    Perubahan tersimpan (simulasi). Data belum masuk database.
+                </p>
+            </template>
             <a href="{{ route('pengajaran.index') }}"
                class="flex h-11 items-center rounded-md bg-red-500 px-6 text-base text-white hover:bg-red-600">Batal</a>
             <button type="submit"
@@ -242,7 +247,7 @@
         Alpine.data('formEditPengajaran', () => ({
             tahunAkademik: @js($daftarTahunAkademik[0]),
             // Nilai awal = data pengajaran yang sedang diedit (data tiruan)
-            prodi: 'Teknologi Rekayasa Komputer', kelas: '2B', matkul: 'Jaringan Komputer',
+            prodi: 'D4 Teknologi Rekayasa Komputer', kelas: 'TI-2B', matkul: 'Jaringan Komputer',
 
             // Semester = kata terakhir dari Tahun akademik ("2025/2026 Ganjil" => "Ganjil")
             get semester() { return this.tahunAkademik.split(' ').pop(); },
@@ -286,7 +291,7 @@
 
             // Simpan (simulasi)
             tersimpan: false,
-            simpan() { this.tersimpan = true; this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Perubahan berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' }); },
+            simpan() { this.tersimpan = true; },
         }));
     });
 </script>
