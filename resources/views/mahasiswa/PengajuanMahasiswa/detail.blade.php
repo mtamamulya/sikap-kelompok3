@@ -232,7 +232,7 @@
                 </button>
             </div>
             <div class="overflow-x-auto pb-6">
-                @include('pengajuan.partials.surat')
+                @include('mahasiswa.PengajuanMahasiswa.partials.surat')
             </div>
         </div>
     </div>

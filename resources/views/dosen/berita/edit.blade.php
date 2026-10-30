@@ -4,7 +4,7 @@
 
 @php
     // DATA TIRUAN dari berita/data.php. $id berasal dari alamat /pengajuan/berita/{id}/edit.
-    $semua = require resource_path('views/berita/data.php');
+    $semua = require resource_path('views/dosen/berita/data.php');
     $b     = $semua[max(1, min(count($semua), (int) ($id ?? 1))) - 1];
 @endphp
 
@@ -27,6 +27,6 @@
         </div>
     @endif
 
-    @include('berita._form', ['b' => $b, 'aksi' => '#'])
+    @include('dosen.berita._form', ['b' => $b, 'aksi' => '#'])
 
 @endsection

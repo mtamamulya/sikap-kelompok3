@@ -358,17 +358,17 @@ class PengajuanController extends Controller
 
         $counts = $all->countBy('status');
 
-        return view('pengajuan.index', compact('rows', 'all', 'counts', 'q', 'status', 'from', 'to'));
+        return view('dosen.pengajuan.index', compact('rows', 'all', 'counts', 'q', 'status', 'from', 'to'));
     }
 
     public function create()
     {
-        return view('pengajuan.create', ['item' => null]);
+        return view('dosen.pengajuan.create', ['item' => null]);
     }
 
     public function edit(int $id)
     {
-        return view('pengajuan.create', ['item' => $this->findEditable($id)]);
+        return view('dosen.pengajuan.create', ['item' => $this->findEditable($id)]);
     }
 
     public function show(int $id)
@@ -413,7 +413,7 @@ class PengajuanController extends Controller
                 ['name' => 'Lampiran_pendukung.pdf', 'meta' => 'PDF • 840 KB'],
             ];
 
-        return view('pengajuan.show', compact('row', 'steps', 'student', 'files', 'item'));
+        return view('mahasiswa.PengajuanMahasiswa.detail', compact('row', 'steps', 'student', 'files', 'item'));
     }
 
     public function upload(Request $request)

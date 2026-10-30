@@ -9,6 +9,6 @@
         <p class="text-2xl text-gray-400">Dashboard / Pengajuan / Berita / Pengajuan Berita</p>
     </div>
 
-    @include('berita._form', ['b' => null, 'aksi' => '#'])
+    @include('dosen.berita._form', ['b' => null, 'aksi' => '#'])
 
 @endsection

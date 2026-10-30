@@ -6,7 +6,7 @@
     // DATA TIRUAN dari berita/data.php. $id berasal dari alamat /pengajuan/berita/{id}.
     // Urutannya sama dengan daftar di halaman Pengajuan Berita, jadi tombol mata di baris ke-2 membuka contoh "Direvisi", dst.
     // Nanti diganti data berita dari controller / database oleh tim backend.
-    $semua   = require resource_path('views/berita/data.php');
+    $semua   = require resource_path('views/dosen/berita/data.php');
     $b       = $semua[max(1, min(count($semua), (int) ($id ?? 2))) - 1];
     $status  = $b['status'];
     $catatan = $b['catatan'];   // catatan revisi / alasan penolakan

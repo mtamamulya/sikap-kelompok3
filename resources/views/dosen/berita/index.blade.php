@@ -4,7 +4,7 @@
 
 @php
     // DATA TIRUAN dari berita/data.php. Nanti diganti data dari controller / database oleh tim backend.
-    $berita = require resource_path('views/berita/data.php');
+    $berita = require resource_path('views/dosen/berita/data.php');
 @endphp
 
 @section('content')

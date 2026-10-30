@@ -21,7 +21,13 @@
             @if (session('success'))
                 <div class="mx-4 mt-4 rounded-lg bg-[#ECFDF5] px-4 py-3 text-sm text-[#047857] sm:mx-6 lg:mx-12">{{ session('success') }}</div>
             @endif
+            @if (request()->routeIs('mahasiswa.*'))
+                <div class="min-w-0 px-4 py-6 sm:px-6 lg:px-8">
+            @endif
             @yield('content')
+            @if (request()->routeIs('mahasiswa.*'))
+                </div>
+            @endif
         </main>
     </div>
 </div>

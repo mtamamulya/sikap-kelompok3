@@ -156,7 +156,7 @@
                         <input name="title" value="{{ $v('title') }}" class="{{ $input }}" placeholder="Masukkan judul kegiatan...">
                     </x-pengajuan.field>
 
-                    @include('pengajuan.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Lomba'])
+                    @include('mahasiswa.PengajuanMahasiswa.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Lomba'])
 
                     <div class="flex flex-col gap-5 md:flex-row">
                         <div class="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -250,7 +250,7 @@
                         </div>
                     </x-pengajuan.field>
 
-                    @include('pengajuan.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Tim'])
+                    @include('mahasiswa.PengajuanMahasiswa.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Tim'])
 
                     <x-pengajuan.field label="Tautan Informasi Kegiatan" optional hint="Tautan situs resmi, poster, atau halaman pendaftaran." name="info_url">
                         <input name="info_url" value="{{ $v('info_url') }}" class="{{ $input }}" placeholder="https://...">

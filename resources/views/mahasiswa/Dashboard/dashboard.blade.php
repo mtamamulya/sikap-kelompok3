@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.mahasiswa')
 
 @section('title', 'Dashboard - Teknologi Rekayasa Komputer')
 
 @section('content')
-<div class="flex flex-col gap-6 p-4 md:px-6 md:py-8 lg:px-12 bg-[#F9FAFB]">
+<div class="flex flex-col gap-6">
     
     <!-- Hero Profile Card (Dengan Efek Fill Transition Kiri-ke-Kanan & Kanan-ke-Kiri) -->
     <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-8 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-500 hover:border-[#2277FF]">
@@ -41,11 +41,11 @@
 
             <!-- Akses Cepat Kanan -->
             <div class="flex items-center gap-3 border-t border-[#E5E7EB] pt-4 md:border-t-0 md:pt-0 transition-colors duration-500 group-hover:border-white/20">
-                <a href="{{ url('/profil') }}" class="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-xs font-semibold text-[#374151] shadow-xs transition-all duration-300 hover:bg-gray-50 group-hover:border-white/30 group-hover:bg-white/10 group-hover:text-white group-hover:hover:bg-white/20">
+                <a href="{{ route('mahasiswa.profil') }}" class="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-xs font-semibold text-[#374151] shadow-xs transition-all duration-300 hover:bg-gray-50 group-hover:border-white/30 group-hover:bg-white/10 group-hover:text-white group-hover:hover:bg-white/20">
                     <svg class="size-4 text-[#6B7280] transition-colors duration-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     <span>Edit Profil</span>
                 </a>
-                <a href="{{ url('/kegiatan') }}" class="flex items-center gap-2 rounded-xl bg-[#2277FF] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-blue-600 group-hover:bg-white group-hover:text-[#2277FF]">
+                <a href="{{ route('mahasiswa.kegiatan') }}" class="flex items-center gap-2 rounded-xl bg-[#2277FF] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-blue-600 group-hover:bg-white group-hover:text-[#2277FF]">
                     <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span>Tambah Kegiatan</span>
                 </a>

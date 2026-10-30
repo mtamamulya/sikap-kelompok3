@@ -151,7 +151,7 @@
             </table>
         </div>
 
-        {{ $mataKuliah->links('pagination.mahasiswa') }}
+        {{ $mataKuliah->links('mahasiswa.pagination.mahasiswa') }}
     </section>
 </div>
 @endsection

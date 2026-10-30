@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Profil mahasiswa</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- Jika Alpine belum terpasang via npm, aktifkan baris di bawah --}}
-    {{-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
-    <style>[x-cloak]{display:none !important}</style>
-</head>
-<body class="bg-[#F9FAFB] text-[#111827] antialiased">
+@extends('layouts.mahasiswa')
+
+@section('title', 'Profil mahasiswa')
+
+@section('content')
 @php
     // Data dari controller: compact('mahasiswa'). Fallback untuk preview.
     $nama     = $mahasiswa->nama     ?? 'Arya Bima';
@@ -25,7 +17,7 @@
     $maskedEmail = substr($local, 0, 1) . str_repeat('*', max(strlen($local) - 1, 3)) . '@' . $domain;
 @endphp
 
-<div class="flex min-h-screen flex-col"
+<div class="flex flex-col gap-6"
      x-data="{
         open: false,
         pw: '',
@@ -49,15 +41,7 @@
      }"
      x-on:keydown.escape.window="close()">
 
-    {{-- Header --}}
-    <header class="flex h-[104px] shrink-0 items-center justify-between overflow-hidden bg-white px-8 shadow-[0_3px_4px_rgba(0,0,0,0.14)]">
-        <div class="flex items-center gap-4">
-            <img src="{{ asset('images/logo-trk.png') }}" alt="" class="size-16">
-            <div class="whitespace-pre-line text-[22px] font-bold leading-[130%] text-[#003385]">TEKNOLOGI&#10;REKAYASA KOMPUTER</div>
-        </div>
-    </header>
-
-    <main class="flex flex-1 flex-col gap-6 px-4 py-6 sm:px-8">
+    <div class="flex flex-col gap-6">
         {{-- Title row --}}
         <div class="flex flex-col gap-3">
             <a href="{{ url()->previous() }}" class="flex w-fit items-center gap-2.5 text-sm tracking-[-0.16px] text-[#6B7280]">
@@ -124,15 +108,20 @@
                 </div>
             </section>
         </div>
-    </main>
+    </div>
 
     {{-- Dialog Ubah Kata Sandi --}}
     <div x-show="open" x-cloak x-transition.opacity
          class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4"
          x-on:click.self="close()">
-        <form method="POST" action="{{ route('password.otp.send') }}" role="dialog" aria-modal="true"
-              class="flex w-full max-w-[872px] flex-col overflow-hidden rounded-lg bg-white shadow-[-1px_2px_5px_rgba(0,0,0,0.1),-4px_9px_10px_rgba(0,0,0,0.09),-10px_20px_13px_rgba(0,0,0,0.05)] md:flex-row">
-            @csrf
+        @if (Route::has('password.otp.send'))
+            <form method="POST" action="{{ route('password.otp.send') }}" role="dialog" aria-modal="true"
+                  class="flex w-full max-w-[872px] flex-col overflow-hidden rounded-lg bg-white shadow-[-1px_2px_5px_rgba(0,0,0,0.1),-4px_9px_10px_rgba(0,0,0,0.09),-10px_20px_13px_rgba(0,0,0,0.05)] md:flex-row">
+                @csrf
+        @else
+            <div role="dialog" aria-modal="true"
+                 class="flex w-full max-w-[872px] flex-col overflow-hidden rounded-lg bg-white shadow-[-1px_2px_5px_rgba(0,0,0,0.1),-4px_9px_10px_rgba(0,0,0,0.09),-10px_20px_13px_rgba(0,0,0,0.05)] md:flex-row">
+        @endif
 
             <aside class="flex shrink-0 flex-col gap-6 bg-[#F2F6FD] px-5 pb-6 pt-5 md:w-[314px] md:justify-between md:gap-12">
                 <div class="flex flex-col gap-6">
@@ -241,9 +230,15 @@
                             @enderror
                         </div>
 
-                        <p class="text-sm font-medium leading-5 tracking-[-0.16px] text-[#A8A8A8]">
-                            Kode OTP akan dikirim ke {{ $maskedEmail }}.
-                        </p>
+                        @if (Route::has('password.otp.send'))
+                            <p class="text-sm font-medium leading-5 tracking-[-0.16px] text-[#A8A8A8]">
+                                Kode OTP akan dikirim ke {{ $maskedEmail }}.
+                            </p>
+                        @else
+                            <p class="text-sm font-medium leading-5 text-[#B45309]">
+                                Pengiriman OTP belum tersedia karena route pengiriman belum dikonfigurasi.
+                            </p>
+                        @endif
                     </div>
                 </div>
 
@@ -252,14 +247,24 @@
                             class="rounded-md bg-[#FF3F3F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
                         Batal
                     </button>
-                    <button type="submit" :disabled="!canSubmit"
-                            class="rounded-md bg-[#27F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)] disabled:cursor-not-allowed disabled:opacity-50">
-                        Kirim Kode OTP
-                    </button>
+                    @if (Route::has('password.otp.send'))
+                        <button type="submit" :disabled="!canSubmit"
+                                class="rounded-md bg-[#27F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)] disabled:cursor-not-allowed disabled:opacity-50">
+                            Kirim Kode OTP
+                        </button>
+                    @else
+                        <button type="button" disabled
+                                class="rounded-md bg-[#27F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] opacity-50">
+                            OTP belum tersedia
+                        </button>
+                    @endif
                 </div>
             </div>
-        </form>
+        @if (Route::has('password.otp.send'))
+            </form>
+        @else
+            </div>
+        @endif
     </div>
 </div>
-</body>
-</html>
+@endsection
