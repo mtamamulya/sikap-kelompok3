@@ -18,4 +18,20 @@ Route::get('/pengajuan/{id}', [PengajuanController::class, 'show'])->whereNumber
 Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->whereNumber('id')->name('pengajuan.edit');
 Route::put('/pengajuan/{id}', [PengajuanController::class, 'update'])->whereNumber('id')->name('pengajuan.update');
 Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroy'])->whereNumber('id')->name('pengajuan.destroy');
-Route::view('/pengajuan-segera', 'PengajuanMahasiswa.segera')->name('pengajuan-segera');
+Route::get('/pengajuan-segera', function () {
+    if (! request()->has('menu')) {
+        return view('PengajuanMahasiswa.segera');
+    }
+
+    $destination = match (mb_strtolower(trim((string) request()->query('menu')))) {
+        'dashboard' => 'mahasiswa.dashboard',
+        'mahasiswa' => 'mahasiswa.index',
+        'mata kuliah' => 'mahasiswa.mata-kuliah',
+        'prestasi', 'prestasi mahasiswa' => 'mahasiswa.prestasi',
+        'kegiatan' => 'mahasiswa.kegiatan',
+        'profil saya' => 'mahasiswa.profil',
+        default => abort(404),
+    };
+
+    return redirect()->route($destination);
+})->name('pengajuan-segera');

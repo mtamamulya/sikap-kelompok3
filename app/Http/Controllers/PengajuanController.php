@@ -341,6 +341,11 @@ class PengajuanController extends Controller
 
     public function index(Request $request)
     {
+        return $this->renderIndex($request, 'PengajuanMahasiswa.index');
+    }
+
+    private function renderIndex(Request $request, string $view)
+    {
         $all = $this->rows();
         $q = trim($request->string('q')->toString());
         $status = $request->string('status')->toString();
@@ -369,7 +374,7 @@ class PengajuanController extends Controller
 
         $counts = $all->countBy('status');
 
-        return view('PengajuanMahasiswa.index', compact('rows', 'all', 'counts', 'q', 'status', 'from', 'to'));
+        return view($view, compact('rows', 'all', 'counts', 'q', 'status', 'from', 'to'));
     }
 
     public function create()
