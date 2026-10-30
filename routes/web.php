@@ -11,7 +11,7 @@ Route::view('/verifikasi/{id}', 'verifikasi.show')->whereNumber('id')->name('ver
 Route::view('/profil', 'profil.show')->name('profil');
 Route::view('/notifikasi', 'notifikasi.index')->name('notifikasi');
 
-Route::view('/penelitian', 'penelitian.index')->name('penelitian.index');
+Route::view('/penelitian','penelitian.index')->name('penelitian.index');
 Route::view('/penelitian/create', 'penelitian.create')->name('penelitian.create');
 // Detail: harus di bawah /penelitian/create supaya "create" tidak dianggap sebagai {id}
 Route::view('/penelitian/{id}', 'penelitian.show')->whereNumber('id')->name('penelitian.show');
@@ -48,5 +48,11 @@ Route::view('/pengajuan/dosen/{id}', 'pengajuan.show', ['asal' => 'dosen'])->whe
 Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
 // Detail pengajuan mahasiswa (angka = id pengajuan)
 Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
+// Pengajuan berita dosen (angka = id berita). Admin yang mereview dikerjakan terpisah.
+Route::view('/pengajuan/berita', 'berita.index')->name('berita.index');
+Route::view('/pengajuan/berita/create', 'berita.create')->name('berita.create');
+// Detail: harus di bawah /pengajuan/berita/create supaya "create" tidak dianggap sebagai {id}
+Route::view('/pengajuan/berita/{id}', 'berita.show')->whereNumber('id')->name('berita.show');
+Route::view('/pengajuan/berita/{id}/edit', 'berita.edit')->whereNumber('id')->name('berita.edit');
 // Tinjau / detail pengajuan (angka = id pengajuan)
 Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
