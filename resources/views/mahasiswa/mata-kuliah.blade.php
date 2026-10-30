@@ -4,28 +4,26 @@
 
 @section('content')
 @php
+    // Tab "riwayat" yang lama sudah dihapus. Tab "semua" sekarang tampil sebagai "Riwayat mata kuliah".
     $subjudul = [
-        'semua'    => 'Telusuri seluruh catatan mata kuliah Anda dalam satu tempat.',
+        'semua'    => 'Telusuri catatan mata kuliah Anda dari semester sebelumnya.',
         'berjalan' => 'Pantau mata kuliah dan beban studi Anda pada semester aktif.',
-        'riwayat'  => 'Telusuri catatan mata kuliah Anda dari semester sebelumnya.',
     ][$tab];
 
     $judulKartu = [
-        'semua'    => 'Daftar semua mata kuliah',
+        'semua'    => 'Riwayat mata kuliah',
         'berjalan' => 'Paket mata kuliah semester berjalan',
-        'riwayat'  => 'Daftar per semester',
     ][$tab];
 
     $ketKartu = [
         'semua'    => 'Temukan mata kuliah berdasarkan tingkat, periode, atau nama dosen.',
         'berjalan' => 'Daftar mata kuliah yang ditetapkan untuk semester aktif Anda.',
-        'riwayat'  => 'Telusuri catatan berdasarkan tahun akademik, semester, dan tingkat.',
     ][$tab];
 
+    // Urutan tombol tab: Semester berjalan di depan, Riwayat mata kuliah di belakang.
     $tabs = [
-        ['semua',    'Semua mata kuliah',   'mahasiswa.mata-kuliah'],
         ['berjalan', 'Semester berjalan',   'mahasiswa.mata-kuliah.berjalan'],
-        ['riwayat',  'Riwayat mata kuliah', 'mahasiswa.mata-kuliah.riwayat'],
+        ['semua',    'Riwayat mata kuliah', 'mahasiswa.mata-kuliah'],
     ];
 
     $n        = $rows->count();
@@ -33,12 +31,6 @@
     $badgeCls = 'shrink-0 rounded-full border border-[#B8D0FA] bg-[#E8F0FE] px-3 py-1 text-xs font-medium text-[#0162DD]';
     $selCls   = 'h-10 w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white pl-3.5 pr-9 text-sm text-[#0A0A0A] outline-none transition-colors hover:border-[#C7D2E5] focus:border-[#27F]';
     $infoIcon = '<svg class="mt-0.5 size-5 shrink-0 text-[#003385]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0"/><path d="M12 9h.01"/><path d="M11 12h1v4h1"/></svg>';
-
-    // Warna label Semester
-    $chipSemester = [
-        'Ganjil' => 'border-[#B8D0FA] bg-[#EEF4FF] text-[#0162DD]',
-        'Genap'  => 'border-[#F5D9A8] bg-[#FFF7E6] text-[#B25E09]',
-    ];
 @endphp
 
 <div class="flex flex-col gap-6">
@@ -142,7 +134,7 @@
             <div class="flex gap-3 rounded-xl bg-[#EEF4FF] px-4 py-3.5 text-[#003385]">
                 {!! $infoIcon !!}
                 <div class="flex flex-col gap-0.5">
-                    <div class="text-sm font-semibold">{{ $tab === 'semua' ? 'Informasi mata kuliah belum lengkap' : 'Pemetaan semester belum tersedia' }}</div>
+                    <div class="text-sm font-semibold">Informasi mata kuliah belum lengkap</div>
                     <p class="text-sm leading-5">
                         {{ $n }} catatan sumber ditampilkan apa adanya, termasuk nama mata kuliah yang berulang. Tingkat dan periode Ganjil/Genap bukan nomor semester. Nilai, SKS, dan status tiap mata kuliah belum tersedia.
                     </p>
@@ -150,8 +142,7 @@
             </div>
         @endif
 
-        {{-- Tabel: lebar kolom dikunci, tinggi minimum setara 10 baris --}}
-               {{-- Tabel: gaya sama dengan dashboard mahasiswa. Lebar kolom dikunci, tinggi minimum setara 10 baris --}}
+        {{-- Tabel: gaya sama dengan dashboard mahasiswa. Lebar kolom dikunci, tinggi minimum setara 10 baris --}}
         <div class="{{ $tab === 'berjalan' ? '' : 'min-h-[452px]' }} overflow-x-auto rounded-lg border border-[#E5E7EB]">
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
@@ -187,7 +178,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B7280]">
             <span>
                 @if ($tab === 'berjalan') {{ $n }} mata kuliah dipaketkan untuk semester aktif
