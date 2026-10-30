@@ -48,7 +48,7 @@
                     <select name="previous_activity" :disabled="sourceType !== 'previous'" class="{{ $select }}">
                         <option value="">Pilih kegiatan</option>
                         @foreach ($activities as $activity)
-                            <option value="{{ $activity }}" @selected($value('previous_activity') === $activity)>{{ $activity }}</option>
+                            <option value="{{ $activity['title'] }}" @selected($value('previous_activity') === $activity['title'])>{{ $activity['title'] }}</option>
                         @endforeach
                     </select>
                     <i class="ti ti-chevron-down pointer-events-none absolute right-3 top-3 text-base"></i>

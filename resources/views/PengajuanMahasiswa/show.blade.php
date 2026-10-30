@@ -36,6 +36,14 @@
                 <h1 class="text-[26px] font-bold leading-9">Detail pengajuan</h1>
                 <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $badge[$status] }}">{{ $status }}</span>
                 <div class="ml-auto flex flex-wrap items-center gap-2">
+                    <form method="POST" action="{{ route('pengajuan.destroy', $row['id']) }}"
+                          onsubmit="return confirm('Yakin ingin menghapus pengajuan ini? Tindakan ini tidak dapat dibatalkan.')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="flex h-10 items-center gap-2 rounded-lg border border-[#FECACA] bg-white px-4 text-sm font-semibold text-[#B91C1C] hover:bg-[#FEF2F2]">
+                            <i class="ti ti-trash text-base"></i>Hapus pengajuan
+                        </button>
+                    </form>
                     @if ($row['editable'])
                         <a href="{{ route('pengajuan.edit', $row['id']) }}" class="flex h-10 items-center gap-2 rounded-lg bg-[#2563EB] px-4 text-sm font-semibold text-white">
                             <i class="ti ti-pencil text-base"></i>Edit pengajuan

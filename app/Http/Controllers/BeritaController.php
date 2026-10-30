@@ -38,11 +38,7 @@ class BeritaController extends Controller
         return [
             'item' => $item,
             'categories' => self::CATEGORIES,
-            'activities' => [
-                'Lomba UI/UX Design Festival Mahasiswa 2026',
-                'Kunjungan Industri PT Teknologi Nusantara',
-                'Program Magang Industri 2026',
-            ],
+            'activities' => app(PengajuanController::class)->activityOptions(),
         ];
     }
 
@@ -100,10 +96,13 @@ class BeritaController extends Controller
     {
         $isSubmit = $request->input('intent') === 'submit';
         $required = $isSubmit ? 'required' : 'nullable';
+        $activities = app(PengajuanController::class)->activityOptions()
+            ->pluck('title')
+            ->all();
         $data = $request->validate([
             'intent' => ['required', Rule::in(['draft', 'submit'])],
             'source_type' => [$required, Rule::in(['previous', 'new'])],
-            'previous_activity' => [$isSubmit ? 'required_if:source_type,previous' : 'nullable', 'nullable', 'string', 'max:255'],
+            'previous_activity' => [$isSubmit ? 'required_if:source_type,previous' : 'nullable', 'nullable', 'string', 'max:255', Rule::in($activities)],
             'activity_name' => [$isSubmit ? 'required_if:source_type,new' : 'nullable', 'nullable', 'string', 'max:255'],
             'category' => [$required, Rule::in(self::CATEGORIES)],
             'title' => [$required, 'string', 'max:255'],

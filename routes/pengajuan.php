@@ -17,4 +17,5 @@ Route::post('/pengajuan', [PengajuanController::class, 'store'])->name('pengajua
 Route::get('/pengajuan/{id}', [PengajuanController::class, 'show'])->whereNumber('id')->name('pengajuan.show');
 Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->whereNumber('id')->name('pengajuan.edit');
 Route::put('/pengajuan/{id}', [PengajuanController::class, 'update'])->whereNumber('id')->name('pengajuan.update');
+Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroy'])->whereNumber('id')->name('pengajuan.destroy');
 Route::view('/pengajuan-segera', 'PengajuanMahasiswa.segera')->name('pengajuan-segera');

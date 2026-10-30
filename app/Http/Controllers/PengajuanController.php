@@ -12,6 +12,8 @@ class PengajuanController extends Controller
 {
     private const KEY = 'pengajuan.items';
 
+    private const DELETED_KEY = 'pengajuan.deleted';
+
     private const EDITABLE = ['Diajukan', 'Direview', 'Perlu revisi'];
 
     private function items(): array
@@ -273,8 +275,18 @@ class PengajuanController extends Controller
     private function all(): Collection
     {
         $mine = collect($this->items())->keyBy('id');
+        $deleted = collect(session(self::DELETED_KEY, []));
 
-        return $this->dummyItems()->keyBy('id')->replace($mine)->values();
+        return $this->dummyItems()->keyBy('id')->replace($mine)
+            ->reject(fn (array $item) => $deleted->contains($item['id']))
+            ->values();
+    }
+
+    public function activityOptions(): Collection
+    {
+        return $this->all()
+            ->map(fn (array $item) => ['id' => $item['id'], 'title' => $item['title']])
+            ->values();
     }
 
     private function find(int $id): array
@@ -408,6 +420,29 @@ class PengajuanController extends Controller
         ])->all();
 
         return view('PengajuanMahasiswa.show', compact('row', 'steps', 'student', 'files', 'item'));
+    }
+
+    public function destroy(int $id)
+    {
+        $this->find($id);
+
+        $items = collect($this->items())
+            ->reject(fn (array $item) => $item['id'] === $id)
+            ->values()
+            ->all();
+        $deleted = collect(session(self::DELETED_KEY, []))
+            ->push($id)
+            ->unique()
+            ->values()
+            ->all();
+
+        session([
+            self::KEY => $items,
+            self::DELETED_KEY => $deleted,
+        ]);
+
+        return redirect()->route('pengajuan.index')
+            ->with('success', 'Pengajuan berhasil dihapus.');
     }
 
     private function validated(Request $request): array

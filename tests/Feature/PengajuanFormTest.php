@@ -89,8 +89,53 @@ class PengajuanFormTest extends TestCase
     {
         $this->get(route('pengajuan.show', 1))
             ->assertOk()
+            ->assertSee('Hapus pengajuan')
             ->assertDontSee('Preview surat')
             ->assertDontSee('Preview surat pengajuan');
+    }
+
+    public function test_pengajuan_can_be_deleted_for_every_status(): void
+    {
+        $statuses = ['Diajukan', 'Direview', 'Disetujui', 'Selesai', 'Ditolak', 'Perlu revisi'];
+        $items = [];
+
+        foreach ($statuses as $index => $status) {
+            $items[] = [
+                'id' => 101 + $index,
+                'title' => 'Pengajuan status '.$status,
+                'category' => 'Pengabdian',
+                'type' => 'Kegiatan Pengabdian',
+                'status' => $status,
+                'submitted_at' => '2026-10-30T09:00:00+07:00',
+                'data' => [],
+                'documents' => [],
+            ];
+        }
+
+        $this->withSession(['pengajuan.items' => $items]);
+
+        foreach ($statuses as $index => $status) {
+            $id = 101 + $index;
+            $this->get(route('pengajuan.show', $id))
+                ->assertOk()
+                ->assertSee('Pengajuan status '.$status)
+                ->assertSee('Hapus pengajuan');
+
+            $this->delete(route('pengajuan.destroy', $id))
+                ->assertRedirect(route('pengajuan.index'))
+                ->assertSessionHas('success', 'Pengajuan berhasil dihapus.');
+
+            $this->get(route('pengajuan.show', $id))->assertNotFound();
+        }
+
+        $this->get(route('pengajuan.index'))
+            ->assertOk()
+            ->assertDontSee('Pengajuan status Diajukan');
+
+        $this->withSession(['success' => 'Pengajuan berhasil dihapus.'])
+            ->get(route('pengajuan.index'))
+            ->assertOk()
+            ->assertSee('Pengajuan berhasil dihapus.');
     }
 
     public function test_existing_dosen_and_mahasiswa_pages_remain_available(): void
@@ -98,6 +143,13 @@ class PengajuanFormTest extends TestCase
         $this->get(route('pengajuan.dosen'))->assertOk();
         $this->get(route('pengajuan.mahasiswa'))->assertOk();
         $this->get(route('pengajuan-segera'))->assertOk();
+    }
+
+    public function test_dashboard_renders_with_develop_pengajuan_routes(): void
+    {
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Kegiatan Menunggu Verifikasi');
     }
 
     public function test_berita_pages_and_draft_workflow_are_available(): void
@@ -119,6 +171,28 @@ class PengajuanFormTest extends TestCase
         $this->get(route('pengajuan.berita.show', 1))
             ->assertOk()
             ->assertSee('Draft');
+    }
+
+    public function test_berita_form_lists_existing_and_new_pengajuan_activities(): void
+    {
+        $this->get(route('pengajuan.berita.create'))
+            ->assertOk()
+            ->assertSee('Pengajuan Lomba KMPIN VII 2026');
+
+        $this->post(route('pengajuan.store'), [
+            'category' => 'Pengabdian',
+            'title' => 'Pengabdian Desa Digital',
+            'organizer' => 'Program Studi',
+            'location' => 'Semarang',
+            'start_date' => '2026-10-30',
+            'end_date' => '2026-10-31',
+        ])->assertRedirect(route('pengajuan.show', 101));
+
+        $this->get(route('pengajuan.berita.create'))
+            ->assertOk()
+            ->assertSee('Pengajuan Lomba KMPIN VII 2026')
+            ->assertSee('Pengabdian Desa Digital')
+            ->assertDontSee('Lomba UI/UX Design Festival Mahasiswa 2026');
     }
 
     public function test_berita_submission_requires_complete_fields_and_cover_photo(): void
