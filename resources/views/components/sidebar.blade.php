@@ -41,10 +41,11 @@
         [
             'label'  => 'Pengajuan',
             'href'   => '#',
-            'active' => request()->routeIs('pengajuan.*'),
+            'active' => request()->routeIs('pengajuan.*', 'berita.*'),
             'children' => [
                 ['label' => 'Dosen',     'href' => route('pengajuan.dosen'),     'active' => request()->routeIs('pengajuan.dosen*')],
                 ['label' => 'Mahasiswa', 'href' => route('pengajuan.mahasiswa'), 'active' => request()->routeIs('pengajuan.mahasiswa*')],
+                ['label' => 'Berita',    'href' => route('berita.index'),        'active' => request()->routeIs('berita.*')],
             ],
             'icon'   => '<path d="M13.0815 18.1953L17.4592 21.0095C18.1248 21.4373 19 20.9595 19 20.1683V7C19 4.79086 17.2091 3 15 3H9C6.79086 3 5 4.79086 5 7V20.1683C5 20.9595 5.87525 21.4373 6.54076 21.0095L10.9185 18.1953C11.5773 17.7717 12.4227 17.7717 13.0815 18.1953Z" stroke="currentColor" stroke-width="1.5"/><path d="M9 8.5H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
         ],
