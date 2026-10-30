@@ -21,7 +21,7 @@ $daftar = [
 
 // id tetap (1, 2, 3, ...) supaya tautan Lihat / Edit tidak berubah saat tabel dicari, difilter, atau diurutkan.
 foreach ($daftar as $n => &$d) {
-    $d['id']  = $n + 1;
+    $d['id'] = $n + 1;
     $d['isi'] = $isi;
 }
 unset($d);
