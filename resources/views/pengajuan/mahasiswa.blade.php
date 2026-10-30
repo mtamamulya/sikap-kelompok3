@@ -32,15 +32,12 @@
         $k['label3']  = $a['label3'];
         return $k;
     }, $daftar);
-    // id tetap (1, 2, 3, ...) supaya tombol Tinjau tidak berubah saat daftar difilter oleh tab atau pencarian.
-    foreach ($daftar as $n => &$d) { $d['id'] = $n + 1; }
-    unset($d);
 @endphp
 
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-3xl font-bold tracking-tight">Pengajuan Mahasiswa</h1>
+        <h1 class="text-4xl font-bold tracking-tight">Pengajuan Mahasiswa</h1>
         <p class="text-2xl text-gray-400">Dashboard / Pengajuan / Mahasiswa</p>
     </div>
 
@@ -84,17 +81,17 @@
 
                         <div class="flex shrink-0 items-center gap-3">
                             <span :class="warnaBadge[k.status]" class="rounded-md px-2 py-0.5 text-xs" x-text="k.status"></span>
-                            {{-- Tombol Tinjau: membuka halaman Detail Pengajuan --}}
-                            <a :href="`{{ url('/pengajuan/mahasiswa') }}/${k.id}`" :aria-label="`Tinjau ${k.judul}`"
+                            {{-- Tombol Tinjau: alamat halaman tinjau diisi nanti --}}
+                            <a href="#" :aria-label="`Tinjau ${k.judul}`"
                                class="flex h-9 items-center rounded-md bg-brand px-4 text-base text-white hover:bg-blue-700">Tinjau</a>
                         </div>
                     </div>
 
                     {{-- Alur 4 langkah --}}
-                    <ol class="flex" aria-label="Tahapan pengajuan">
+                    <ol class="grid grid-cols-4" aria-label="Tahapan pengajuan">
                         <template x-for="(s, n) in k.langkah" :key="n">
-                            <li class="flex flex-col items-start gap-2" :class="n === 3 ? 'shrink-0' : 'flex-1'">
-                                <div class="flex w-full items-center">
+                            <li class="flex flex-col gap-2" :class="n === 3 ? 'items-end' : 'items-start'">
+                                <div class="flex w-full items-center" :class="n === 3 ? 'justify-end' : ''">
                                     <span :class="lingkaran(k, n)"
                                           class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-medium">
                                         <template x-if="s === 'd' || s === 'h'">

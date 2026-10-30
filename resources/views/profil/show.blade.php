@@ -69,7 +69,7 @@
     {{-- Judul halaman + tombol --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-3xl font-bold tracking-tight">Profil</h1>
+            <h1 class="text-4xl font-bold tracking-tight">Profil</h1>
             <p class="text-2xl text-gray-400">Dashboard / Profil</p>
         </div>
         <div class="mt-2 flex items-center gap-3">
@@ -158,28 +158,22 @@
 
     {{-- Aktivitas dosen: tab berpindah dengan Alpine.js --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-5 shadow-sm"
-            x-data="{ tab: 'Penelitian', data: @js($aktivitas) }">
+             x-data="{ tab: 'Penelitian', data: @js($aktivitas) }">
         <h2 class="text-2xl font-medium">Aktivitas Dosen</h2>
 
-        <!-- Container Tab dengan Scroll Horizontal -->
-        <div class="w-full border-b border-gray-200">
-            <div role="tablist" aria-label="Jenis aktivitas" 
-                class="flex overflow-x-auto whitespace-nowrap gap-4 no-scrollbar">
-                @foreach (array_keys($aktivitas) as $nama)
-                    <button type="button" role="tab" id="tab-{{ $nama }}"
-                            x-on:click="tab = '{{ $nama }}'"
-                            :aria-selected="tab === '{{ $nama }}'"
-                            :class="tab === '{{ $nama }}' ? 'border-brand text-gray-900 font-medium' : 'border-transparent text-gray-400 hover:text-gray-700'"
-                            class="-mb-px flex shrink-0 cursor-pointer items-center gap-2 border-b-2 pb-3 pt-1 text-sm transition-colors">
-                        <span>{{ $nama }}</span>
-                        
-                        {{-- Badge Angka --}}
-                        <span x-show="tab === '{{ $nama }}'" x-cloak
-                            class="flex size-5 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white"
-                            x-text="data['{{ $nama }}'].length"></span>
-                    </button>
-                @endforeach
-            </div>
+        <div role="tablist" aria-label="Jenis aktivitas" class="flex flex-wrap gap-x-2 border-b border-gray-200">
+            @foreach (array_keys($aktivitas) as $nama)
+                <button type="button" role="tab" id="tab-{{ $nama }}"
+                        x-on:click="tab = '{{ $nama }}'"
+                        :aria-selected="tab === '{{ $nama }}'"
+                        :class="tab === '{{ $nama }}' ? 'border-brand text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-700'"
+                        class="-mb-px flex cursor-pointer items-center gap-2 border-b-2 px-3 py-2.5 text-sm">
+                    {{ $nama }}
+                    <span x-show="tab === '{{ $nama }}'" x-cloak
+                          class="flex size-5 items-center justify-center rounded-full bg-brand text-xs text-white"
+                          x-text="data['{{ $nama }}'].length"></span>
+                </button>
+            @endforeach
         </div>
 
         <ul role="tabpanel" :aria-labelledby="`tab-${tab}`" class="flex flex-col">
@@ -232,7 +226,7 @@
 
                 {{-- Pilih file --}}
                 <div class="flex flex-col gap-2">
-                    <label class="relative flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed border-brand bg-white px-4 py-8 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
+                    <label class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed border-brand bg-white px-4 py-8 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
                         <input type="file" name="foto" class="sr-only" accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                                x-ref="berkas" x-on:change="pilih($event)">
                         <span class="flex items-center gap-2 text-base font-medium text-gray-500">
@@ -410,6 +404,10 @@
                                     class="cursor-pointer text-base text-brand hover:underline">Kirim ulang kode</button>
                         </div>
 
+                        <p x-show="selesai" x-cloak role="status"
+                           class="rounded-lg border border-green-200 bg-green-50 px-3.5 py-2.5 text-sm text-green-800">
+                            Tersimpan (simulasi). Pengiriman ke web master belum tersambung.
+                        </p>
                     </div>
 
                     {{-- Tombol --}}
@@ -494,14 +492,13 @@
                 this.info = '';
                 this.otp = ['', '', '', '', '', ''];
                 this.mulaiTimer();
-                this.$dispatch('tampil-alert', { tipe: 'info', judul: 'Kode verifikasi dikirim', pesan: 'Periksa email kamu. Kode berlaku 5 menit. (Simulasi: belum ada email yang terkirim.)' });
                 this.$nextTick(() => document.getElementById('otp-0').focus());
             },
             kirimUlang() {
                 this.otp = ['', '', '', '', '', ''];
                 this.selesai = false;
                 this.mulaiTimer();
-                this.$dispatch('tampil-alert', { tipe: 'info', judul: 'Kode baru dikirim', pesan: 'Kode sebelumnya tidak berlaku lagi. (Simulasi.)' });
+                this.info = 'Kode baru telah dikirim (simulasi).';
                 this.$nextTick(() => document.getElementById('otp-0').focus());
             },
 
@@ -529,12 +526,7 @@
             // Kalau alamat web master sudah diisi ($urlSimpanSandi di atas), formulir dikirim ke sana
             // berisi password, password_confirmation, dan otp. Kalau masih '#', hanya simulasi.
             simpan() {
-                if (action === '#') {
-                    // Simulasi: modal ditutup, lalu alert sukses muncul
-                    this.tutup();
-                    this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Kata sandi berhasil diubah', pesan: 'Simulasi: pengiriman ke web master belum tersambung.' });
-                    return;
-                }
+                if (action === '#') { this.selesai = true; return; }
                 this.$refs.form.submit();
             },
         }));
@@ -593,7 +585,6 @@
                 this.namaFile = '';
                 this.$refs.berkas.value = '';
                 this.terbuka = false;
-                this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Foto profil berhasil diubah', pesan: 'Simulasi: setelah halaman di-refresh, foto kembali seperti semula.' });
             },
         }));
     });

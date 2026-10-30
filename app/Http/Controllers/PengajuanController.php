@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PengajuanController extends Controller
@@ -68,7 +67,7 @@ class PengajuanController extends Controller
             [
                 'status' => 'Disetujui',
                 'submitted_at' => '2026-04-08T08:45:00+07:00',
-                'category' => 'Lainnya',
+                'category' => 'Pengabdian',
                 'title' => 'Seminar Nasional Teknologi Terapan 2026',
                 'organizer' => 'Politeknik Negeri Semarang',
                 'location' => 'Semarang',
@@ -121,7 +120,7 @@ class PengajuanController extends Controller
             [
                 'status' => 'Disetujui',
                 'submitted_at' => '2026-06-17T15:10:00+07:00',
-                'category' => 'Lainnya',
+                'category' => 'Pengabdian',
                 'title' => 'Pelatihan Keamanan Jaringan dan Cloud Computing',
                 'organizer' => 'Himpunan Mahasiswa Teknologi Rekayasa Komputer',
                 'location' => 'Semarang',
@@ -214,7 +213,7 @@ class PengajuanController extends Controller
             [
                 'status' => 'Direview',
                 'submitted_at' => '2026-10-04T10:15:00+07:00',
-                'category' => 'Lainnya',
+                'category' => 'Pengabdian',
                 'title' => 'Workshop Pengembangan Aplikasi Berbasis Cloud',
                 'organizer' => 'Cloud Computing Indonesia',
                 'location' => 'Daring',
@@ -241,7 +240,7 @@ class PengajuanController extends Controller
             [
                 'status' => 'Direview',
                 'submitted_at' => '2026-10-22T08:55:00+07:00',
-                'category' => 'Lainnya',
+                'category' => 'Pengabdian',
                 'title' => 'Seminar Nasional Transformasi Digital Kampus',
                 'organizer' => 'Forum Pendidikan Tinggi Indonesia',
                 'location' => 'Surakarta',
@@ -358,17 +357,17 @@ class PengajuanController extends Controller
 
         $counts = $all->countBy('status');
 
-        return view('pengajuan.index', compact('rows', 'all', 'counts', 'q', 'status', 'from', 'to'));
+        return view('PengajuanMahasiswa.index', compact('rows', 'all', 'counts', 'q', 'status', 'from', 'to'));
     }
 
     public function create()
     {
-        return view('pengajuan.create', ['item' => null]);
+        return view('PengajuanMahasiswa.create', ['item' => null]);
     }
 
     public function edit(int $id)
     {
-        return view('pengajuan.create', ['item' => $this->findEditable($id)]);
+        return view('PengajuanMahasiswa.create', ['item' => $this->findEditable($id)]);
     }
 
     public function show(int $id)
@@ -402,52 +401,16 @@ class PengajuanController extends Controller
 
         $student = ['name' => 'Arya Bima', 'nim' => '43325115', 'prodi' => 'Teknologi Rekayasa Komputer'];
 
-        $files = $item['documents']
-            ? collect($item['documents'])->map(fn ($f) => [
-                'name' => $f['name'],
-                'meta' => strtoupper(pathinfo($f['name'], PATHINFO_EXTENSION)).' • '.$this->readableSize((int) $f['size']),
-                'url' => asset('storage/'.$f['path']),
-            ])->all()
-            : [
-                ['name' => 'Dokumen_pengajuan_Arya.pdf', 'meta' => 'PDF • 1,2 MB'],
-                ['name' => 'Lampiran_pendukung.pdf', 'meta' => 'PDF • 840 KB'],
-            ];
+        $files = collect($item['documents'] ?? [])->map(fn ($f) => [
+            'name' => $f['name'] ?? 'Dokumen pendukung',
+            'meta' => $f['type'] ?? (isset($f['size']) ? strtoupper(pathinfo($f['name'], PATHINFO_EXTENSION)).' • '.$this->readableSize((int) $f['size']) : 'Tautan dokumen'),
+            'url' => $f['url'] ?? (isset($f['path']) ? asset('storage/'.$f['path']) : null),
+        ])->all();
 
-        return view('pengajuan.show', compact('row', 'steps', 'student', 'files', 'item'));
+        return view('PengajuanMahasiswa.show', compact('row', 'steps', 'student', 'files', 'item'));
     }
 
-    public function upload(Request $request)
-    {
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip', 'max:10240'],
-        ], [
-            'file.mimes' => 'Format tidak didukung.',
-            'file.max' => 'Ukuran berkas maksimal 10 MB.',
-            'file.uploaded' => 'Gagal mengunggah. Ukuran melebihi batas server (cek upload_max_filesize di php.ini).',
-        ]);
-
-        $file = $request->file('file');
-        $path = $file->store('tmp', 'public');
-
-        return response()->json([
-            'path' => $path,
-            'name' => $file->getClientOriginalName(),
-            'size' => $file->getSize(),
-        ]);
-    }
-
-    public function removeUpload(Request $request)
-    {
-        $path = $request->input('path');
-
-        if (is_string($path) && str_starts_with($path, 'tmp/') && ! str_contains($path, '..')) {
-            Storage::disk('public')->delete($path);
-        }
-
-        return response()->json(['ok' => true]);
-    }
-
-    private function validated(Request $request, array $oldDocs = [], bool $docsOptional = false): array
+    private function validated(Request $request): array
     {
         $members = ['exclude_unless:participation,Tim', 'required', 'json', function ($attr, $value, $fail) {
             if (count(json_decode($value, true) ?? []) < 1) {
@@ -456,23 +419,15 @@ class PengajuanController extends Controller
         }];
 
         $common = [
-            'category' => ['required', Rule::in(['Lomba', 'Volunteer', 'Magang', 'Lainnya'])],
+            'category' => ['required', Rule::in(['Lomba', 'Volunteer', 'Magang', 'Pengabdian'])],
             'location' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-            'description' => ['required', 'string', 'max:1000'],
-            'documents' => $docsOptional ? ['nullable', 'array', 'max:5'] : ['required', 'array', 'min:1', 'max:5'],
-            'documents.*' => ['required', 'string', function ($attr, $value, $fail) use ($oldDocs) {
-                $valid = (str_starts_with($value, 'tmp/') || in_array($value, $oldDocs, true))
-                    && ! str_contains($value, '..')
-                    && Storage::disk('public')->exists($value);
-
-                if (! $valid) {
-                    $fail('Berkas tidak valid, silakan unggah ulang.');
-                }
-            }],
-            'document_names' => ['nullable', 'array'],
-            'document_names.*' => ['nullable', 'string', 'max:255'],
+            'documents' => ['nullable', 'array'],
+            'documents.*' => ['required', 'array:name,type,url'],
+            'documents.*.name' => ['required', 'string', 'max:255'],
+            'documents.*.type' => ['required', Rule::in(['Dokumentasi', 'Surat Mitra', 'Surat Mahasiswa', 'Surat Pengabdian'])],
+            'documents.*.url' => ['required', 'url', 'max:500'],
         ];
 
         $specific = match ($request->input('category')) {
@@ -495,13 +450,9 @@ class PengajuanController extends Controller
                 'organizer' => ['required', 'string', 'max:255'],
                 'duration_months' => ['required', 'integer', 'min:1', 'max:60'],
             ],
-            'Lainnya' => [
+            'Pengabdian' => [
                 'title' => ['required', 'string', 'max:255'],
                 'organizer' => ['required', 'string', 'max:255'],
-                'scope' => ['required', Rule::in(['Kampus', 'Regional', 'Nasional', 'Internasional'])],
-                'role' => ['required', Rule::in(['Peserta', 'Panitia', 'Narasumber', 'Lainnya'])],
-                'participation' => ['required', Rule::in(['Individu', 'Tim'])],
-                'members' => $members,
                 'info_url' => ['nullable', 'url'],
                 'advisor' => ['nullable', 'string', 'max:255'],
             ],
@@ -521,31 +472,19 @@ class PengajuanController extends Controller
         return $data;
     }
 
-    private function persistDocuments(array $data): array
-    {
-        return collect($data['documents'] ?? [])->map(function ($path, $i) use ($data) {
-            $name = $data['document_names'][$i] ?? basename($path);
-
-            if (str_starts_with($path, 'tmp/')) {
-                $final = 'pengajuan/'.basename($path);
-                Storage::disk('public')->move($path, $final);
-                $path = $final;
-            }
-
-            return ['path' => $path, 'name' => $name, 'size' => Storage::disk('public')->size($path)];
-        })->values()->all();
-    }
-
     private function typeFor(string $category): string
     {
-        return $category === 'Lainnya' ? 'Kegiatan mahasiswa' : 'Dukungan '.strtolower($category).' mahasiswa';
+        return match ($category) {
+            'Lomba', 'Volunteer', 'Magang' => 'Dukungan '.strtolower($category).' mahasiswa',
+            default => 'Kegiatan '.$category,
+        };
     }
 
     public function store(Request $request)
     {
         $data = $this->validated($request);
-        $files = $this->persistDocuments($data);
-        unset($data['documents'], $data['document_names']);
+        $documents = $data['documents'] ?? [];
+        unset($data['documents']);
 
         $items = $this->items();
         $id = max(100, (int) collect($items)->max('id')) + 1;
@@ -558,37 +497,29 @@ class PengajuanController extends Controller
             'status' => 'Diajukan',
             'submitted_at' => now()->toIso8601String(),
             'data' => $data,
-            'documents' => $files,
+            'documents' => $documents,
         ];
         session([self::KEY => $items]);
 
         // TODO: ganti penyimpanan session dengan Eloquent (Submission::create) saat database siap.
 
         return redirect()->route('pengajuan.show', $id)
-            ->with('success', 'Pengajuan berhasil dikirim.')
-            ->with('preview', true);
+            ->with('success', 'Pengajuan berhasil dikirim.');
     }
 
     public function update(Request $request, int $id)
     {
         $item = $this->findEditable($id);
-        $legacy = $item['documents'] === null;
-        $oldPaths = collect($item['documents'] ?? [])->pluck('path')->all();
-
-        $data = $this->validated($request, $oldPaths, $legacy);
-        $files = $this->persistDocuments($data);
-        unset($data['documents'], $data['document_names']);
-
-        foreach (array_diff($oldPaths, collect($files)->pluck('path')->all()) as $removed) {
-            Storage::disk('public')->delete($removed);
-        }
+        $data = $this->validated($request);
+        $documents = $data['documents'] ?? [];
+        unset($data['documents']);
 
         $updated = array_merge($item, [
             'title' => $data['title'],
             'category' => $data['category'],
             'type' => $this->typeFor($data['category']),
             'data' => $data,
-            'documents' => ($legacy && ! $files) ? null : $files,
+            'documents' => $documents,
             'updated_at' => now()->toIso8601String(),
         ]);
 
@@ -596,7 +527,6 @@ class PengajuanController extends Controller
         session([self::KEY => $items]);
 
         return redirect()->route('pengajuan.show', $id)
-            ->with('success', 'Perubahan pengajuan berhasil disimpan.')
-            ->with('preview', true);
+            ->with('success', 'Perubahan pengajuan berhasil disimpan.');
     }
 }

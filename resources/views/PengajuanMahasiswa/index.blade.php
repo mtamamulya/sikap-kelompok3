@@ -17,9 +17,9 @@
         ['SELESAI', $counts['Selesai'] ?? 0, 'bg-[#9CA3AF]'],
     ];
     $guide = [
-        'Pastikan semua dokumen pendukung sudah lengkap.',
-        'Gunakan format PDF dengan ukuran maksimal 5 MB.',
-        'Gunakan nama file yang jelas dan relevan.',
+        'Dokumen pendukung bersifat opsional.',
+        'Lampirkan tautan yang dapat diakses oleh tim peninjau.',
+        'Gunakan nama dokumen dan jenis yang sesuai.',
     ];
     $fmt = fn ($d) => \Carbon\Carbon::parse($d)->locale('id')->translatedFormat('d M Y');
     $rangeLabel = $from && $to ? $fmt($from).' - '.$fmt($to) : ($from ? 'Mulai '.$fmt($from) : ($to ? 'Sampai '.$fmt($to) : 'Semua tanggal'));

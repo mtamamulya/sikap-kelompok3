@@ -40,7 +40,7 @@
     {{-- Judul halaman + tombol kembali --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-3xl font-bold tracking-tight">Detail Penelitian</h1>
+            <h1 class="text-4xl font-bold tracking-tight">Detail Penelitian</h1>
             <p class="text-2xl text-gray-400">Dashboard / Penelitian / Detail Penelitian</p>
         </div>
         <a href="{{ route('penelitian.index') }}"

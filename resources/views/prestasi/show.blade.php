@@ -39,7 +39,7 @@
     {{-- Judul halaman + tombol kembali --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-3xl font-bold tracking-tight">Detail Prestasi</h1>
+            <h1 class="text-4xl font-bold tracking-tight">Detail Prestasi</h1>
             <p class="text-2xl text-gray-400">Dashboard / Prestasi / Detail Prestasi</p>
         </div>
         <a href="{{ route('prestasi.index') }}"
@@ -141,12 +141,11 @@
                                 </div>
 
                                 <div class="flex items-center gap-2">
-                                    <button type="button" x-data
-                                       x-on:click="$dispatch('buka-preview', { file: @js($d['file']), url: @js($d['url']), jenis: @js($d['jenis'] ?? '') })"
-                                       class="cursor-pointer flex h-9 items-center gap-1.5 rounded-lg bg-blue-100 px-3.5 text-sm font-medium text-brand hover:bg-blue-200">
+                                    <a href="{{ $d['url'] }}" target="_blank" rel="noopener noreferrer"
+                                       class="flex h-9 items-center gap-1.5 rounded-lg bg-blue-100 px-3.5 text-sm font-medium text-brand hover:bg-blue-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
                                         Lihat
-                                    </button>
+                                    </a>
                                     <a href="{{ $d['url'] }}" download="{{ $d['file'] }}"
                                        class="flex h-9 items-center gap-1.5 rounded-lg border border-brand bg-white px-3.5 text-sm font-medium text-brand hover:bg-blue-50">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>

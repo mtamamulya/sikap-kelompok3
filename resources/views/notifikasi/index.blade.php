@@ -26,7 +26,7 @@
         {{-- Judul + tombol --}}
         <div class="flex flex-wrap items-end justify-between gap-3">
             <div class="flex flex-col gap-1.5">
-                <h1 class="text-3xl font-bold tracking-tight">Notifikasi</h1>
+                <h1 class="text-4xl font-bold tracking-tight">Notifikasi</h1>
                 <p class="text-2xl text-gray-400">Dashboard / Notifikasi</p>
             </div>
             <button type="button" x-on:click="tandaiSemua()" :disabled="belumDibaca === 0"
@@ -50,7 +50,7 @@
         </div>
 
         {{-- Daftar, dikelompokkan per waktu --}}
-        <div class="flex max-w-full flex-col gap-5">
+        <div class="flex max-w-4xl flex-col gap-5">
             <template x-for="g in grup" :key="g.judul">
                 <section :aria-label="g.judul" class="flex flex-col gap-2">
                     <h2 class="text-sm font-semibold tracking-wide text-gray-500" x-text="g.judul"></h2>
