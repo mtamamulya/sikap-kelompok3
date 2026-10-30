@@ -225,13 +225,13 @@
                         </div>
                         <div class="grid gap-4 md:grid-cols-2">
                             <label class="flex flex-col gap-1.5 text-[13px] font-medium text-[#374151]">
-                                Nama dokumen <span class="text-[#FF3F3F]">*</span>
+                                <span>Nama dokumen <span class="text-[#FF3F3F]">*</span></span>
                                 <input type="text" x-model="document.name" :name="'documents[' + index + '][name]'" maxlength="255" required
                                        class="{{ $input }}" placeholder="Contoh: Proposal pengabdian">
                                 @error('documents.*.name')<span class="text-xs text-[#FF3F3F]">{{ $message }}</span>@enderror
                             </label>
                             <label class="flex flex-col gap-1.5 text-[13px] font-medium text-[#374151]">
-                                Jenis dokumen <span class="text-[#FF3F3F]">*</span>
+                                <span>Jenis dokumen <span class="text-[#FF3F3F]">*</span></span>
                                 <div class="relative">
                                     <select x-model="document.type" :name="'documents[' + index + '][type]'" required class="{{ $select }}">
                                         <option value="">Pilih jenis dokumen</option>
@@ -245,7 +245,7 @@
                             </label>
                         </div>
                         <label class="flex flex-col gap-1.5 text-[13px] font-medium text-[#374151]">
-                            Tautan dokumen <span class="text-[#FF3F3F]">*</span>
+                            <span>Tautan dokumen <span class="text-[#FF3F3F]">*</span></span>
                             <input type="url" x-model="document.url" :name="'documents[' + index + '][url]'" maxlength="500" required
                                    class="{{ $input }}" placeholder="https://...">
                             @error('documents.*.url')<span class="text-xs text-[#FF3F3F]">{{ $message }}</span>@enderror

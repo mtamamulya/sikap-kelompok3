@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -46,6 +47,30 @@ Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.maha
 Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 // Tinjau / detail pengajuan (angka = id pengajuan)
 Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
+
+Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])
+    ->name('mahasiswa.dashboard');
+Route::get('/mahasiswa/mata-kuliah', [MahasiswaController::class, 'mataKuliah'])
+    ->defaults('tab', 'semua')->name('mahasiswa.mata-kuliah');
+Route::get('/mahasiswa/mata-kuliah/semester-berjalan', [MahasiswaController::class, 'mataKuliah'])
+    ->defaults('tab', 'berjalan')->name('mahasiswa.mata-kuliah.berjalan');
+Route::get('/mahasiswa/mata-kuliah/riwayat', [MahasiswaController::class, 'mataKuliah'])
+    ->defaults('tab', 'riwayat')->name('mahasiswa.mata-kuliah.riwayat');
+Route::get('/mahasiswa/prestasi', [MahasiswaController::class, 'prestasi'])
+    ->name('mahasiswa.prestasi');
+Route::get('/mahasiswa/prestasi/tambah', [MahasiswaController::class, 'prestasiTambah'])
+    ->name('mahasiswa.prestasi.tambah');
+Route::post('/mahasiswa/prestasi', [MahasiswaController::class, 'prestasiSimpan'])
+    ->name('mahasiswa.prestasi.simpan');
+Route::get('/mahasiswa/prestasi/{prestasi}/edit', [MahasiswaController::class, 'prestasiEdit'])
+    ->name('mahasiswa.prestasi.edit');
+Route::delete('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiHapus'])
+    ->name('mahasiswa.prestasi.hapus');
+Route::put('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiUpdate'])
+    ->name('mahasiswa.prestasi.update');
+
+Route::post('/logout', fn () => redirect()->route('profil'))->name('logout');
+Route::post('/password/otp', fn () => back())->name('password.otp.send');
 
 // Route halaman Pengajuan mahasiswa (daftar, form, detail) ada di routes/pengajuan.php.
 // Route detail tim (/pengajuan/{id} dengan nama pengajuan.show) tidak dipakai karena bentrok
