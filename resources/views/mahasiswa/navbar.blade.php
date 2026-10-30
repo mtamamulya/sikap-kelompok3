@@ -1,0 +1,87 @@
+@php
+    $mhsActive = request()->is('mahasiswa*', 'profil');
+
+    $menuMhs = [
+        ['label' => 'Mata kuliah',        'url' => url('/mahasiswa/mata-kuliah'), 'match' => 'mahasiswa/mata-kuliah*'],
+        ['label' => 'Prestasi mahasiswa', 'url' => url('/mahasiswa/prestasi'),    'match' => 'mahasiswa/prestasi*'],
+    ];
+    $subAktif = collect($menuMhs)->contains(fn ($i) => request()->is($i['match']));
+
+    $navItem = 'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-white/10';
+    $navIcon = 'size-5 shrink-0';
+@endphp
+
+{{-- ================= SIDEBAR (ASIDE) ================= --}}
+<aside class="hidden w-60 shrink-0 flex-col gap-6 overflow-y-auto bg-linear-to-b from-[#1f66e5] from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% px-3 py-5 text-white lg:flex sticky top-0 h-screen">
+
+    <!-- Logo & Brand Header -->
+    <a href="{{ url('/') }}" class="flex items-center gap-2.5 px-2">
+        <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0" onerror="this.src='https://api.builder.io/api/v1/image/assets/TEMP/89ec6d5eff0263da1bc98643370f3576302d902a?width=92'">
+        <span class="text-[13px] font-bold leading-[1.3] text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
+    </a>
+
+    <!-- Menu Navigasi Utama -->
+    <nav class="flex flex-col gap-1.5 text-[15px] text-white">
+        
+        <!-- Dashboard -->
+        <a href="{{ url('/') }}" 
+           class="{{ $navItem }} {{ request()->is('/') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
+            <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h6v6h-6z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6h-6z"/><path d="M14 14h6v6h-6z"/>
+            </svg>
+            Dashboard
+        </a>
+
+        <!-- Pengajuan -->
+        <a href="#" 
+           class="{{ $navItem }} {{ request()->is('pengajuan*') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
+            <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/>
+            </svg>
+            Pengajuan
+        </a>
+
+        {{-- ===== Grup Submenu Mahasiswa ===== --}}
+        <div x-data="{ openMhs: {{ $mhsActive ? 'true' : 'false' }} }" class="flex flex-col gap-1.5">
+            <div class="flex items-center rounded-lg transition-colors
+                        {{ $subAktif ? 'bg-white/15 text-white' : ($mhsActive ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'hover:bg-white/10') }}">
+                
+                <a href="#" class="flex flex-1 items-center gap-3 rounded-l-lg px-3 py-2.5">
+                    <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M8 21v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/><path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M17 10h2a2 2 0 0 1 2 2v1"/><path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M3 13v-1a2 2 0 0 1 2-2h2"/>
+                    </svg>
+                    <span class="flex-1">Mahasiswa</span>
+                </a>
+
+                <button type="button" x-on:click="openMhs = !openMhs" :aria-expanded="openMhs"
+                        aria-label="Buka atau tutup submenu Mahasiswa" class="rounded-r-lg px-3 py-2.5">
+                    <svg class="size-4 transition-transform" :class="openMhs && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9l6 6l6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div x-show="openMhs" x-cloak x-transition class="flex flex-col gap-1.5">
+                @foreach ($menuMhs as $item)
+                    @php $aktif = request()->is($item['match']); @endphp
+                    <a href="{{ $item['url'] }}" @if ($aktif) aria-current="page" @endif
+                       class="rounded-lg py-2 pl-11 pr-3 text-sm transition-colors
+                              {{ $aktif ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+        {{-- ===== Akhir Grup Mahasiswa ===== --}}
+
+        <!-- Kegiatan -->
+        <a href="{{ url('/kegiatan') }}" 
+           class="{{ $navItem }} {{ request()->is('kegiatan*') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
+            <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3-5a9 9 0 0 0 6-8a3 3 0 0 0-3-3a9 9 0 0 0-8 6a6 6 0 0 0-5 3"/><path d="M7 14a6 6 0 0 0-3 6a6 6 0 0 0 6-3"/><path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/>
+            </svg>
+            Kegiatan
+        </a>
+
+    </nav>
+</aside>
