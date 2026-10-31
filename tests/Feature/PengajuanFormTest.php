@@ -159,7 +159,7 @@ class PengajuanFormTest extends TestCase
     {
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('Kegiatan Menunggu Verifikasi');
+            ->assertSee('TOTAL PENGAJUAN');
     }
 
     public function test_teammate_mahasiswa_pages_are_available(): void

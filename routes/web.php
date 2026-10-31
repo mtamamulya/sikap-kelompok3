@@ -13,7 +13,7 @@ Route::post('/logout', function () {
 })->name('logout');
 
 // --- Halaman Utama & Fitur ---
-Route::view('/dashboard', 'dosen.dashboard')->name('dashboard');
+Route::view('/dashboard', 'dashboard')->name('dashboard');
 Route::view('/kegiatan', 'kegiatan')->name('kegiatan.index');
 Route::view('/profil', 'profil')->name('profil');
 
