@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MahasiswaController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Redirect halaman utama ke dashboard
@@ -38,10 +39,17 @@ Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.maha
 Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
 
-// Route pengajuan berita (diperlukan oleh Automated Test CI)
+// Route pengajuan berita (Diperlukan Automated Test CI)
 Route::view('/pengajuan/berita/tambah', 'pengajuan.berita.create')->name('pengajuan.berita.create');
 Route::view('/pengajuan/berita', 'pengajuan.berita.index')->name('pengajuan.berita.index');
-Route::post('/pengajuan/berita', function () {
+Route::post('/pengajuan/berita', function (Request $request) {
+    $request->validate([
+        'category' => 'required',
+        'title' => 'required',
+        'content' => 'required',
+        'cover' => 'required',
+    ]);
+
     return redirect()->back();
 })->name('pengajuan.berita.store');
 
