@@ -4,6 +4,8 @@ use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\PengajuanController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
+
 Route::get('/pengajuan/berita', [BeritaController::class, 'index'])->name('pengajuan.berita.index');
 Route::get('/pengajuan/berita/baru', [BeritaController::class, 'create'])->name('pengajuan.berita.create');
 Route::post('/pengajuan/berita', [BeritaController::class, 'store'])->name('pengajuan.berita.store');

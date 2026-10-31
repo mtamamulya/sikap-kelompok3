@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'DOSEN') | DOSEN</title>
+    <title>@yield('title', 'Pengajuan Dosen') | DOSEN</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,12 @@
     <style>[x-cloak]{display:none !important}</style>
 </head>
 <body class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
+@php
+    $pengajuanDosen = [
+        ['id' => 1, 'nama' => 'Penyuluhan Literasi Digital', 'pengaju' => 'Filda Huwani Dewi', 'kategori' => 'Pengabdian', 'status' => 'Diajukan'],
+        ['id' => 2, 'nama' => 'Seminar Nasional AI', 'pengaju' => 'Angga Wahyu Wibowo', 'kategori' => 'Pengabdian', 'status' => 'Direview'],
+    ];
+@endphp
 {{-- menu = status menu samping di layar kecil (HP / tablet). Di layar lebar menu selalu tampil. --}}
 <div class="flex h-full" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
 
@@ -99,7 +105,38 @@
 
         {{-- ISI HALAMAN --}}
         <main class="flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12">
-            @yield('content')
+            <section class="flex flex-col gap-6" x-data="{ pengajuanDosen: @js($pengajuanDosen) }">
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">Pengajuan Dosen</h1>
+                    <p class="mt-1 text-sm text-gray-500">Daftar kegiatan yang diajukan oleh dosen.</p>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                    <table class="w-full min-w-[640px] text-left text-sm">
+                        <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            <tr>
+                                <th class="px-5 py-3">Nama kegiatan</th>
+                                <th class="px-5 py-3">Diajukan oleh</th>
+                                <th class="px-5 py-3">Kategori</th>
+                                <th class="px-5 py-3">Status</th>
+                                <th class="px-5 py-3"><span class="sr-only">Aksi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <template x-for="k in pengajuanDosen" :key="k.id">
+                                <tr class="text-gray-700">
+                                    <th scope="row" class="px-5 py-4 font-semibold text-gray-900" x-text="k.nama"></th>
+                                    <td class="px-5 py-4" x-text="k.pengaju"></td>
+                                    <td class="px-5 py-4" x-text="k.kategori"></td>
+                                    <td class="px-5 py-4" x-text="k.status"></td>
+                                    <td class="px-5 py-4 text-right">
+                                        <a :href="`/pengajuan/dosen/${k.id}`" class="font-semibold text-brand hover:underline">Lihat detail</a>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 

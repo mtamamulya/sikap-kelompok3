@@ -1,14 +1,19 @@
 <?php
 
 use App\Http\Controllers\MahasiswaController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\PengajuanController;
 use Illuminate\Support\Facades\Route;
 
 // Redirect halaman utama ke dashboard
 Route::redirect('/', '/dashboard');
 
+// --- Auth Mock ---
+Route::post('/logout', function () {
+    return redirect('/');
+})->name('logout');
+
 // --- Halaman Utama & Fitur ---
-Route::view('/dashboard', 'dashboard')->name('dashboard');
+Route::view('/dashboard', 'dosen.dashboard')->name('dashboard');
 Route::view('/kegiatan', 'kegiatan')->name('kegiatan.index');
 Route::view('/profil', 'profil')->name('profil');
 
@@ -31,33 +36,23 @@ Route::view('/pengabdian', 'pengabdian.index')->name('pengabdian.index');
 Route::view('/pengabdian/create', 'pengabdian.create')->name('pengabdian.create');
 Route::view('/pengabdian/{id}', 'pengabdian.show')->whereNumber('id')->name('pengabdian.show');
 Route::view('/pengabdian/{id}/edit', 'pengabdian.edit')->whereNumber('id')->name('pengabdian.edit');
+Route::view('/pengajaran', 'dosen.pengajaran.index')->name('pengajaran.index');
+Route::view('/prestasi', 'dosen.prestasi.index')->name('prestasi.index');
 
 // --- Pengajuan ---
-Route::view('/pengajuan/dosen', 'pengajuan.dosen')->name('pengajuan.dosen');
-Route::view('/pengajuan/dosen/{id}', 'pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('pengajuan.dosen.show');
-Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
-Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
-Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
-
-// Route pengajuan berita (Diperlukan Automated Test CI)
-Route::view('/pengajuan/berita/tambah', 'pengajuan.berita.create')->name('pengajuan.berita.create');
-Route::view('/pengajuan/berita', 'pengajuan.berita.index')->name('pengajuan.berita.index');
-Route::post('/pengajuan/berita', function (Request $request) {
-    $request->validate([
-        'category' => 'required',
-        'title' => 'required',
-        'content' => 'required',
-        'cover' => 'required',
-    ]);
-
-    return redirect()->back();
-})->name('pengajuan.berita.store');
+Route::view('/pengajuan/dosen', 'dosen.pengajuan.dosen')->name('pengajuan.dosen');
+Route::view('/pengajuan/dosen/{id}', 'dosen.pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('pengajuan.dosen.show');
+Route::get('/pengajuan/mahasiswa', [PengajuanController::class, 'index'])->name('pengajuan.mahasiswa');
+Route::view('/pengajuan/mahasiswa/{id}', 'mahasiswa.PengajuanMahasiswa.detail', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 
 // --- Controller Mahasiswa ---
+Route::get('/mahasiswa', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.index');
 Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
 Route::get('/mahasiswa/mata-kuliah', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'semua')->name('mahasiswa.mata-kuliah');
 Route::get('/mahasiswa/mata-kuliah/semester-berjalan', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'berjalan')->name('mahasiswa.mata-kuliah.berjalan');
 Route::get('/mahasiswa/mata-kuliah/riwayat', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'riwayat')->name('mahasiswa.mata-kuliah.riwayat');
+Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan')->name('mahasiswa.kegiatan');
+Route::view('/mahasiswa/profil', 'mahasiswa.profil')->name('mahasiswa.profil');
 
 Route::get('/mahasiswa/prestasi', [MahasiswaController::class, 'prestasi'])->name('mahasiswa.prestasi');
 Route::get('/mahasiswa/prestasi/tambah', [MahasiswaController::class, 'prestasiTambah'])->name('mahasiswa.prestasi.tambah');
@@ -65,3 +60,5 @@ Route::post('/mahasiswa/prestasi', [MahasiswaController::class, 'prestasiSimpan'
 Route::get('/mahasiswa/prestasi/{prestasi}/edit', [MahasiswaController::class, 'prestasiEdit'])->name('mahasiswa.prestasi.edit');
 Route::delete('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiHapus'])->name('mahasiswa.prestasi.hapus');
 Route::put('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiUpdate'])->name('mahasiswa.prestasi.update');
+
+require __DIR__.'/pengajuan.php';
