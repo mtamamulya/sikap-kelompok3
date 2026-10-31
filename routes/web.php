@@ -3,7 +3,7 @@
 use App\Http\Controllers\MahasiswaController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect halaman utama langsung ke dashboard
+// Redirect halaman utama ke dashboard
 Route::redirect('/', '/dashboard');
 
 // --- Halaman Utama & Fitur ---
@@ -16,7 +16,7 @@ Route::view('/kegiatan-page', 'kegiatan')->name('kegiatan');
 Route::view('/header', 'header')->name('header');
 Route::view('/navbar', 'navbar')->name('navbar');
 
-// --- Notifikasi & Modul Lain ---
+// --- Notifikasi ---
 Route::view('/notifikasi', 'notifikasi.index')->name('notifikasi');
 
 // --- Penelitian ---
@@ -37,6 +37,10 @@ Route::view('/pengajuan/dosen/{id}', 'pengajuan.show', ['asal' => 'dosen'])->whe
 Route::view('/pengajuan/mahasiswa', 'pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
 Route::view('/pengajuan/mahasiswa/{id}', 'pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('pengajuan.show');
+
+// Route pengajuan berita (diperlukan oleh Automated Test CI)
+Route::view('/pengajuan/berita/tambah', 'pengajuan.berita.create')->name('pengajuan.berita.create');
+Route::view('/pengajuan/berita', 'pengajuan.berita.index')->name('pengajuan.berita.index');
 
 // --- Controller Mahasiswa ---
 Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
