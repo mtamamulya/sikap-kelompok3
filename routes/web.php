@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Route;
 // Redirect halaman utama langsung ke dashboard
 Route::redirect('/', '/dashboard');
 
-<<<<<<< HEAD
 Route::post('/logout', function (Request $request) {
     Auth::guard('web')->logout();
     $request->session()->invalidate();
@@ -53,7 +52,6 @@ Route::view('/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create'
 // Detail: harus di bawah /kegiatan/create supaya "create" tidak dianggap sebagai {id}
 Route::view('/kegiatan/{id}', 'dosen.kegiatan.show')->whereNumber('id')->name('kegiatan.show');
 Route::view('/kegiatan/{id}/edit', 'dosen.kegiatan.edit')->whereNumber('id')->name('kegiatan.edit');
-=======
 // --- Halaman Utama (Langsung memanggil file di root folder resources/views) ---
 Route::view('/dashboard', 'dashboard')->name('dashboard');
 Route::view('/kegiatan', 'kegiatan')->name('kegiatan.index');
@@ -99,7 +97,6 @@ Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->n
 Route::get('/mahasiswa/mata-kuliah', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'semua')->name('mahasiswa.mata-kuliah');
 Route::get('/mahasiswa/mata-kuliah/semester-berjalan', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'berjalan')->name('mahasiswa.mata-kuliah.berjalan');
 Route::get('/mahasiswa/mata-kuliah/riwayat', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'riwayat')->name('mahasiswa.mata-kuliah.riwayat');
->>>>>>> 98ba7d0 (fix: update navbar, header, layouts, views, dan web routes)
 
 Route::view('/mahasiswa/dashboard', 'mahasiswa.Dashboard.dashboard')->name('mahasiswa.dashboard');
 Route::get('/mahasiswa', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.index');
@@ -113,7 +110,6 @@ Route::delete('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'pr
 Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan')->name('mahasiswa.kegiatan');
 Route::view('/mahasiswa/profil', 'mahasiswa.profil')->name('mahasiswa.profil');
 
-<<<<<<< HEAD
 // Pengajuan (submenu dropdown)
 Route::view('/pengajuan/dosen', 'dosen.pengajuan.dosen')->name('pengajuan.dosen');
 // Detail pengajuan dosen (angka = id pengajuan). Halaman yang sama dengan detail pengajuan, tombol Kembali ke daftar Dosen.
@@ -129,8 +125,6 @@ Route::view('/berita/{id}/edit', 'dosen.berita.edit')->whereNumber('id')->name('
 Route::view('/berita/{id}', 'dosen.berita.show')->whereNumber('id')->name('berita.show');
 
 require __DIR__.'/pengajuan.php';
-=======
 // --- Auth Dummy ---
 Route::post('/logout', fn () => redirect()->route('profil'))->name('logout');
 Route::post('/password/otp', fn () => back())->name('password.otp.send');
->>>>>>> 98ba7d0 (fix: update navbar, header, layouts, views, dan web routes)
