@@ -41,6 +41,9 @@ Route::view('/pengajuan/{id}', 'pengajuan.show')->whereNumber('id')->name('penga
 // Route pengajuan berita (diperlukan oleh Automated Test CI)
 Route::view('/pengajuan/berita/tambah', 'pengajuan.berita.create')->name('pengajuan.berita.create');
 Route::view('/pengajuan/berita', 'pengajuan.berita.index')->name('pengajuan.berita.index');
+Route::post('/pengajuan/berita', function () {
+    return redirect()->back();
+})->name('pengajuan.berita.store');
 
 // --- Controller Mahasiswa ---
 Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
