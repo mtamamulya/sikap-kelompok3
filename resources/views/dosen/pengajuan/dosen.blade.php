@@ -1,166 +1,151 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Pengajuan Dosen') | DOSEN</title>
 
-@section('title', 'Pengajuan Dosen')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo_trk.png') }}?v=2">
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>[x-cloak]{display:none !important}</style>
+</head>
+<body class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
 @php
-    $daftar = [
-        ['judul' => 'Penyuluhan Literasi Digital', 'oleh' => 'Filda Huwani Dewi', 'kategori' => 'Pengabdian', 'tanggal' => '3 Oktober 2026', 'status' => 'Diajukan', 'catatan' => null],
-        ['judul' => 'Seminar Nasional AI', 'oleh' => 'Angga Wahyu Wibowo', 'kategori' => 'Pengabdian', 'tanggal' => '15 Agustus 2026', 'status' => 'Direview', 'catatan' => null],
-        ['judul' => 'Pelatihan Industri', 'oleh' => 'Kuwat Santoso', 'kategori' => 'Pengabdian', 'tanggal' => '12 Agustus 2026', 'status' => 'Direvisi', 'catatan' => 'Lampirkan surat tugas yang sudah ditandatangani.'],
-        ['judul' => 'Woorkshop Penulisan Jurnal', 'oleh' => 'Tahan Prahara', 'kategori' => 'Pengabdian', 'tanggal' => '2 Juli 2026', 'status' => 'Ditolak', 'catatan' => 'Jadwal bentrok dengan kegiatan fakultas pada tanggal yang sama.'],
-        ['judul' => 'Kunjungan Industri', 'oleh' => 'Wiktasari', 'kategori' => 'Pengabdian', 'tanggal' => '26 Juli 2026', 'status' => 'Diterima', 'catatan' => null],
-        ['judul' => 'Kuliah Tamu', 'oleh' => 'Kuwat Santoso', 'kategori' => 'Pengabdian', 'tanggal' => '10 Juli 2026', 'status' => 'Selesai', 'catatan' => null],
+    $pengajuanDosen = [
+        ['id' => 1, 'nama' => 'Penyuluhan Literasi Digital', 'pengaju' => 'Filda Huwani Dewi', 'kategori' => 'Pengabdian', 'status' => 'Diajukan'],
+        ['id' => 2, 'nama' => 'Seminar Nasional AI', 'pengaju' => 'Angga Wahyu Wibowo', 'kategori' => 'Pengabdian', 'status' => 'Direview'],
     ];
-
-    $alur = [
-        'Diajukan' => ['langkah' => ['a', 'm', 'm', 'm'], 'warna' => 'biru', 'label3' => 'Keputusan'],
-        'Direview' => ['langkah' => ['d', 'a', 'm', 'm'], 'warna' => 'biru', 'label3' => 'Keputusan'],
-        'Direvisi' => ['langkah' => ['d', 'd', 'a', 'm'], 'warna' => 'oranye', 'label3' => 'Direvisi'],
-        'Ditolak' => ['langkah' => ['d', 'd', 'a', 'm'], 'warna' => 'merah', 'label3' => 'Ditolak'],
-        'Diterima' => ['langkah' => ['d', 'd', 'h', 'm'], 'warna' => 'hijau', 'label3' => 'Diterima'],
-        'Selesai' => ['langkah' => ['d', 'd', 'd', 'h'], 'warna' => 'hijau', 'label3' => 'Diterima'],
-    ];
-
-    foreach ($daftar as $n => &$pengajuan) {
-        $status = $alur[$pengajuan['status']];
-        $pengajuan = array_merge($pengajuan, $status, ['id' => $n + 1]);
-    }
-    unset($pengajuan);
 @endphp
+{{-- menu = status menu samping di layar kecil (HP / tablet). Di layar lebar menu selalu tampil. --}}
+<div class="flex h-full" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
 
-@section('content')
-<div class="flex flex-col gap-1.5">
-    <h1 class="text-3xl font-bold tracking-tight">Pengajuan Dosen</h1>
-    <p class="text-2xl text-gray-400">Dashboard / Pengajuan / Dosen</p>
-</div>
+    {{-- Latar gelap di belakang menu (layar kecil). Klik = tutup menu. --}}
+    <div x-show="menu" x-cloak x-transition.opacity x-on:click="menu = false"
+         class="fixed inset-0 z-30 bg-black/40 lg:hidden" aria-hidden="true"></div>
 
-<section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
-         x-data="pengajuanDosen(@js($daftar))">
-    <div role="tablist" aria-label="Status pengajuan" class="flex gap-x-2 overflow-x-auto border-b border-gray-200 pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <template x-for="t in tab" :key="t">
-            <button type="button" role="tab" :aria-selected="aktif === t" x-on:click="aktif = t"
-                    :class="aktif === t ? 'border-brand text-gray-900' : 'border-transparent text-gray-400 hover:text-gray-700'"
-                    class="-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm">
-                <span x-text="t"></span>
-                <span x-show="aktif === t" x-cloak class="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-xs text-white" x-text="jumlah(t)"></span>
+    {{-- SIDEBAR (berisi logo) di kiri, setinggi layar --}}
+    <x-sidebar />
+
+    {{-- KANAN: header + isi halaman. Hanya <main> yang bisa di-scroll. --}}
+    <div class="flex min-w-0 flex-1 flex-col">
+        {{-- HEADER --}}
+        <header class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-3 bg-white px-4 py-3 lg:gap-x-6 lg:px-6 lg:py-3.5">
+            {{-- Tombol menu: hanya tampil di layar kecil. Logo ada di sidebar. --}}
+            <button type="button" x-on:click="menu = true" aria-label="Buka menu" aria-controls="menu-utama" :aria-expanded="menu"
+                    class="-ml-1 flex size-10 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:hidden">
+                <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
             </button>
-        </template>
-    </div>
 
-    <div class="relative">
-        <label for="q" class="sr-only">Cari kegiatan atau nama dosen</label>
-        <svg class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
-        <input id="q" type="search" x-model="cari" placeholder="Cari kegiatan atau nama dosen..."
-               class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
-    </div>
+            <div class="ml-auto flex items-center gap-4">
+                {{-- Lonceng: membuka halaman Notifikasi. Angka merah = jumlah belum dibaca (data tiruan: 3).
+                     Nanti backend mengganti angka 3 di x-data. Angkanya ikut berubah saat notifikasi dibaca. --}}
+                <a href="{{ route('notifikasi') }}"
+                   x-data="{ n: 3 }" x-on:notif-count.window="n = $event.detail"
+                   :aria-label="`Notifikasi, ${n} belum dibaca`"
+                   @if (request()->routeIs('notifikasi')) aria-current="page" @endif
+                   class="relative flex size-10 items-center justify-center rounded-lg {{ request()->routeIs('notifikasi') ? 'bg-blue-100 text-brand' : 'hover:bg-gray-100' }}">
+                    <svg class="size-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2 2 0 0 0 4 0"/>
+                    </svg>
+                    <span x-show="n > 0" x-text="n" aria-hidden="true"
+                          class="absolute top-0.5 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white"></span>
+                </a>
 
-    <div class="flex flex-col gap-5">
-        <template x-for="k in tampil" :key="k.id">
-            <article class="flex flex-col gap-5 rounded-lg border border-gray-200 p-4">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex min-w-0 flex-col gap-2 text-[15px]">
-                        <h2 class="text-lg font-semibold" x-text="k.judul"></h2>
-                        <p>Diajukan oleh <span class="font-semibold" x-text="k.oleh"></span></p>
-                        <p><span x-text="k.kategori"></span> &middot; Diajukan <span x-text="k.tanggal"></span></p>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-3">
-                        <span :class="warnaBadge[k.status]" class="rounded-md px-2 py-0.5 text-xs" x-text="k.status"></span>
-                        <a :href="`{{ url('/pengajuan/dosen') }}/${k.id}`" :aria-label="`Tinjau ${k.judul}`"
-                           class="flex h-9 items-center rounded-md bg-brand px-4 text-base text-white hover:bg-blue-700">Tinjau</a>
+                {{-- Akun: klik untuk membuka menu kecil (Profil Saya dan Keluar). Tutup dengan klik di luar menu atau tombol Esc. --}}
+                <div class="relative" x-data="{ akun: false }" x-on:click.outside="akun = false" x-on:keydown.escape.window="akun = false">
+                    <button type="button" x-on:click="akun = !akun" aria-haspopup="menu" aria-controls="menu-akun" :aria-expanded="akun"
+                            class="-m-1 flex cursor-pointer items-center gap-2.5 rounded-lg p-1 hover:bg-gray-100"
+                            :class="akun ? 'bg-gray-100' : ''">
+                        {{-- Kalau file public/images/kuwat.jpg ada, fotonya dipakai. Kalau tidak, tampil inisial. --}}
+                        @if (file_exists(public_path('images/kuwat.jpg')))
+                            <img src="{{ asset('images/kuwat.jpg') }}" alt="" class="size-[34px] rounded-full object-cover">
+                        @else
+                            <span class="flex size-[34px] items-center justify-center rounded-full bg-red-600 text-[13px] font-semibold text-white">KS</span>
+                        @endif
+                        <span class="hidden max-w-40 flex-col text-left leading-tight sm:flex">
+                            {{-- nanti diganti data user yang login --}}
+                            <span class="truncate text-sm font-semibold">Kuwat Santoso</span>
+                            <span class="text-xs text-gray-600">Dosen</span>
+                        </span>
+                        <svg class="size-4 shrink-0 text-gray-500 transition-transform" :class="akun ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+
+                    <div id="menu-akun" x-show="akun" x-cloak role="menu" aria-label="Menu akun"
+                         x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="-translate-y-1 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+                         x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                         class="absolute top-full right-0 z-40 mt-3 w-64 rounded-xl border border-gray-100 bg-white p-4 shadow-lg">
+                        <div class="flex flex-col gap-0.5 pb-3">
+                            {{-- nanti diganti data user yang login --}}
+                            <p class="truncate text-[15px] font-bold" title="Kuwat Santoso">Kuwat Santoso</p>
+                            <p class="text-sm text-gray-500">Dosen</p>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <a href="{{ route('profil') }}" role="menuitem"
+                               class="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] text-gray-800 hover:bg-gray-100">
+                                <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+                                Profil Saya
+                            </a>
+                            {{-- Keluar: nanti jadi form POST logout dengan @csrf. Sekarang cukup tautan. --}}
+                            <a href="#" role="menuitem"
+                               class="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] text-red-600 hover:bg-red-50">
+                                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2H9M14 8l4 4-4 4M18 12H9"/></svg>
+                                Keluar
+                            </a>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </header>
 
-                <ol class="flex" aria-label="Tahapan pengajuan">
-                    <template x-for="(s, n) in k.langkah" :key="n">
-                        <li class="flex flex-col items-start gap-2" :class="n === 3 ? 'shrink-0' : 'flex-1'">
-                            <div class="flex w-full items-center">
-                                <span :class="lingkaran(k, n)" class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-medium">
-                                    <template x-if="s === 'd' || s === 'h'">
-                                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-                                    </template>
-                                    <template x-if="s === 'a' || s === 'm'"><span x-text="'0' + (n + 1)"></span></template>
-                                </span>
-                                <span x-show="n < 3" class="mx-2 h-px flex-1 bg-gray-400" aria-hidden="true"></span>
-                            </div>
-                            <span :class="teksLangkah(k, n)" class="text-xs font-medium" x-text="namaLangkah(k, n)"></span>
-                        </li>
-                    </template>
-                </ol>
-
-                <template x-if="k.catatan">
-                    <div :class="k.status === 'Ditolak' ? 'bg-red-400' : 'bg-orange-300'" class="rounded-md px-3 py-2.5 text-gray-900">
-                        <p class="text-xs font-semibold">Catatan reviewer</p>
-                        <p class="text-xs" x-text="k.catatan"></p>
-                    </div>
-                </template>
-            </article>
-        </template>
-
-        <p x-show="tampil.length === 0" x-cloak class="px-4 py-10 text-center text-sm text-gray-500">
-            Tidak ada pengajuan yang cocok dengan filter ini.
-        </p>
+        {{-- ISI HALAMAN --}}
+        <main class="flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12">
+            <section class="flex flex-col gap-6" x-data="{ pengajuanDosen: @js($pengajuanDosen) }">
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight">Pengajuan Dosen</h1>
+                    <p class="mt-1 text-sm text-gray-500">Daftar kegiatan yang diajukan oleh dosen.</p>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                    <table class="w-full min-w-[640px] text-left text-sm">
+                        <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                            <tr>
+                                <th class="px-5 py-3">Nama kegiatan</th>
+                                <th class="px-5 py-3">Diajukan oleh</th>
+                                <th class="px-5 py-3">Kategori</th>
+                                <th class="px-5 py-3">Status</th>
+                                <th class="px-5 py-3"><span class="sr-only">Aksi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <template x-for="k in pengajuanDosen" :key="k.id">
+                                <tr class="text-gray-700">
+                                    <th scope="row" class="px-5 py-4 font-semibold text-gray-900" x-text="k.nama"></th>
+                                    <td class="px-5 py-4" x-text="k.pengaju"></td>
+                                    <td class="px-5 py-4" x-text="k.kategori"></td>
+                                    <td class="px-5 py-4" x-text="k.status"></td>
+                                    <td class="px-5 py-4 text-right">
+                                        <a :href="`/pengajuan/dosen/${k.id}`" class="font-semibold text-brand hover:underline">Lihat detail</a>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
-</section>
-@endsection
 
-@push('scripts')
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('pengajuanDosen', (daftar) => ({
-            daftar,
-            tab: ['Semua', 'Diajukan', 'Direview', 'Direvisi', 'Ditolak', 'Diterima', 'Selesai'],
-            aktif: 'Semua',
-            cari: '',
-            warnaBadge: {
-                Diajukan: 'border border-blue-200 bg-blue-100 text-blue-700',
-                Direview: 'border border-blue-200 bg-blue-100 text-blue-700',
-                Direvisi: 'border border-orange-200 bg-orange-100 text-orange-700',
-                Ditolak: 'border border-red-200 bg-red-100 text-red-600',
-                Diterima: 'border border-green-200 bg-green-100 text-green-700',
-                Selesai: 'border border-green-200 bg-green-100 text-green-700',
-            },
-            jumlah(t) {
-                return t === 'Semua' ? this.daftar.length : this.daftar.filter(k => k.status === t).length;
-            },
-            get tampil() {
-                const q = this.cari.trim().toLowerCase();
-                return this.daftar.filter(k =>
-                    (this.aktif === 'Semua' || k.status === this.aktif) &&
-                    (q === '' || k.judul.toLowerCase().includes(q) || k.oleh.toLowerCase().includes(q))
-                );
-            },
-            warnaAktif(k, n) {
-                if (n === 2 && k.langkah[2] === 'a') {
-                    return { oranye: 'orange', merah: 'red' }[k.warna] || 'blue';
-                }
-                return 'blue';
-            },
-            lingkaran(k, n) {
-                const s = k.langkah[n];
-                if (s === 'd') return 'border-brand bg-brand text-white';
-                if (s === 'h') return 'border-lime-500 bg-lime-500 text-white';
-                if (s === 'a') {
-                    const w = this.warnaAktif(k, n);
-                    return w === 'orange' ? 'border-orange-400 bg-white text-orange-400'
-                        : w === 'red' ? 'border-red-500 bg-white text-red-500'
-                        : 'border-brand bg-white text-brand';
-                }
-                return 'border-gray-400 bg-white text-gray-700';
-            },
-            teksLangkah(k, n) {
-                const s = k.langkah[n];
-                if (s === 'm') return 'text-gray-700';
-                if (s === 'h') return 'text-lime-600';
-                if (s === 'a') {
-                    const w = this.warnaAktif(k, n);
-                    return w === 'orange' ? 'text-orange-400' : w === 'red' ? 'text-red-500' : 'text-brand';
-                }
-                return 'text-brand';
-            },
-            namaLangkah(k, n) {
-                return ['Diajukan', 'Direview', k.label3, 'Selesai'][n];
-            },
-        }));
-    });
-</script>
-@endpush
+    {{-- Alert / callout global: lihat components/alert.blade.php --}}
+    <x-alert />
+
+    {{-- Pratinjau dokumen: dibuka lewat tombol mata / Lihat pada dokumen. Lihat components/preview-dokumen.blade.php --}}
+    <x-preview-dokumen />
+
+</div>
+</body>
+</html>

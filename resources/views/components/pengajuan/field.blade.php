@@ -1,11 +1,25 @@
-@props(['label', 'required' => false, 'optional' => false, 'hint' => null, 'name' => null])
-<div {{ $attributes->merge(['class' => 'flex min-w-0 flex-col gap-1.5']) }}>
-    <label class="text-[13px] font-semibold leading-5 text-[#374151]">
+@props([
+    'label',
+    'name',
+    'hint' => null,
+    'required' => false,
+    'optional' => false,
+])
+
+<label {{ $attributes->merge(['class' => 'flex flex-col gap-1.5 text-[13px] font-medium text-[#374151]']) }}>
+    <span>
         {{ $label }}
-        @if ($required)<span class="text-[#FF3F3F]"> *</span>@endif
-        @if ($optional)<span class="font-normal text-[#6B7280]"> (opsional)</span>@endif
-    </label>
+        @if ($required)
+            <span class="text-[#EF4444]">*</span>
+        @elseif ($optional)
+            <span class="font-normal text-[#6B7280]">(Opsional)</span>
+        @endif
+    </span>
+    @if ($hint)
+        <span class="text-xs font-normal leading-[18px] text-[#6B7280]">{{ $hint }}</span>
+    @endif
     {{ $slot }}
-    @if ($hint)<p class="text-xs leading-[18px] text-[#6B7280]">{{ $hint }}</p>@endif
-    @if ($name)@error($name)<p class="text-xs text-[#FF3F3F]">{{ $message }}</p>@enderror @endif
-</div>
+    @error($name)
+        <span class="text-xs font-normal text-[#DC2626]">{{ $message }}</span>
+    @enderror
+</label>
