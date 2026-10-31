@@ -1,8 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+<<<<<<< HEAD
     <title>@yield('title', 'DOSEN') | DOSEN</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,11 +11,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('images/logo_trk.png') }}?v=2">
 
+=======
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'SIKAP - Teknologi Rekayasa Komputer')</title>
+>>>>>>> 98ba7d0 (fix: update navbar, header, layouts, views, dan web routes)
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    {{-- Alpine.js: untuk interaksi kecil (dropdown, tambah/hapus baris, dll.) --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+    <style>[x-cloak]{display:none !important}</style>
 </head>
+<<<<<<< HEAD
 <body class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
 {{-- menu = status menu samping di layar kecil (HP / tablet). Di layar lebar menu selalu tampil. --}}
 <div class="flex h-full" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
@@ -98,6 +102,25 @@
     </header>
 
         <main class="flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12">
+=======
+<body class="bg-[#F9FAFB] text-[#111827] antialiased">
+
+<div class="min-h-screen flex" x-data="{ sidebar: false }" x-on:keydown.escape.window="sidebar = false">
+
+    {{-- Overlay untuk tampilan Mobile --}}
+    <div x-show="sidebar" x-cloak x-transition.opacity class="fixed inset-0 z-30 bg-black/40 lg:hidden" x-on:click="sidebar = false"></div>
+
+    {{-- Sidebar Navigasi dari file resources/views/navbar.blade.php --}}
+    @include('navbar')
+
+    {{-- Area Konten Utama & Header Topbar --}}
+    <div class="flex-1 flex flex-col min-w-0">
+        {{-- Header Topbar dari file resources/views/header.blade.php --}}
+        @include('header')
+
+        {{-- Isi Konten Halaman --}}
+        <main class="w-full flex-1">
+>>>>>>> 98ba7d0 (fix: update navbar, header, layouts, views, dan web routes)
             @yield('content')
         </main>
     </div>
@@ -110,6 +133,5 @@
 
 </div>
 
-@stack('scripts')
 </body>
 </html>
