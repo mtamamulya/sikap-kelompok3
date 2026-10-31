@@ -4,7 +4,6 @@
 
 @section('content')
 @php
-    // Data dari controller: compact('mahasiswa'). Fallback untuk preview.
     $nama     = $mahasiswa->nama     ?? 'Arya Bima';
     $angkatan = $mahasiswa->angkatan ?? '2024';
     $email    = $mahasiswa->email    ?? 'aryabima@mhs.polines.ac.id';
@@ -12,259 +11,625 @@
     $prodi    = $mahasiswa->prodi    ?? 'Teknologi Rekayasa Komputer';
     $status   = $mahasiswa->status   ?? 'Aktif';
 
-    // Masking email: a***********@domain
     [$local, $domain] = explode('@', $email, 2);
-    $maskedEmail = substr($local, 0, 1) . str_repeat('*', max(strlen($local) - 1, 3)) . '@' . $domain;
+    $maskedEmail = substr($local, 0, 1).str_repeat('*', max(strlen($local) - 1, 3)).'@'.$domain;
 @endphp
 
-<div class="flex flex-col gap-6"
-     x-data="{
-        open: false,
-        pw: '',
-        confirm: '',
-        showPw: false,
-        showConfirm: false,
-        get rules() {
-            return [
-                { label: 'Minimal 8 karakter',  ok: this.pw.length >= 8 },
-                { label: 'Mengandung huruf',    ok: /[A-Za-z]/.test(this.pw) },
-                { label: 'Mengandung angka',    ok: /\d/.test(this.pw) },
-                { label: 'Mengandung simbol',   ok: /[^A-Za-z0-9]/.test(this.pw) },
-            ];
-        },
-        get count() { return this.rules.filter(r => r.ok).length },
-        get strong() { return this.count === 4 },
-        get barColor() { return this.strong ? '#80CC16' : '#FF3F3F' },
-        get matches() { return this.confirm.length > 0 && this.pw === this.confirm },
-        get canSubmit() { return this.strong && this.matches },
-        close() { this.open = false; this.pw = ''; this.confirm = ''; this.showPw = false; this.showConfirm = false; }
-     }"
-     x-on:keydown.escape.window="close()">
+<div class="mx-auto flex w-full max-w-7xl flex-col gap-6"
+     x-data="profilMahasiswa()"
+     x-on:keydown.escape.window="close(); openPhotoModal = false">
 
-    <div class="flex flex-col gap-6">
-        {{-- Title row --}}
-        <div class="flex flex-col gap-3">
-            <a href="{{ url()->previous() }}" class="flex w-fit items-center gap-2.5 text-sm tracking-[-0.16px] text-[#6B7280]">
-                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg>
-                Kembali
-            </a>
-            <div class="flex flex-wrap items-center gap-2">
-                <div class="flex min-w-0 flex-1 basis-72 flex-col gap-2">
-                    <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px] text-[#111827]">Profil mahasiswa</h1>
-                    <p class="text-sm leading-5 text-[#6B7280]">Informasi identitas dan status akademikmu dalam satu tempat.</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" x-on:click="open = true"
-                            class="flex items-center gap-1 rounded-md bg-[#27F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
-                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5-10.5a2.828 2.828 0 1 0-4-4L4 16v4"/><path d="M13.5 6.5l4 4"/></svg>
-                        Ubah Kata Sandi
-                    </button>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                                class="flex items-center gap-1 rounded-md bg-[#FF3F3F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8v-2a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2"/><path d="M9 12h12l-3-3"/><path d="M18 15l3-3"/></svg>
-                            Keluar
-                        </button>
-                    </form>
-                </div>
-            </div>
+    {{-- Tombol Kembali --}}
+    <a href="{{ url('/mahasiswa/dashboard') }}"
+       class="inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-[#6B7280] transition hover:text-[#111827]">
+        <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Kembali
+    </a>
+
+    {{-- Judul & tombol aksi --}}
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-xl font-bold text-[#111827] sm:text-2xl">Profil mahasiswa</h1>
+            <p class="mt-0.5 text-xs text-[#6B7280]">Informasi identitas dan status akademikmu dalam satu tempat.</p>
         </div>
 
-        <div class="flex flex-col gap-4">
-            {{-- Kartu avatar --}}
-            <section class="flex flex-col items-center gap-4 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]">
-                <div class="size-24 rounded-full bg-[lightgray]"></div>
-                <div class="flex flex-col items-center gap-2 self-stretch text-center">
-                    <div class="text-2xl font-medium leading-[30px] tracking-[-0.15px] text-[#111827]">{{ $nama }}</div>
-                    <div class="text-sm leading-5 text-[#6B7280]">Mahasiswa • Angkatan {{ $angkatan }}</div>
-                </div>
-            </section>
-
-            {{-- Informasi mahasiswa --}}
-            <section class="flex flex-col gap-4 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]">
-                <div class="flex flex-col gap-2">
-                    <h2 class="text-[22px] font-semibold text-[#111827]">Informasi mahasiswa</h2>
-                    <p class="text-sm leading-5 text-[#6B7280]">Data identitas yang terdaftar pada sistem akademik.</p>
-                </div>
-
-                <div class="flex flex-wrap gap-5">
-                    <x-profil.field label="Email" detail="Email mahasiswa">
-                        <div class="break-all text-[19px] font-medium leading-[27px] tracking-[-0.216px] text-[#0A0A0A]">{{ $email }}</div>
-                    </x-profil.field>
-                    <x-profil.field label="NIM" :value="$nim" detail="Nomor Induk Mahasiswa" />
-                </div>
-
-                <div class="flex flex-wrap gap-5">
-                    <x-profil.field label="Prodi (Program Studi)" :value="$prodi" detail="Diploma IV / Sarjana Terapan" />
-                    <x-profil.field label="Status akademik" detail="Terdaftar pada semester berjalan">
-                        <div class="w-fit rounded-lg border border-[#D6EDB5] bg-[#E6F3D3] px-2 py-0.5 text-[15px] font-semibold leading-4 tracking-[-0.12px] text-[#4C7D08]">{{ $status }}</div>
-                    </x-profil.field>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <svg class="size-4 shrink-0 text-[#2277FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.46 20.846a12 12 0 0 1-7.96-14.846a12 12 0 0 0 8.5-3a12 12 0 0 0 8.5 3a12 12 0 0 1-.09 7.06"/><path d="M15 19l2 2l4-4"/></svg>
-                    <span class="text-xs tracking-[-0.12px] text-[#6B7280]">Data mahasiswa dikelola oleh bagian administrasi akademik.</span>
-                </div>
-            </section>
+        <div class="flex items-center gap-2">
+            <button type="button" x-on:click="open = true; step = 1"
+                    class="flex items-center gap-1.5 rounded-xl bg-[#2563EB] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700">
+                <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                Ubah Kata Sandi
+            </button>
+            <form method="POST" action="{{ route('logout') }}" class="inline">
+                @csrf
+                <button type="submit"
+                        class="flex items-center gap-1.5 rounded-xl bg-[#EF4444] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-red-600">
+                    <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Keluar
+                </button>
+            </form>
         </div>
     </div>
 
-    {{-- Dialog Ubah Kata Sandi --}}
-    <div x-show="open" x-cloak x-transition.opacity
-         class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4"
-         x-on:click.self="close()">
-        @if (Route::has('password.otp.send'))
-            <form method="POST" action="{{ route('password.otp.send') }}" role="dialog" aria-modal="true"
-                  class="flex w-full max-w-[872px] flex-col overflow-hidden rounded-lg bg-white shadow-[-1px_2px_5px_rgba(0,0,0,0.1),-4px_9px_10px_rgba(0,0,0,0.09),-10px_20px_13px_rgba(0,0,0,0.05)] md:flex-row">
-                @csrf
-        @else
-            <div role="dialog" aria-modal="true"
-                 class="flex w-full max-w-[872px] flex-col overflow-hidden rounded-lg bg-white shadow-[-1px_2px_5px_rgba(0,0,0,0.1),-4px_9px_10px_rgba(0,0,0,0.09),-10px_20px_13px_rgba(0,0,0,0.05)] md:flex-row">
-        @endif
+    {{-- Kartu foto profil --}}
+    <section class="flex flex-col items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-white p-6 text-center shadow-xs sm:p-8">
+        <div class="relative size-20 sm:size-24">
+            <div class="flex size-full items-center justify-center overflow-hidden rounded-2xl border border-[#E5E7EB] bg-[#E0E7FF] text-2xl font-bold text-[#2563EB] shadow-xs sm:text-3xl">
+                <template x-if="previewPhoto">
+                    <img :src="previewPhoto" alt="Foto profil" class="size-full object-cover">
+                </template>
+                <template x-if="!previewPhoto">
+                    <span>{{ strtoupper(substr($nama, 0, 1)) }}</span>
+                </template>
+            </div>
 
-            <aside class="flex shrink-0 flex-col gap-6 bg-[#F2F6FD] px-5 pb-6 pt-5 md:w-[314px] md:justify-between md:gap-12">
-                <div class="flex flex-col gap-6">
-                    <div class="flex flex-col gap-2">
-                        <div class="text-base tracking-[-0.18px] text-[#00235C]">K E A M A N A N &nbsp;A K U N</div>
-                        <div class="text-2xl font-medium leading-[30px] tracking-[-0.15px] text-[#0A0A0A]">Ubah Kata Sandi</div>
+            <button type="button" aria-label="Ubah foto profil"
+                    x-on:click="openPhotoModal = true; resetCropState()"
+                    class="absolute -right-1 -bottom-1 flex size-7 items-center justify-center rounded-xl border-2 border-white bg-[#2563EB] text-white shadow-md transition hover:scale-105 hover:bg-blue-700">
+                <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex flex-col items-center gap-0.5">
+            <h2 class="text-lg font-bold text-[#111827] sm:text-xl">{{ $nama }}</h2>
+            <p class="text-xs text-[#6B7280]">Mahasiswa • Angkatan {{ $angkatan }}</p>
+        </div>
+    </section>
+
+    {{-- Informasi mahasiswa --}}
+    <section class="flex flex-col gap-5 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs sm:p-6">
+        <div>
+            <h2 class="text-base font-bold text-[#111827] sm:text-lg">Informasi mahasiswa</h2>
+            <p class="mt-0.5 text-xs text-[#6B7280]">Data identitas yang terdaftar pada sistem akademik.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="rounded-xl border border-[#F3F4F6] bg-[#F9FAFB] p-3.5">
+                <span class="text-xs font-medium text-[#6B7280]">Email</span>
+                <p class="mt-1 text-xs font-bold break-all text-[#111827] sm:text-sm">{{ $email }}</p>
+                <span class="mt-0.5 block text-[10px] text-[#9CA3AF]">Email mahasiswa</span>
+            </div>
+
+            <div class="rounded-xl border border-[#F3F4F6] bg-[#F9FAFB] p-3.5">
+                <span class="text-xs font-medium text-[#6B7280]">NIM</span>
+                <p class="mt-1 text-xs font-bold text-[#111827] sm:text-sm">{{ $nim }}</p>
+                <span class="mt-0.5 block text-[10px] text-[#9CA3AF]">Nomor Induk Mahasiswa</span>
+            </div>
+
+            <div class="rounded-xl border border-[#F3F4F6] bg-[#F9FAFB] p-3.5">
+                <span class="text-xs font-medium text-[#6B7280]">Prodi (Program Studi)</span>
+                <p class="mt-1 text-xs font-bold text-[#111827] sm:text-sm">{{ $prodi }}</p>
+                <span class="mt-0.5 block text-[10px] text-[#9CA3AF]">Diploma IV / Sarjana Terapan</span>
+            </div>
+
+            <div class="rounded-xl border border-[#F3F4F6] bg-[#F9FAFB] p-3.5">
+                <span class="text-xs font-medium text-[#6B7280]">Status akademik</span>
+                <div class="mt-1">
+                    <span class="rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-xs font-semibold text-[#047857]">{{ $status }}</span>
+                </div>
+                <span class="mt-1 block text-[10px] text-[#9CA3AF]">Terdaftar pada semester berjalan</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1 text-xs text-[#6B7280]">
+            <svg class="size-4 shrink-0 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Data mahasiswa dikelola oleh bagian administrasi akademik.</span>
+        </div>
+    </section>
+
+    {{-- ================= MODAL: ATUR FOTO PROFIL ================= --}}
+    <div x-show="openPhotoModal" x-cloak x-transition.opacity
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+         x-on:click.self="openPhotoModal = false">
+        <div role="dialog" aria-modal="true" class="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+            <div class="flex items-center justify-between border-b border-[#F3F4F6] pb-3">
+                <h3 class="text-base font-bold text-[#111827]">Atur Foto Profil</h3>
+                <button type="button" aria-label="Tutup" x-on:click="openPhotoModal = false" class="rounded-lg p-1 text-[#9CA3AF] hover:bg-gray-100">
+                    <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center gap-4 py-4">
+                {{-- Bingkai canvas kotak --}}
+                <div class="relative flex size-60 cursor-grab items-center justify-center overflow-hidden rounded-2xl border border-[#E5E7EB] bg-[#F3F4F6] select-none active:cursor-grabbing sm:size-64"
+                     x-on:mousedown="startDrag($event)"
+                     x-on:mousemove="onDrag($event)"
+                     x-on:mouseup="stopDrag()"
+                     x-on:mouseleave="stopDrag()"
+                     x-on:touchstart="startDrag($event)"
+                     x-on:touchmove="onDrag($event)"
+                     x-on:touchend="stopDrag()"
+                     x-on:wheel="handleWheel($event)">
+
+                    <canvas x-ref="cropCanvas" width="300" height="300" class="size-full" x-show="imageLoaded"></canvas>
+
+                    <template x-if="!imageLoaded">
+                        <div class="flex flex-col items-center gap-2 text-[#9CA3AF]">
+                            <svg class="size-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span class="text-xs font-medium">Pilih foto terlebih dahulu</span>
+                        </div>
+                    </template>
+                </div>
+
+                {{-- Pilih foto & zoom --}}
+                <div class="flex w-full items-center justify-between pt-1">
+                    <label for="modal-upload-input"
+                           class="flex cursor-pointer items-center gap-2 rounded-xl border border-[#2563EB] bg-[#EFF6FF] px-3.5 py-2 text-xs font-semibold text-[#2563EB] transition hover:bg-blue-100">
+                        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span x-text="imageLoaded ? 'Ganti Foto' : 'Pilih Foto'"></span>
+                        <input type="file" id="modal-upload-input" class="hidden" accept="image/*" x-on:change="handleFileSelect($event)">
+                    </label>
+
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" aria-label="Perbesar" x-on:click="zoomIn()" :disabled="!imageLoaded"
+                                class="flex size-8 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-sm font-bold text-[#374151] shadow-2xs transition hover:bg-gray-100 disabled:opacity-40">+</button>
+                        <button type="button" aria-label="Perkecil" x-on:click="zoomOut()" :disabled="!imageLoaded"
+                                class="flex size-8 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-sm font-bold text-[#374151] shadow-2xs transition hover:bg-gray-100 disabled:opacity-40">-</button>
                     </div>
-                    <ol class="flex flex-col gap-8 px-4 pb-6 pt-4">
-                        <li class="flex items-start gap-2.5">
-                            <span class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-[#27F] bg-white text-xs font-medium text-[#0162DD]">01</span>
-                            <div class="flex flex-col gap-2">
-                                <div class="text-base font-semibold leading-[22px] tracking-[-0.18px] text-[#0A0A0A]">Kata sandi baru</div>
-                                <div class="text-base leading-[22px] tracking-[-0.18px] text-[#0A0A0A]">Buat kata sandi yang kuat</div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 border-t border-[#F3F4F6] pt-4">
+                <button type="button" x-on:click="openPhotoModal = false"
+                        class="rounded-xl border border-[#E5E7EB] bg-white px-4 py-2 text-xs font-semibold text-[#4B5563] transition hover:bg-gray-50">
+                    Batal
+                </button>
+                <button type="button" x-on:click="savePhoto()" :disabled="!imageLoaded"
+                        class="rounded-xl bg-[#2563EB] px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50">
+                    Simpan Foto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= MODAL: UBAH KATA SANDI ================= --}}
+    <div x-show="open" x-cloak x-transition.opacity
+         class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-3 backdrop-blur-xs sm:p-4"
+         x-on:click.self="close()">
+        <div role="dialog" aria-modal="true" class="flex w-full max-w-[800px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl md:flex-row">
+
+            {{-- Panel kiri: langkah-langkah --}}
+            <aside class="flex shrink-0 flex-col justify-between bg-[#F2F6FD] p-6 md:w-[280px]">
+                <div class="flex flex-col gap-6">
+                    <div class="flex flex-col gap-0.5">
+                        <div class="text-[10px] font-bold tracking-wider text-[#00235C] uppercase">Keamanan akun</div>
+                        <div class="text-lg font-extrabold text-[#0A0A0A]">Ubah Kata Sandi</div>
+                    </div>
+
+                    <ol class="flex flex-col gap-6 pt-1">
+                        <li class="flex items-start gap-3">
+                            <span class="flex size-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors"
+                                  :class="step === 1 ? 'border-[#2563EB] bg-white text-[#2563EB]' : 'border-[#80CC16] bg-[#80CC16] text-white'">
+                                <template x-if="step === 1"><span>01</span></template>
+                                <template x-if="step === 2">
+                                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </template>
+                            </span>
+                            <div class="flex flex-col gap-0.5">
+                                <div class="text-xs font-bold" :class="step === 1 ? 'text-[#0A0A0A]' : 'text-[#6B7280]'">Kata sandi baru</div>
+                                <div class="text-[11px] leading-tight text-[#6B7280]">Buat kata sandi yang kuat</div>
                             </div>
                         </li>
-                        <li class="flex items-start gap-2.5">
-                            <span class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-[#A1AEBE] bg-white text-xs font-medium text-[#242E39]">02</span>
-                            <div class="flex flex-col gap-2">
-                                <div class="text-base font-semibold leading-[22px] tracking-[-0.18px] text-[#A8A8A8]">Verifikasi OTP</div>
-                                <div class="text-base leading-[22px] tracking-[-0.18px] text-[#A8A8A8]">Konfirmasi dengan kode dari email Anda.</div>
+
+                        <li class="flex items-start gap-3">
+                            <span class="flex size-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors"
+                                  :class="step === 2 ? 'border-[#2563EB] bg-white text-[#2563EB]' : 'border-[#A1AEBE] bg-white text-[#6B7280]'">02</span>
+                            <div class="flex flex-col gap-0.5">
+                                <div class="text-xs font-bold" :class="step === 2 ? 'text-[#0A0A0A]' : 'text-[#9CA3AF]'">Verifikasi OTP</div>
+                                <div class="text-[11px] leading-tight" :class="step === 2 ? 'text-[#6B7280]' : 'text-[#9CA3AF]'">Konfirmasi dengan kode dari email Anda.</div>
                             </div>
                         </li>
                     </ol>
                 </div>
-                <div class="flex items-start gap-3">
-                    <svg class="size-6 shrink-0 text-[#2277FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.46 20.846a12 12 0 0 1-7.96-14.846a12 12 0 0 0 8.5-3a12 12 0 0 0 8.5 3a12 12 0 0 1-.09 7.06"/><path d="M15 19l2 2l4-4"/></svg>
-                    <p class="max-w-[196px] text-sm font-medium leading-5 tracking-[-0.16px] text-[#2E2E2E]">
-                        Kata sandi lama tidak diperlukan. Identitas Anda dipastikan lewat kode OTP.
-                    </p>
+
+                <div class="flex items-start gap-2 pt-6 text-[11px] text-[#4B5563] md:pt-0">
+                    <svg class="mt-0.5 size-4 shrink-0 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <p class="leading-tight">Kata sandi lama tidak diperlukan. Identitas Anda dipastikan lewat kode OTP.</p>
                 </div>
             </aside>
 
-            <div class="flex min-w-0 flex-1 flex-col gap-8 px-5 pb-6 pt-5">
-                <div class="flex flex-col gap-6">
-                    <div class="flex flex-col gap-2">
-                        <h2 class="text-2xl font-medium leading-[30px] tracking-[-0.15px] text-[#0A0A0A]">Buat kata sandi baru</h2>
-                        <p class="text-base leading-[22px] tracking-[-0.18px] text-[#A8A8A8]">
-                            Gunakan kata sandi yang berbeda dari sebelumnya dan belum pernah dipakai di tempat lain.
-                        </p>
-                    </div>
+            {{-- Panel kanan --}}
+            <div class="flex min-w-0 flex-1 flex-col justify-between p-6">
 
+                {{-- LANGKAH 1: kata sandi baru --}}
+                <div x-show="step === 1" class="flex h-full flex-col justify-between gap-6">
                     <div class="flex flex-col gap-4">
-                        <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-3">
-                                {{-- Kata sandi baru --}}
-                                <div class="flex flex-col gap-2">
-                                    <label for="password" class="text-base font-medium leading-[22px] tracking-[-0.18px] text-[#0A0A0A]">Kata sandi baru</label>
-                                    <div class="flex items-center gap-1 rounded-lg border border-[rgba(10,10,10,0.06)] bg-white px-4 py-1.5 focus-within:border-[#27F]">
-                                        <input id="password" name="password" x-model="pw" :type="showPw ? 'text' : 'password'"
-                                               autocomplete="new-password" placeholder="Masukkan kata sandi baru"
-                                               class="min-w-0 flex-1 bg-transparent text-base tracking-[-0.18px] text-[#0A0A0A] outline-none placeholder:text-[#A8A8A8]">
-                                        <button type="button" x-on:click="showPw = !showPw"
-                                                :aria-label="showPw ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'" class="text-[#0A0A0A]">
-                                            <svg x-show="showPw" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M21 12c-2.4 4-5.4 6-9 6c-3.6 0-6.6-2-9-6c2.4-4 5.4-6 9-6c3.6 0 6.6 2 9 6"/></svg>
-                                            <svg x-show="!showPw" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"/><path d="M16.681 16.673a8.717 8.717 0 0 1-4.681 1.327c-3.6 0-6.6-2-9-6c1.272-2.12 2.712-3.678 4.32-4.674m2.86-1.146a9.055 9.055 0 0 1 1.82-.18c3.6 0 6.6 2 9 6c-.666 1.11-1.379 2.067-2.138 2.87"/><path d="M3 3l18 18"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-[#0A0A0A]">Buat kata sandi baru</h2>
+                            <p class="mt-0.5 text-xs text-[#6B7280]">Gunakan kata sandi yang berbeda dari sebelumnya dan belum pernah dipakai di tempat lain.</p>
+                        </div>
 
-                                {{-- Indikator kekuatan --}}
-                                <div class="flex items-center gap-2.5">
-                                    <div class="flex flex-1 items-center gap-1">
-                                        <template x-for="i in 4" :key="i">
-                                            <div class="h-[3px] flex-1" :style="`background:${i <= count ? barColor : '#E3E3E3'}`"></div>
-                                        </template>
-                                    </div>
-                                    <span class="w-9 text-xs font-medium tracking-[-0.12px]"
-                                          :style="`color:${count === 0 ? 'transparent' : barColor}`"
-                                          x-text="strong ? 'Kuat' : 'Lemah'"></span>
+                        <div class="flex flex-col gap-3.5">
+                            {{-- Kata sandi baru --}}
+                            <div class="flex flex-col gap-1">
+                                <label for="password" class="text-xs font-semibold text-[#0A0A0A]">Kata sandi baru</label>
+                                <div class="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 focus-within:border-[#2563EB]">
+                                    <input id="password" name="password" x-model="pw" :type="showPw ? 'text' : 'password'"
+                                           autocomplete="new-password" placeholder="Masukkan kata sandi baru"
+                                           class="w-full bg-transparent text-xs text-[#0A0A0A] outline-none placeholder:text-[#9CA3AF]">
+                                    <button type="button" aria-label="Tampilkan atau sembunyikan kata sandi" x-on:click="showPw = !showPw" class="text-[#6B7280]">
+                                        <svg x-show="showPw" class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <svg x-show="!showPw" class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.018 10.018 0 013.222-.563c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m-2.115 2.115a3 3 0 11-4.243-4.243M3 3l18 18"/></svg>
+                                    </button>
                                 </div>
+                            </div>
 
-                                {{-- Checklist aturan --}}
-                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-6">
-                                    <template x-for="r in rules" :key="r.label">
-                                        <div class="flex items-center gap-2">
-                                            <span class="flex size-6 shrink-0 items-center justify-center rounded-full border"
-                                                  :class="r.ok ? 'border-2 border-[#80CC16] bg-[#80CC16]' : 'border-[#A8A8A8]'">
-                                                <svg x-show="r.ok" class="size-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10-10"/></svg>
-                                            </span>
-                                            <span class="text-sm font-medium leading-5 tracking-[-0.16px]"
-                                                  :style="`color:${r.ok ? '#80CC16' : '#A8A8A8'}`" x-text="r.label"></span>
-                                        </div>
+                            {{-- Indikator kekuatan --}}
+                            <div class="flex items-center gap-2">
+                                <div class="flex flex-1 items-center gap-1">
+                                    <template x-for="i in 4" :key="i">
+                                        <div class="h-1 flex-1 rounded-full transition-all" :style="`background:${i <= count ? barColor : '#E5E7EB'}`"></div>
                                     </template>
                                 </div>
+                                <span class="text-[10px] font-semibold" :style="`color:${count === 0 ? 'transparent' : barColor}`" x-text="strong ? 'Kuat' : 'Lemah'"></span>
+                            </div>
+
+                            {{-- Daftar syarat --}}
+                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                <template x-for="r in rules" :key="r.label">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="flex size-4 shrink-0 items-center justify-center rounded-full border text-[10px] transition-colors"
+                                              :class="r.ok ? 'border-[#80CC16] bg-[#80CC16] text-white' : 'border-[#9CA3AF] bg-white text-transparent'">
+                                            <svg class="size-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        </span>
+                                        <span class="text-[11px] font-medium" :class="r.ok ? 'text-[#111827]' : 'text-[#6B7280]'" x-text="r.label"></span>
+                                    </div>
+                                </template>
                             </div>
 
                             {{-- Konfirmasi --}}
-                            <div class="flex flex-col gap-2">
-                                <label for="password_confirmation" class="text-base font-medium leading-[22px] tracking-[-0.18px] text-[#0A0A0A]">Konfirmasi kata sandi baru</label>
-                                <div class="flex items-center gap-1 rounded-lg border bg-white px-4 py-1.5 focus-within:border-[#27F]"
-                                     :class="confirm.length > 0 && !matches ? 'border-[#FF3F3F]' : 'border-[rgba(10,10,10,0.06)]'">
+                            <div class="flex flex-col gap-1">
+                                <label for="password_confirmation" class="text-xs font-semibold text-[#0A0A0A]">Konfirmasi kata sandi baru</label>
+                                <div class="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 focus-within:border-[#2563EB]"
+                                     :class="confirm.length > 0 && !matches ? 'border-[#EF4444]' : 'border-[#E5E7EB]'">
                                     <input id="password_confirmation" name="password_confirmation" x-model="confirm" :type="showConfirm ? 'text' : 'password'"
-                                           autocomplete="new-password" placeholder="Masukkan kata sandi baru"
-                                           class="min-w-0 flex-1 bg-transparent text-base tracking-[-0.18px] text-[#0A0A0A] outline-none placeholder:text-[#A8A8A8]">
-                                    <button type="button" x-on:click="showConfirm = !showConfirm"
-                                            :aria-label="showConfirm ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'" class="text-[#0A0A0A]">
-                                        <svg x-show="showConfirm" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M21 12c-2.4 4-5.4 6-9 6c-3.6 0-6.6-2-9-6c2.4-4 5.4-6 9-6c3.6 0 6.6 2 9 6"/></svg>
-                                        <svg x-show="!showConfirm" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"/><path d="M16.681 16.673a8.717 8.717 0 0 1-4.681 1.327c-3.6 0-6.6-2-9-6c1.272-2.12 2.712-3.678 4.32-4.674m2.86-1.146a9.055 9.055 0 0 1 1.82-.18c3.6 0 6.6 2 9 6c-.666 1.11-1.379 2.067-2.138 2.87"/><path d="M3 3l18 18"/></svg>
+                                           autocomplete="new-password" placeholder="Ulangi kata sandi baru"
+                                           class="w-full bg-transparent text-xs text-[#0A0A0A] outline-none placeholder:text-[#9CA3AF]">
+                                    <button type="button" aria-label="Tampilkan atau sembunyikan konfirmasi" x-on:click="showConfirm = !showConfirm" class="text-[#6B7280]">
+                                        <svg x-show="showConfirm" class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <svg x-show="!showConfirm" class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.018 10.018 0 013.222-.563c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m-2.115 2.115a3 3 0 11-4.243-4.243M3 3l18 18"/></svg>
                                     </button>
                                 </div>
-                                <p x-show="confirm.length > 0 && !matches" x-cloak class="text-xs font-medium text-[#FF3F3F]">Konfirmasi kata sandi tidak cocok.</p>
+                                <p x-show="confirm.length > 0 && !matches" x-cloak class="text-[11px] font-semibold text-[#EF4444]">Konfirmasi kata sandi tidak cocok.</p>
                             </div>
 
-                            @error('password')
-                                <p class="text-xs font-medium text-[#FF3F3F]">{{ $message }}</p>
-                            @enderror
+                            <p class="text-[11px] text-[#9CA3AF]">Kode OTP akan dikirim ke {{ $maskedEmail }}.</p>
                         </div>
+                    </div>
 
-                        @if (Route::has('password.otp.send'))
-                            <p class="text-sm font-medium leading-5 tracking-[-0.16px] text-[#A8A8A8]">
-                                Kode OTP akan dikirim ke {{ $maskedEmail }}.
-                            </p>
-                        @else
-                            <p class="text-sm font-medium leading-5 text-[#B45309]">
-                                Pengiriman OTP belum tersedia karena route pengiriman belum dikonfigurasi.
-                            </p>
-                        @endif
+                    <div class="flex items-center justify-end gap-2 pt-4">
+                        <button type="button" x-on:click="close()"
+                                class="rounded-lg bg-[#EF4444] px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-600">
+                            Batal
+                        </button>
+                        <button type="button" x-on:click="goToStep2()" :disabled="!canSubmit"
+                                class="rounded-lg bg-[#2563EB] px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                            Kirim Kode OTP
+                        </button>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center justify-end gap-2">
-                    <button type="button" x-on:click="close()"
-                            class="rounded-md bg-[#FF3F3F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)]">
-                        Batal
-                    </button>
-                    @if (Route::has('password.otp.send'))
-                        <button type="submit" :disabled="!canSubmit"
-                                class="rounded-md bg-[#27F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] shadow-[0_1px_2px_rgba(0,0,0,0.12)] disabled:cursor-not-allowed disabled:opacity-50">
-                            Kirim Kode OTP
+                {{-- LANGKAH 2: verifikasi OTP --}}
+                <div x-show="step === 2" x-cloak class="flex h-full flex-col justify-between gap-6">
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-[#0A0A0A]">Masukkan kode OTP</h2>
+                            <p class="mt-0.5 text-xs text-[#6B7280]">Kami mengirimkan kode 6 digit ke {{ $maskedEmail }}. Kode berlaku 5 menit.</p>
+                        </div>
+
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-[#0A0A0A]">Kode OTP</span>
+                                <span class="text-xs font-bold text-[#4B5563]" x-text="formattedTimer"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-2" x-on:paste="onOtpPaste($event)">
+                                <template x-for="(digit, idx) in 6" :key="idx">
+                                    <input :id="`otp-${idx}`"
+                                           type="text"
+                                           inputmode="numeric"
+                                           pattern="[0-9]*"
+                                           maxlength="1"
+                                           x-on:input="onOtpInput($event, idx)"
+                                           x-on:keydown="onOtpKeydown($event, idx)"
+                                           x-on:focus="$event.target.select()"
+                                           class="size-10 rounded-xl border border-[#E5E7EB] bg-white text-center text-lg font-bold text-[#111827] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 sm:size-11">
+                                </template>
+                            </div>
+
+                            <div class="flex items-center justify-start">
+                                <button type="button" x-on:click="startTimer()" class="text-xs font-semibold text-[#2563EB] hover:underline">
+                                    Kirim ulang kode
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 border-t border-[#F3F4F6] pt-4">
+                        <button type="button" x-on:click="step = 1"
+                                class="rounded-lg border border-[#E5E7EB] bg-white px-4 py-2 text-xs font-semibold text-[#4B5563] transition hover:bg-gray-50">
+                            Kembali
                         </button>
-                    @else
-                        <button type="button" disabled
-                                class="rounded-md bg-[#27F] px-4 py-2 text-lg font-medium leading-[22px] tracking-[-0.18px] text-[#FEFEFE] opacity-50">
-                            OTP belum tersedia
+                        {{-- Sementara dummy. Nanti backend mengganti ini dengan form POST ke route verifikasi OTP. --}}
+                        <button type="button" x-on:click="simpanKataSandi()" :disabled="!isOtpComplete"
+                                class="rounded-lg bg-[#2563EB] px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                            Simpan Kata Sandi
                         </button>
-                    @endif
+                    </div>
                 </div>
+
             </div>
-        @if (Route::has('password.otp.send'))
-            </form>
-        @else
-            </div>
-        @endif
+        </div>
     </div>
 </div>
+
+<script>
+    function profilMahasiswa() {
+        return {
+            // --- Modal ---
+            open: false,
+            step: 1,
+            openPhotoModal: false,
+            previewPhoto: null,
+
+            // --- Editor foto (canvas) ---
+            imageLoaded: false,
+            imgObj: null,
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+
+            // --- Form kata sandi ---
+            pw: '',
+            confirm: '',
+            showPw: false,
+            showConfirm: false,
+
+            // --- OTP ---
+            otp: ['', '', '', '', '', ''],
+            timer: 300,
+            timerInterval: null,
+
+            init() {
+                try {
+                    this.previewPhoto = localStorage.getItem('user_avatar');
+                } catch (e) {
+                    this.previewPhoto = null;
+                }
+            },
+
+            get rules() {
+                return [
+                    { label: 'Minimal 8 karakter', ok: this.pw.length >= 8 },
+                    { label: 'Mengandung huruf', ok: /[A-Za-z]/.test(this.pw) },
+                    { label: 'Mengandung angka', ok: /\d/.test(this.pw) },
+                    { label: 'Mengandung simbol', ok: /[^A-Za-z0-9]/.test(this.pw) },
+                ];
+            },
+            get count() { return this.rules.filter((r) => r.ok).length; },
+            get strong() { return this.count === 4; },
+            get barColor() {
+                if (this.count === 0) return '#E5E7EB';
+                if (this.strong) return '#80CC16';
+                return '#FF3F3F';
+            },
+            get matches() { return this.confirm.length > 0 && this.pw === this.confirm; },
+            get canSubmit() { return this.strong && this.matches; },
+
+            get formattedTimer() {
+                const m = Math.floor(this.timer / 60).toString().padStart(2, '0');
+                const s = (this.timer % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            },
+            get isOtpComplete() { return this.otp.every((d) => d !== ''); },
+
+            startTimer() {
+                this.timer = 300;
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    if (this.timer > 0) {
+                        this.timer--;
+                    } else {
+                        clearInterval(this.timerInterval);
+                    }
+                }, 1000);
+            },
+
+            goToStep2() {
+                if (!this.canSubmit) return;
+                this.step = 2;
+                this.startTimer();
+                setTimeout(() => {
+                    const first = document.getElementById('otp-0');
+                    if (first) {
+                        first.focus();
+                        first.select();
+                    }
+                }, 150);
+            },
+
+            // --- Handler OTP ---
+            focusOtp(idx) {
+                const el = document.getElementById(`otp-${idx}`);
+                if (el) {
+                    el.focus();
+                    el.select();
+                }
+            },
+
+            onOtpInput(e, idx) {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                if (val.length > 0) {
+                    const char = val.slice(-1);
+                    this.otp[idx] = char;
+                    e.target.value = char;
+                    if (idx < 5) this.focusOtp(idx + 1);
+                } else {
+                    this.otp[idx] = '';
+                    e.target.value = '';
+                }
+            },
+
+            onOtpKeydown(e, idx) {
+                if (e.key === 'Backspace') {
+                    if (!e.target.value && idx > 0) this.focusOtp(idx - 1);
+                } else if (e.key === 'ArrowLeft' && idx > 0) {
+                    this.focusOtp(idx - 1);
+                } else if (e.key === 'ArrowRight' && idx < 5) {
+                    this.focusOtp(idx + 1);
+                }
+            },
+
+            onOtpPaste(e) {
+                e.preventDefault();
+                const pasted = (e.clipboardData || window.clipboardData)
+                    .getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                if (!pasted) return;
+                for (let i = 0; i < 6; i++) {
+                    const char = pasted[i] || '';
+                    this.otp[i] = char;
+                    const el = document.getElementById(`otp-${i}`);
+                    if (el) el.value = char;
+                }
+                this.focusOtp(Math.min(pasted.length, 5));
+            },
+
+            simpanKataSandi() {
+                if (!this.isOtpComplete) return;
+                alert('Kata sandi berhasil disimpan!');
+                this.close();
+            },
+
+            close() {
+                this.open = false;
+                this.step = 1;
+                this.pw = '';
+                this.confirm = '';
+                this.showPw = false;
+                this.showConfirm = false;
+                this.otp = ['', '', '', '', '', ''];
+                clearInterval(this.timerInterval);
+            },
+
+            // --- Editor foto ---
+            resetCropState() {
+                this.imageLoaded = false;
+                this.imgObj = null;
+                this.zoom = 1;
+                this.offsetX = 0;
+                this.offsetY = 0;
+                this.isDragging = false;
+            },
+
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.imgObj = img;
+                        this.zoom = 1;
+                        this.offsetX = 0;
+                        this.offsetY = 0;
+                        this.imageLoaded = true;
+                        this.$nextTick(() => this.drawCanvas());
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            },
+
+            zoomIn() {
+                if (!this.imageLoaded) return;
+                this.zoom = Math.min(this.zoom + 0.15, 3.5);
+                this.drawCanvas();
+            },
+
+            zoomOut() {
+                if (!this.imageLoaded) return;
+                this.zoom = Math.max(this.zoom - 0.15, 0.5);
+                this.drawCanvas();
+            },
+
+            handleWheel(e) {
+                if (!this.imageLoaded) return;
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    this.zoomIn();
+                } else {
+                    this.zoomOut();
+                }
+            },
+
+            startDrag(e) {
+                if (!this.imageLoaded) return;
+                this.isDragging = true;
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                this.startX = x - this.offsetX;
+                this.startY = y - this.offsetY;
+            },
+
+            onDrag(e) {
+                if (!this.isDragging) return;
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                this.offsetX = x - this.startX;
+                this.offsetY = y - this.startY;
+                this.drawCanvas();
+            },
+
+            stopDrag() {
+                this.isDragging = false;
+            },
+
+            drawCanvas() {
+                const canvas = this.$refs.cropCanvas;
+                if (!canvas || !this.imgObj) return;
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+
+                ctx.clearRect(0, 0, width, height);
+
+                const baseScale = Math.max(width / this.imgObj.width, height / this.imgObj.height);
+                const scale = baseScale * this.zoom;
+                const w = this.imgObj.width * scale;
+                const h = this.imgObj.height * scale;
+                const x = (width - w) / 2 + this.offsetX;
+                const y = (height - h) / 2 + this.offsetY;
+
+                ctx.drawImage(this.imgObj, x, y, w, h);
+            },
+
+            savePhoto() {
+                const canvas = this.$refs.cropCanvas;
+                if (!canvas || !this.imageLoaded) return;
+
+                const out = document.createElement('canvas');
+                out.width = 300;
+                out.height = 300;
+                out.getContext('2d').drawImage(canvas, 0, 0, 300, 300);
+
+                const dataUrl = out.toDataURL('image/png');
+                this.previewPhoto = dataUrl;
+                try {
+                    localStorage.setItem('user_avatar', dataUrl);
+                } catch (e) {
+                    // penyimpanan penuh atau diblokir: foto tetap tampil untuk sesi ini
+                }
+                window.dispatchEvent(new CustomEvent('avatar-updated', { detail: dataUrl }));
+
+                this.openPhotoModal = false;
+                this.resetCropState();
+            },
+        };
+    }
+</script>
 @endsection

@@ -162,6 +162,16 @@ class PengajuanFormTest extends TestCase
             ->assertSee('Kegiatan Menunggu Verifikasi');
     }
 
+    public function test_teammate_mahasiswa_pages_are_available(): void
+    {
+        $this->get(route('mahasiswa.dashboard'))->assertOk();
+        $this->get(route('mahasiswa.mata-kuliah'))->assertOk();
+        $this->get(route('mahasiswa.mata-kuliah', ['tab' => 'berjalan']))->assertOk();
+        $this->get(route('mahasiswa.mata-kuliah', ['tab' => 'riwayat']))->assertOk();
+        $this->get(route('mahasiswa.prestasi'))->assertOk();
+        $this->get(route('mahasiswa.prestasi.tambah'))->assertOk();
+    }
+
     public function test_berita_pages_and_draft_workflow_are_available(): void
     {
         $this->get(route('pengajuan.berita.index'))
