@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', isset($prestasi) ? 'Edit prestasi' : 'Tambah prestasi')
 
@@ -21,7 +21,7 @@
     $selDok = 'h-[38px] w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white pl-3 pr-9 text-sm text-[#0A0A0A] outline-none transition focus:border-[#2277FF] focus:ring-2 focus:ring-[#2277FF]/15';
 
     // Anggota tim. Kirim $daftarMahasiswa dan $peranList dari controller (cadangan di bawah ini hanya contoh).
-    $daftarMahasiswa = $daftarMahasiswa ?? ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', 'Arya Bima', 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'];
+    $daftarMahasiswa = $daftarMahasiswa ?? ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', config('mahasiswa.nama'), 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'];
     $peranList       = $peranList ?? ['Ketua', 'Anggota'];
 
     // Mode edit: controller mengirim $prestasi (data yang sudah ada). Tanpa itu, form dalam mode tambah.
@@ -46,7 +46,7 @@
             Kembali ke prestasi
         </a>
         <div class="flex flex-col gap-1">
-            <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px]">{{ $edit ? 'Edit prestasi' : 'Tambah prestasi' }}</h1>
+            <h1 class="text-2xl font-bold leading-tight tracking-[-0.2px] sm:text-[32px] sm:leading-[38px]">{{ $edit ? 'Edit prestasi' : 'Tambah prestasi' }}</h1>
             <p class="text-base text-[#6B7280]">{{ $edit ? 'Perbarui informasi pencapaian dan bukti pendukung.' : 'Lengkapi informasi pencapaian dan unggah bukti pendukung.' }}</p>
         </div>
     </div>
@@ -263,15 +263,15 @@
 
                                 {{-- Tabel anggota: baru tampil setelah ada anggota yang ditambahkan --}}
                                 <div x-show="anggota.length > 0" x-cloak class="overflow-hidden rounded-lg border border-[#E5E7EB] text-sm text-[#1C2024]">
-                                    <div class="grid grid-cols-[minmax(0,1fr)_120px_64px] bg-[#F9FAFB] text-xs font-medium text-[#6B7280]">
+                                    <div class="hidden grid-cols-[minmax(0,1fr)_120px_64px] bg-[#F9FAFB] text-xs font-medium text-[#6B7280] sm:grid">
                                         <div class="px-3 py-2">Nama</div>
                                         <div class="px-3 py-2">Peran</div>
                                         <div class="px-3 py-2">Aksi</div>
                                     </div>
 
                                     <template x-for="(a, i) in anggota" x-bind:key="a.id">
-                                        <div class="grid grid-cols-[minmax(0,1fr)_120px_64px] items-center border-t border-[#E5E7EB]">
-                                            <div class="truncate px-3 py-2" x-text="a.nama"></div>
+                                        <div class="grid grid-cols-[minmax(0,1fr)_120px_64px] items-center border-t border-[#E5E7EB] max-sm:grid-cols-[minmax(0,1fr)_64px]">
+                                            <div class="min-w-0 px-3 py-2 max-sm:col-span-2 max-sm:truncate" x-text="a.nama"></div>
                                             <div class="px-3 py-2" x-text="a.peran"></div>
                                             <div class="px-3 py-1.5">
                                                 <input type="hidden" x-bind:name="'anggota[' + i + '][nama]'" x-bind:value="a.nama" x-bind:disabled="bentuk !== 'Tim'">

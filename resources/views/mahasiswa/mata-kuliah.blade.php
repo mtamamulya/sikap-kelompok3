@@ -1,31 +1,29 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Mata Kuliah')
 
 @section('content')
 @php
+    // Tab "riwayat" yang lama sudah dihapus. Tab "semua" sekarang tampil sebagai "Riwayat mata kuliah".
     $subjudul = [
-        'semua'    => 'Telusuri seluruh catatan mata kuliah Anda dalam satu tempat.',
+        'semua'    => 'Telusuri catatan mata kuliah Anda dari semester sebelumnya.',
         'berjalan' => 'Pantau mata kuliah dan beban studi Anda pada semester aktif.',
-        'riwayat'  => 'Telusuri catatan mata kuliah Anda dari semester sebelumnya.',
     ][$tab];
 
     $judulKartu = [
-        'semua'    => 'Daftar semua mata kuliah',
+        'semua'    => 'Riwayat mata kuliah',
         'berjalan' => 'Paket mata kuliah semester berjalan',
-        'riwayat'  => 'Daftar per semester',
     ][$tab];
 
     $ketKartu = [
         'semua'    => 'Temukan mata kuliah berdasarkan tingkat, periode, atau nama dosen.',
         'berjalan' => 'Daftar mata kuliah yang ditetapkan untuk semester aktif Anda.',
-        'riwayat'  => 'Telusuri catatan berdasarkan tahun akademik, semester, dan tingkat.',
     ][$tab];
 
+    // Urutan tombol tab: Semester berjalan di depan, Riwayat mata kuliah di belakang.
     $tabs = [
-        ['semua',    'Semua mata kuliah',   'mahasiswa.mata-kuliah'],
         ['berjalan', 'Semester berjalan',   'mahasiswa.mata-kuliah.berjalan'],
-        ['riwayat',  'Riwayat mata kuliah', 'mahasiswa.mata-kuliah.riwayat'],
+        ['semua',    'Riwayat mata kuliah', 'mahasiswa.mata-kuliah'],
     ];
 
     $n        = $rows->count();
@@ -33,18 +31,12 @@
     $badgeCls = 'shrink-0 rounded-full border border-[#B8D0FA] bg-[#E8F0FE] px-3 py-1 text-xs font-medium text-[#0162DD]';
     $selCls   = 'h-10 w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white pl-3.5 pr-9 text-sm text-[#0A0A0A] outline-none transition-colors hover:border-[#C7D2E5] focus:border-[#27F]';
     $infoIcon = '<svg class="mt-0.5 size-5 shrink-0 text-[#003385]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0"/><path d="M12 9h.01"/><path d="M11 12h1v4h1"/></svg>';
-
-    // Warna label Semester
-    $chipSemester = [
-        'Ganjil' => 'border-[#B8D0FA] bg-[#EEF4FF] text-[#0162DD]',
-        'Genap'  => 'border-[#F5D9A8] bg-[#FFF7E6] text-[#B25E09]',
-    ];
 @endphp
 
 <div class="flex flex-col gap-6">
     {{-- Judul halaman --}}
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px]">Mata Kuliah</h1>
+        <h1 class="text-2xl font-bold leading-tight tracking-[-0.2px] sm:text-[32px] sm:leading-[38px]">Mata Kuliah</h1>
         <p class="text-base text-[#6B7280]">{{ $subjudul }}</p>
     </div>
 
@@ -112,7 +104,7 @@
                   class="grid grid-cols-1 gap-3 rounded-xl border border-[#EEF0F3] bg-[#F9FAFB] p-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_180px_180px_180px_88px]">
                 <div class="flex h-10 items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3.5 transition-colors focus-within:border-[#27F] sm:col-span-2 xl:col-span-1">
                     <svg class="size-4 shrink-0 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M21 21l-6-6"/></svg>
-                    <input type="search" name="q" value="{{ $filter['q'] }}" placeholder="Cari mata kuliah..."
+                    <input type="search" name="q" value="{{ $filter['q'] }}" data-live-search placeholder="Cari mata kuliah..."
                            class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#A8A8A8]">
                 </div>
 
@@ -142,7 +134,7 @@
             <div class="flex gap-3 rounded-xl bg-[#EEF4FF] px-4 py-3.5 text-[#003385]">
                 {!! $infoIcon !!}
                 <div class="flex flex-col gap-0.5">
-                    <div class="text-sm font-semibold">{{ $tab === 'semua' ? 'Informasi mata kuliah belum lengkap' : 'Pemetaan semester belum tersedia' }}</div>
+                    <div class="text-sm font-semibold">Informasi mata kuliah belum lengkap</div>
                     <p class="text-sm leading-5">
                         {{ $n }} catatan sumber ditampilkan apa adanya, termasuk nama mata kuliah yang berulang. Tingkat dan periode Ganjil/Genap bukan nomor semester. Nilai, SKS, dan status tiap mata kuliah belum tersedia.
                     </p>
@@ -150,9 +142,8 @@
             </div>
         @endif
 
-        {{-- Tabel: lebar kolom dikunci, tinggi minimum setara 10 baris --}}
-               {{-- Tabel: gaya sama dengan dashboard mahasiswa. Lebar kolom dikunci, tinggi minimum setara 10 baris --}}
-        <div class="{{ $tab === 'berjalan' ? '' : 'min-h-[452px]' }} overflow-x-auto rounded-lg border border-[#E5E7EB]">
+        {{-- Tabel: gaya sama dengan dashboard mahasiswa. Lebar kolom dikunci, tinggi minimum setara 10 baris --}}
+        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block {{ $tab === 'berjalan' ? '' : 'md:min-h-[452px]' }}">
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
                     <col class="w-[30%]">
@@ -187,7 +178,34 @@
                 </tbody>
             </table>
         </div>
-        
+
+        <div class="flex flex-col gap-3 md:hidden">
+            @forelse ($rows as $r)
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3.5">
+                    <div class="min-w-0">
+                        <h3 class="break-words text-sm font-semibold text-[#111827]">{{ $r['mk'] }}</h3>
+                        <p class="mt-1 break-words text-xs text-[#6B7280]">{{ $r['dosen'] }}</p>
+                    </div>
+                    <dl class="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div>
+                            <dt class="text-[#6B7280]">Tingkat</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">Tingkat {{ $r['tingkat'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[#6B7280]">Semester</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $r['periode'] }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="text-[#6B7280]">{{ $tab === 'berjalan' ? 'SKS' : 'Tahun Akademik' }}</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $tab === 'berjalan' ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</dd>
+                        </div>
+                    </dl>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">Tidak ada mata kuliah yang cocok dengan filter.</p>
+            @endforelse
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B7280]">
             <span>
                 @if ($tab === 'berjalan') {{ $n }} mata kuliah dipaketkan untuk semester aktif

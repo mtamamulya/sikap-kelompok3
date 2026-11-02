@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Dashboard Mahasiswa')
 
@@ -19,16 +19,10 @@
 <div class="flex flex-col gap-6">
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div class="flex min-w-0 flex-col gap-1">
-            <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px]">Selamat {{ $sapaan }}, {{ $depan }}!</h1>
+            <h1 class="text-2xl font-bold leading-tight tracking-[-0.2px] sm:text-[32px] sm:leading-[38px]">Selamat {{ $sapaan }}, {{ $depan }}!</h1>
             <p class="text-base text-[#6B7280]">Pantau perkembangan studi dan aktivitas akademikmu dalam satu tempat.</p>
         </div>
-        <div class="flex items-center gap-4">
-            <span class="text-base text-[#6B7280]">{{ now()->translatedFormat('l, d F Y') }}</span>
-            <a href="#" class="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 text-base font-medium text-[#0162DD] hover:bg-[#F2F6FD]">
-                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M7 11l5 5l5-5"/><path d="M12 4l0 12"/></svg>
-                Unduh KHS
-            </a>
-        </div>
+        <span class="text-base text-[#6B7280]">{{ now()->translatedFormat('l, d F Y') }}</span>
     </div>
 
     {{-- Kartu statistik: memakai komponen x-mahasiswa.stat-card (ukuran diatur di komponennya) --}}
@@ -81,12 +75,22 @@
         </x-mahasiswa.stat-card>
     </div>
 
+    <section class="flex flex-col gap-4 rounded-2xl bg-[#2277FF] p-6 text-white sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-1">
+            <h2 class="text-xl font-bold">Buat pengajuan dokumen baru</h2>
+            <p class="text-xs text-blue-100">Pilih jenis dokumen, lengkapi data, dan lampirkan tautan dokumen yang diperlukan.</p>
+        </div>
+        <a href="{{ route('pengajuan.create') }}" class="inline-flex w-full shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 text-xs font-bold text-[#2277FF] shadow-sm transition hover:bg-blue-50 sm:w-auto">
+            Buat Pengajuan
+        </a>
+    </section>
+
     {{-- Filter dan tabel mata kuliah --}}
     <section class="flex flex-col gap-4 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]">
         <form method="GET" action="{{ url()->current() }}" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_180px_180px_180px_auto]">
             <div class="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3.5 py-2 focus-within:border-[#27F] sm:col-span-2 xl:col-span-1">
                 <svg class="size-4 shrink-0 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M21 21l-6-6"/></svg>
-                <input type="search" name="q" value="{{ $filter['q'] }}" placeholder="Cari mata kuliah atau dosen..."
+                <input type="search" name="q" value="{{ $filter['q'] }}" data-live-search placeholder="Cari mata kuliah atau dosen..."
                        class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#A8A8A8]">
             </div>
 
@@ -114,7 +118,7 @@
             <button type="submit" class="sr-only">Terapkan</button>
         </form>
 
-        <div class="overflow-x-auto rounded-lg border border-[#E5E7EB]">
+        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block">
             {{-- table-fixed + colgroup: lebar kolom dikunci, tidak lagi mengikuti isi data --}}
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
@@ -151,7 +155,34 @@
             </table>
         </div>
 
-        {{ $mataKuliah->links('pagination.mahasiswa') }}
+        <div class="flex flex-col gap-3 md:hidden">
+            @forelse ($mataKuliah as $mk)
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3.5">
+                    <div class="min-w-0">
+                        <h2 class="break-words text-sm font-semibold text-[#111827]">{{ $mk['mk'] }}</h2>
+                        <p class="mt-1 break-words text-xs text-[#6B7280]">{{ $mk['dosen'] }}</p>
+                    </div>
+                    <dl class="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div>
+                            <dt class="text-[#6B7280]">Tingkat</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">Tingkat {{ $mk['tingkat'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[#6B7280]">Semester</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $mk['semester'] }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="text-[#6B7280]">Tahun Akademik</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $mk['tahun'] ?? ($mk['tahun_akademik'] ?? '—') }}</dd>
+                        </div>
+                    </dl>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">Tidak ada mata kuliah yang cocok dengan filter.</p>
+            @endforelse
+        </div>
+
+        {{ $mataKuliah->links('mahasiswa.pagination.mahasiswa') }}
     </section>
 </div>
 @endsection
