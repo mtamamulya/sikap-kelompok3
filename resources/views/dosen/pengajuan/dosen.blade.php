@@ -105,7 +105,7 @@
 
         {{-- ISI HALAMAN --}}
         <main class="flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12">
-            <section class="flex flex-col gap-6" x-data="{ pengajuanDosen: @js($pengajuanDosen) }">
+            <section class="flex flex-col gap-6">
                 <div>
                     <h1 class="text-3xl font-bold tracking-tight">Pengajuan Dosen</h1>
                     <p class="mt-1 text-sm text-gray-500">Daftar kegiatan yang diajukan oleh dosen.</p>
@@ -122,17 +122,21 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <template x-for="k in pengajuanDosen" :key="k.id">
+                            @forelse ($pengajuanDosen as $k)
                                 <tr class="text-gray-700">
-                                    <th scope="row" class="px-5 py-4 font-semibold text-gray-900" x-text="k.nama"></th>
-                                    <td class="px-5 py-4" x-text="k.pengaju"></td>
-                                    <td class="px-5 py-4" x-text="k.kategori"></td>
-                                    <td class="px-5 py-4" x-text="k.status"></td>
+                                    <th scope="row" class="px-5 py-4 font-semibold text-gray-900">{{ $k['nama'] }}</th>
+                                    <td class="px-5 py-4">{{ $k['pengaju'] }}</td>
+                                    <td class="px-5 py-4">{{ $k['kategori'] }}</td>
+                                    <td class="px-5 py-4">{{ $k['status'] }}</td>
                                     <td class="px-5 py-4 text-right">
-                                        <a :href="`/pengajuan/dosen/${k.id}`" class="font-semibold text-brand hover:underline">Lihat detail</a>
+                                        <a href="{{ route('pengajuan.dosen.show', $k['id']) }}" class="font-semibold text-brand hover:underline">Lihat detail</a>
                                     </td>
                                 </tr>
-                            </template>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-5 py-10 text-center text-gray-500">Belum ada pengajuan dosen.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

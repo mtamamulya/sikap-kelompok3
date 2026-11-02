@@ -144,14 +144,16 @@ class PengajuanFormTest extends TestCase
             ->assertOk()
             ->assertViewIs('dosen.pengajuan.dosen')
             ->assertSee('<title>Pengajuan Dosen | DOSEN</title>', false)
-            ->assertSee('pengajuanDosen')
             ->assertSee('Penyuluhan Literasi Digital')
             ->assertSee('Seminar Nasional AI')
-            ->assertSee('/pengajuan/dosen/${k.id}')
+            ->assertSee(route('pengajuan.dosen.show', 1), false)
             ->assertDontSee('Seminar Nasional Transformasi Digital Kampus')
             ->assertDontSee('Tambah pengajuan')
             ->assertDontSee('Halaman sementara');
-        $this->get(route('pengajuan.mahasiswa'))->assertOk();
+        $this->get(route('pengajuan.mahasiswa'))
+            ->assertOk()
+            ->assertViewIs('dosen.pengajuan.mahasiswa')
+            ->assertSee('Volunteer Bakti Sosial');
         $this->get(route('pengajuan-segera'))->assertOk();
     }
 

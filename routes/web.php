@@ -14,8 +14,12 @@ Route::post('/logout', function () {
 
 // --- Halaman Utama & Fitur ---
 Route::get('/dashboard', [PengajuanController::class, 'dashboard'])->name('dashboard');
-Route::view('/kegiatan', 'kegiatan')->name('kegiatan.index');
-Route::view('/profil', 'profil')->name('profil');
+Route::view('/dosen/dashboard', 'dosen.dashboard')->name('dosen.dashboard');
+Route::view('/kegiatan', 'dosen.kegiatan.index')->name('kegiatan.index');
+Route::view('/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
+Route::view('/kegiatan/{id}', 'dosen.kegiatan.show')->whereNumber('id')->name('kegiatan.show');
+Route::view('/kegiatan/{id}/edit', 'dosen.kegiatan.edit')->whereNumber('id')->name('kegiatan.edit');
+Route::view('/profil', 'dosen.profil.show')->name('profil');
 
 // Alias pendukung komponen & sidebar
 Route::view('/kegiatan-page', 'kegiatan')->name('kegiatan');
@@ -23,27 +27,39 @@ Route::view('/header', 'header')->name('header');
 Route::view('/navbar', 'navbar')->name('navbar');
 
 // --- Notifikasi ---
-Route::view('/notifikasi', 'notifikasi.index')->name('notifikasi');
+Route::view('/notifikasi', 'dosen.notifikasi.index')->name('notifikasi');
 
 // --- Penelitian ---
-Route::view('/penelitian', 'penelitian.index')->name('penelitian.index');
-Route::view('/penelitian/create', 'penelitian.create')->name('penelitian.create');
-Route::view('/penelitian/{id}', 'penelitian.show')->whereNumber('id')->name('penelitian.show');
-Route::view('/penelitian/{id}/edit', 'penelitian.edit')->whereNumber('id')->name('penelitian.edit');
+Route::view('/penelitian', 'dosen.penelitian.index')->name('penelitian.index');
+Route::view('/penelitian/create', 'dosen.penelitian.create')->name('penelitian.create');
+Route::view('/penelitian/{id}', 'dosen.penelitian.show')->whereNumber('id')->name('penelitian.show');
+Route::view('/penelitian/{id}/edit', 'dosen.penelitian.edit')->whereNumber('id')->name('penelitian.edit');
 
 // --- Pengabdian ---
-Route::view('/pengabdian', 'pengabdian.index')->name('pengabdian.index');
-Route::view('/pengabdian/create', 'pengabdian.create')->name('pengabdian.create');
-Route::view('/pengabdian/{id}', 'pengabdian.show')->whereNumber('id')->name('pengabdian.show');
-Route::view('/pengabdian/{id}/edit', 'pengabdian.edit')->whereNumber('id')->name('pengabdian.edit');
+Route::view('/pengabdian', 'dosen.pengabdian.index')->name('pengabdian.index');
+Route::view('/pengabdian/create', 'dosen.pengabdian.create')->name('pengabdian.create');
+Route::view('/pengabdian/{id}', 'dosen.pengabdian.show')->whereNumber('id')->name('pengabdian.show');
+Route::view('/pengabdian/{id}/edit', 'dosen.pengabdian.edit')->whereNumber('id')->name('pengabdian.edit');
 Route::view('/pengajaran', 'dosen.pengajaran.index')->name('pengajaran.index');
+Route::view('/pengajaran/create', 'dosen.pengajaran.create')->name('pengajaran.create');
+Route::view('/pengajaran/{id}', 'dosen.pengajaran.show')->whereNumber('id')->name('pengajaran.show');
+Route::view('/pengajaran/{id}/edit', 'dosen.pengajaran.edit')->whereNumber('id')->name('pengajaran.edit');
 Route::view('/prestasi', 'dosen.prestasi.index')->name('prestasi.index');
+Route::view('/prestasi/create', 'dosen.prestasi.create')->name('prestasi.create');
+Route::view('/prestasi/{id}', 'dosen.prestasi.show')->whereNumber('id')->name('prestasi.show');
+Route::view('/prestasi/{id}/edit', 'dosen.prestasi.edit')->whereNumber('id')->name('prestasi.edit');
 
 // --- Pengajuan ---
+Route::get('/pengajuan/dosen/baru', [PengajuanController::class, 'createDosen'])->name('pengajuan.dosen.create');
+Route::post('/pengajuan/dosen', [PengajuanController::class, 'storeDosen'])->name('pengajuan.dosen.store');
 Route::view('/pengajuan/dosen', 'dosen.pengajuan.dosen')->name('pengajuan.dosen');
 Route::view('/pengajuan/dosen/{id}', 'dosen.pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('pengajuan.dosen.show');
-Route::get('/pengajuan/mahasiswa', [PengajuanController::class, 'index'])->name('pengajuan.mahasiswa');
-Route::view('/pengajuan/mahasiswa/{id}', 'mahasiswa.PengajuanMahasiswa.detail', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
+Route::view('/pengajuan/mahasiswa', 'dosen.pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
+Route::view('/pengajuan/mahasiswa/{id}', 'dosen.pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
+Route::view('/berita', 'dosen.berita.index')->name('berita.index');
+Route::view('/berita/create', 'dosen.berita.create')->name('berita.create');
+Route::view('/berita/{id}', 'dosen.berita.show')->whereNumber('id')->name('berita.show');
+Route::view('/berita/{id}/edit', 'dosen.berita.edit')->whereNumber('id')->name('berita.edit');
 
 // --- Controller Mahasiswa ---
 Route::get('/mahasiswa', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.index');

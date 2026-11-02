@@ -394,6 +394,11 @@ class PengajuanController extends Controller
         return view('PengajuanMahasiswa.create', ['item' => null]);
     }
 
+    public function createDosen()
+    {
+        return view('dosen.pengajuan.create', ['item' => null]);
+    }
+
     public function edit(int $id)
     {
         return view('PengajuanMahasiswa.create', ['item' => $this->findEditable($id)]);
@@ -538,6 +543,16 @@ class PengajuanController extends Controller
 
     public function store(Request $request)
     {
+        return $this->saveSubmission($request, 'pengajuan.show');
+    }
+
+    public function storeDosen(Request $request)
+    {
+        return $this->saveSubmission($request, 'pengajuan.dosen.show');
+    }
+
+    private function saveSubmission(Request $request, string $showRoute)
+    {
         $data = $this->validated($request);
         $documents = $data['documents'] ?? [];
         unset($data['documents']);
@@ -559,7 +574,7 @@ class PengajuanController extends Controller
 
         // TODO: ganti penyimpanan session dengan Eloquent (Submission::create) saat database siap.
 
-        return redirect()->route('pengajuan.show', $id)
+        return redirect()->route($showRoute, $id)
             ->with('success', 'Pengajuan berhasil dikirim.');
     }
 

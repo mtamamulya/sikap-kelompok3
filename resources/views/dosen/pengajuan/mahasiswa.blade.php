@@ -82,7 +82,7 @@
                         <div class="flex shrink-0 items-center gap-3">
                             <span :class="warnaBadge[k.status]" class="rounded-md px-2 py-0.5 text-xs" x-text="k.status"></span>
                             {{-- Tombol Tinjau: alamat halaman tinjau diisi nanti --}}
-                            <a href="#" :aria-label="`Tinjau ${k.judul}`"
+                            <a :href="`{{ url('/pengajuan/mahasiswa') }}/${i + 1}`" :aria-label="`Tinjau ${k.judul}`"
                                class="flex h-9 items-center rounded-md bg-brand px-4 text-base text-white hover:bg-blue-700">Tinjau</a>
                         </div>
                     </div>

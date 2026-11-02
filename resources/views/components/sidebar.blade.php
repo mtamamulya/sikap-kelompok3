@@ -4,8 +4,8 @@
     $menu = [
         [
             'label'  => 'Dashboard',
-            'href'   => route('dashboard'),
-            'active' => request()->routeIs('dashboard', 'profil'),
+            'href'   => route('dosen.dashboard'),
+            'active' => request()->routeIs('dosen.dashboard', 'profil'),
             'icon'   => '<rect x="4" y="4" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="14" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="4" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/>',
         ],
         [
@@ -65,7 +65,7 @@
         {{-- Logo: klik untuk ke Dashboard.
              Kalau file belum ada, tampil kotak "TI" sementara. Tombol tutup hanya tampil di layar kecil. --}}
         <div class="flex items-center justify-between gap-2 px-1 pb-5">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" aria-label="Teknologi Rekayasa Komputer, ke Dashboard">
+            <a href="{{ route('dosen.dashboard') }}" class="flex items-center gap-2.5" aria-label="Teknologi Rekayasa Komputer, ke Dashboard">
                 @if (file_exists(public_path('images/logo-trk.png')))
                     <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0">
                 @else

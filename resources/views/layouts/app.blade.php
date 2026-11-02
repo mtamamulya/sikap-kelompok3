@@ -16,18 +16,43 @@
 
 <body class="font-sans antialiased bg-[#F9FAFB] text-[#111827]">
 
-<div class="flex min-h-screen">
+@php
+    $isDosenLayout = request()->routeIs(
+        'dosen.dashboard',
+        'penelitian.*',
+        'pengabdian.*',
+        'pengajaran.*',
+        'prestasi.*',
+        'kegiatan.*',
+        'pengajuan.dosen*',
+        'pengajuan.mahasiswa*',
+        'berita.*',
+        'notifikasi',
+        'profil'
+    );
+@endphp
+
+<div class="flex min-h-screen" x-data="{ menu: false }">
     @unless(View::hasSection('hide_sidebar'))
-        @if(View::exists('components.navbar'))
+        @if ($isDosenLayout)
+            @include('components.sidebar')
+        @elseif(View::exists('components.navbar'))
             @include('components.navbar')
         @else
             @include('navbar')
         @endif
     @endunless
 
+    @if ($isDosenLayout)
+        <button type="button" x-show="menu" x-cloak x-on:click="menu = false"
+                class="fixed inset-0 z-30 bg-black/40 lg:hidden" aria-label="Tutup menu"></button>
+    @endif
+
     <div class="flex min-w-0 flex-1 flex-col">
         @unless(View::hasSection('hide_header'))
-            @if(View::exists('components.header'))
+            @if ($isDosenLayout)
+                @include('components.header-dosen')
+            @elseif(View::exists('components.header'))
                 @include('components.header')
             @else
                 @include('header')
@@ -56,6 +81,8 @@
         window.addEventListener('avatar-updated', syncGlobalAvatar);
     });
 </script>
+
+@stack('scripts')
 
 </body>
 </html>
