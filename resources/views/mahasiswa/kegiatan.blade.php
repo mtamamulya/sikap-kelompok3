@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Kegiatan - Teknologi Rekayasa Komputer')
 
@@ -7,57 +7,57 @@
     // Data Statistik Ringkasan
     $summaryCards = [
         [
-            'label' => 'LOMBA', 
-            'value' => 12, 
+            'label' => 'LOMBA',
+            'value' => 12,
             'unit' => 'Kegiatan',
-            'border_accent' => '#2277FF', 
-            'bg_icon' => '#EFF6FF', 
-            'ic_color' => '#2563EB', 
+            'border_accent' => '#2277FF',
+            'bg_icon' => '#EFF6FF',
+            'ic_color' => '#2563EB',
             'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'
         ],
         [
-            'label' => 'VOLUNTEER', 
-            'value' => 2, 
+            'label' => 'VOLUNTEER',
+            'value' => 2,
             'unit' => 'Kegiatan',
-            'border_accent' => '#F59E0B', 
-            'bg_icon' => '#FFFBEB', 
-            'ic_color' => '#D97706', 
+            'border_accent' => '#F59E0B',
+            'bg_icon' => '#FFFBEB',
+            'ic_color' => '#D97706',
             'icon' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'
         ],
         [
-            'label' => 'KKL', 
-            'value' => 1, 
+            'label' => 'KKL',
+            'value' => 1,
             'unit' => 'Kegiatan',
-            'border_accent' => '#10B981', 
-            'bg_icon' => '#ECFDF5', 
-            'ic_color' => '#059669', 
+            'border_accent' => '#10B981',
+            'bg_icon' => '#ECFDF5',
+            'ic_color' => '#059669',
             'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'
         ],
         [
-            'label' => 'MAGANG', 
-            'value' => 9, 
+            'label' => 'MAGANG',
+            'value' => 9,
             'unit' => 'Kegiatan',
-            'border_accent' => '#8B5CF6', 
-            'bg_icon' => '#F5F3FF', 
-            'ic_color' => '#7C3AED', 
+            'border_accent' => '#8B5CF6',
+            'bg_icon' => '#F5F3FF',
+            'ic_color' => '#7C3AED',
             'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
         ],
         [
-            'label' => 'PENGABDIAN', 
-            'value' => 12, 
+            'label' => 'PENGABDIAN',
+            'value' => 12,
             'unit' => 'Kegiatan',
-            'border_accent' => '#EC4899', 
-            'bg_icon' => '#FDF2F8', 
-            'ic_color' => '#DB2777', 
+            'border_accent' => '#EC4899',
+            'bg_icon' => '#FDF2F8',
+            'ic_color' => '#DB2777',
             'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
         ],
         [
-            'label' => 'PENELITIAN', 
-            'value' => 1, 
+            'label' => 'PENELITIAN',
+            'value' => 1,
             'unit' => 'Kegiatan',
-            'border_accent' => '#06B6D4', 
-            'bg_icon' => '#ECFEFF', 
-            'ic_color' => '#0891B2', 
+            'border_accent' => '#06B6D4',
+            'bg_icon' => '#ECFEFF',
+            'ic_color' => '#0891B2',
             'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
         ],
     ];
@@ -97,18 +97,18 @@
         ['id' => 17, 'name' => 'Kunjungan Industri Telkomsel Digital', 'type' => 'Kunjungan Industri', 'date' => '02 Nov 2024', 'raw_date' => '2024-11-02', 'status' => 'done', 'note' => 'Selesai diikuti.', 'action' => 'Lihat detail', 'capaian' => 'Peserta', 'tingkat' => 'Nasional', 'penyelenggara' => 'Telkomsel Smart Office', 'file_name' => 'sertifikat-telkomsel-visit.pdf', 'file_size' => '1.4 MB'],
         ['id' => 18, 'name' => 'Kompetisi Robotics & Automation', 'type' => 'Lomba', 'date' => '18 Des 2024', 'raw_date' => '2024-12-18', 'status' => 'done', 'note' => 'Juara Harapan 1.', 'action' => 'Lihat detail', 'capaian' => 'Juara Harapan 1', 'tingkat' => 'Nasional', 'penyelenggara' => 'ITB Robotics Club', 'file_name' => 'sertifikat-robotics-2024.pdf', 'file_size' => '1.8 MB'],
     ];
-    
+
     $allActivities = array_merge($page1, $page2, $page3);
 @endphp
 
 <div x-data="kegiatanApp(@js($allActivities))" class="flex flex-col gap-6">
-    
+
     <!-- Grid Ringkasan Kegiatan -->
     <div class="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         @foreach($summaryCards as $c)
             <div class="group relative min-w-0 overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D1D5DB] hover:shadow-md sm:p-5">
                 <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: {{ $c['border_accent'] }};"></div>
-                
+
                 <div class="flex items-center justify-between pl-2">
                     <div class="flex flex-col gap-1">
                         <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider transition-colors duration-300 group-hover:text-[#111827]">{{ $c['label'] }}</span>
@@ -117,7 +117,7 @@
                             <span class="text-[11px] font-medium text-[#9CA3AF]">{{ $c['unit'] }}</span>
                         </div>
                     </div>
-                    
+
                     <div class="flex size-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110" style="background-color: {{ $c['bg_icon'] }};">
                         <svg class="size-5 transition-transform duration-300 group-hover:rotate-6" fill="none" stroke="{{ $c['ic_color'] }}" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="{{ $c['icon'] }}"></path>
@@ -171,7 +171,7 @@
         <div class="flex items-center justify-between">
             <h2 class="text-xl font-bold text-[#111827]">Daftar kegiatan</h2>
             <!-- Button Lihat Semua / Batasi Tampilan -->
-            <button @click="showAll = !showAll; page = 1" 
+            <button @click="showAll = !showAll; page = 1"
                     class="rounded-lg bg-[#EFF6FF] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-blue-100 transition">
                 <span x-text="showAll ? 'Batasi tampilan' : 'Lihat semua'"></span>
             </button>
@@ -191,7 +191,7 @@
             <!-- Kategori -->
             <div x-data="{ open: false }" @click.outside="open = false" class="flex flex-col gap-1.5 flex-1 relative">
                 <span class="text-xs font-medium text-[#4B5563]">Kategori</span>
-                
+
                 <button type="button" @click="open = !open"
                         class="flex h-[42px] w-full items-center justify-between rounded-lg border bg-white px-3 text-xs outline-none transition-all duration-200"
                         :class="open ? 'border-[#2277FF] ring-1 ring-[#2277FF]' : 'border-[#E5E7EB] hover:bg-gray-50'">
@@ -207,7 +207,7 @@
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-[-10px] scale-95"
                      class="absolute left-0 top-[64px] z-50 max-h-[240px] w-full overflow-y-auto rounded-xl border border-[#E5E7EB] bg-white py-1.5 shadow-xl scrollbar-hide">
-                    
+
                     <template x-for="cat in ['', 'Lomba', 'Pengabdian', 'Volunteer', 'Kunjungan Industri', 'Kuliah Kerja Lapangan', 'Magang', 'Pelatihan', 'Seminar', 'Penelitian']">
                         <button type="button" @click="selectedCategory = cat; open = false"
                                 class="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs transition-colors"
@@ -222,8 +222,8 @@
             <!-- Rentang Tanggal -->
             <div x-data="{ dateOpen: false }" @click.outside="dateOpen = false" class="flex flex-col gap-1.5 lg:w-[320px] relative">
                 <span class="text-xs font-medium text-[#4B5563]">Rentang tanggal</span>
-                
-                <button type="button" 
+
+                <button type="button"
                         @click="dateOpen = !dateOpen; if(dateOpen) { tempStartDate = appliedStartDate; tempEndDate = appliedEndDate; }"
                         class="flex h-[42px] w-full items-center justify-between rounded-lg border bg-white px-3 text-xs outline-none transition-all duration-200"
                         :class="dateOpen ? 'border-[#2277FF] ring-1 ring-[#2277FF]' : 'border-[#E5E7EB] hover:bg-gray-50'">
@@ -242,7 +242,7 @@
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-[-10px] scale-95"
                      class="absolute right-0 lg:left-0 top-[64px] z-50 w-[280px] sm:w-full rounded-xl border border-[#E5E7EB] bg-white p-3 shadow-xl">
-                    
+
                     <div class="flex flex-col gap-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-[11px] font-semibold text-[#6B7280]">Dari Tanggal</label>
@@ -252,7 +252,7 @@
                             <label class="text-[11px] font-semibold text-[#6B7280]">Sampai Tanggal</label>
                             <input type="date" x-model="tempEndDate" class="w-full rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] px-3 py-2 text-xs text-[#111827] outline-none focus:border-[#2277FF] focus:ring-1 focus:ring-[#2277FF] transition" />
                         </div>
-                        
+
                         <div class="mt-1 flex items-center justify-between border-t border-[#E5E7EB] pt-3">
                             <button type="button" @click="tempStartDate = ''; tempEndDate = ''; appliedStartDate = ''; appliedEndDate = ''; dateOpen = false;" class="px-3 py-1.5 text-xs font-semibold text-[#6B7280] hover:text-[#EF4444] hover:bg-red-50 rounded-md transition">Kosongkan</button>
                             <button type="button" @click="appliedStartDate = tempStartDate; appliedEndDate = tempEndDate; dateOpen = false;" class="px-4 py-1.5 text-xs font-bold bg-[#2277FF] text-white hover:bg-blue-600 rounded-md transition shadow-sm">Terapkan</button>
@@ -340,24 +340,24 @@
             <span class="text-xs text-[#6B7280]">
                 Menampilkan <span x-text="showAll ? `1–${filteredData.length}` : `${showingStart}–${showingEnd}`"></span> dari <span x-text="filteredData.length"></span> Kegiatan
             </span>
-            
+
             <div class="flex items-center gap-2 text-xs" x-show="!showAll && totalPages > 0">
-                <button @click="prevPage()" 
+                <button @click="prevPage()"
                         :disabled="page === 1"
                         :class="page === 1 ? 'text-[#9CA3AF] cursor-not-allowed' : 'text-[#4B5563] hover:bg-gray-50'"
                         class="flex h-8 items-center gap-1 rounded-lg border border-[#E5E7EB] px-3 transition">
                     <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     <span>Sebelumnya</span>
                 </button>
-                
+
                 <template x-for="p in totalPages" :key="p">
-                    <button @click="page = p" 
+                    <button @click="page = p"
                             :class="page === p ? 'bg-[#2563EB] text-white font-semibold shadow-sm' : 'border border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-gray-50'"
                             class="size-8 rounded-lg transition" x-text="p">
                     </button>
                 </template>
-                
-                <button @click="nextPage()" 
+
+                <button @click="nextPage()"
                         :disabled="page === totalPages"
                         :class="page === totalPages ? 'text-[#9CA3AF] cursor-not-allowed' : 'text-[#4B5563] hover:bg-gray-50'"
                         class="flex h-8 items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 transition">
@@ -369,7 +369,7 @@
     </section>
 
     <!-- Modal Detail Bukti Prestasi -->
-    <div x-show="isModalOpen" 
+    <div x-show="isModalOpen"
          x-cloak
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -378,8 +378,8 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs overflow-y-auto">
-        
-        <div @click.outside="closeModal()" 
+
+        <div @click.outside="closeModal()"
              x-show="isModalOpen"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -388,7 +388,7 @@
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
              class="relative w-full max-w-4xl rounded-2xl bg-white p-6 shadow-2xl my-8">
-            
+
             <div class="flex items-start justify-between border-b border-[#F3F4F6] pb-4">
                 <div>
                     <span class="text-xs font-semibold text-[#6B7280]">Bukti prestasi</span>
@@ -402,12 +402,12 @@
             <div class="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-12">
                 <div class="lg:col-span-7 flex flex-col gap-3">
                     <div class="flex items-center gap-2">
-                        <button @click="activeTab = 'sertifikat'" 
+                        <button @click="activeTab = 'sertifikat'"
                                 :class="activeTab === 'sertifikat' ? 'bg-[#2563EB] text-white font-semibold' : 'bg-white text-[#6B7280] hover:bg-gray-100'"
                                 class="rounded-lg px-3.5 py-1.5 text-xs transition border border-[#E5E7EB]">
                             Dokumen 1 • Sertifikat
                         </button>
-                        <button @click="activeTab = 'foto'" 
+                        <button @click="activeTab = 'foto'"
                                 :class="activeTab === 'foto' ? 'bg-[#2563EB] text-white font-semibold' : 'bg-white text-[#6B7280] hover:bg-gray-100'"
                                 class="rounded-lg px-3.5 py-1.5 text-xs transition border border-[#E5E7EB]">
                             Dokumen 2 • Foto kegiatan
@@ -462,7 +462,7 @@
                             <span class="text-xs font-semibold text-[#111827] break-all" x-text="activeItem?.file_name || 'sertifikat-kegiatan.pdf'"></span>
                             <span class="text-[10px] text-[#9CA3AF]" x-text="activeItem?.file_size || '1.2 MB'"></span>
                         </div>
-                        
+
                         <button @click="downloadFile(activeItem)" class="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#2277FF] text-xs font-bold text-white hover:bg-blue-600 transition shadow-xs">
                             <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             <span>Unduh Sertifikat</span>
@@ -491,13 +491,13 @@ document.addEventListener('alpine:init', () => {
         items: initialData,
         searchQuery: '',
         selectedCategory: '',
-        
+
         appliedStartDate: '',
         appliedEndDate: '',
-        
+
         tempStartDate: '',
         tempEndDate: '',
-        
+
         page: 1,
         itemsPerPage: 6,
         showAll: false,
@@ -544,11 +544,11 @@ document.addEventListener('alpine:init', () => {
 
         get filteredData() {
             return this.items.filter(item => {
-                const matchSearch = item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                const matchSearch = item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                                     item.type.toLowerCase().includes(this.searchQuery.toLowerCase());
-                
+
                 const matchCategory = this.selectedCategory === '' || item.type === this.selectedCategory;
-                
+
                 let matchDate = true;
                 if (this.appliedStartDate && this.appliedEndDate) {
                     matchDate = item.raw_date >= this.appliedStartDate && item.raw_date <= this.appliedEndDate;

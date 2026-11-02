@@ -9,19 +9,19 @@
 
     <!-- Sisi Kanan: Profile Dropdown User -->
     <div class="relative flex items-center gap-4 ml-auto"
-         x-data="{ 
-            dropdownOpen: false, 
-            userAvatar: localStorage.getItem('user_avatar') || null 
+         x-data="{
+            dropdownOpen: false,
+            userAvatar: localStorage.getItem('user_avatar') || null
          }"
          x-init="
             window.addEventListener('avatar-updated', (e) => userAvatar = e.detail);
             window.addEventListener('storage', () => userAvatar = localStorage.getItem('user_avatar'));
          "
          @click.outside="dropdownOpen = false">
-        
+
         <!-- Tombol Profil Topbar -->
-        <button type="button" 
-                @click="dropdownOpen = !dropdownOpen" 
+        <button type="button"
+                @click="dropdownOpen = !dropdownOpen"
                 class="flex items-center gap-3 rounded-xl p-1.5 hover:bg-gray-50 transition outline-none cursor-pointer">
             <div class="flex size-9 items-center justify-center rounded-full bg-[#E0E7FF] text-xs font-bold text-[#1F66E5] overflow-hidden border border-[#E5E7EB]">
                 <template x-if="userAvatar">
@@ -41,7 +41,7 @@
         </button>
 
         <!-- Menu Dropdown Popover -->
-        <div x-show="dropdownOpen" 
+        <div x-show="dropdownOpen"
              x-cloak
              x-transition:enter="transition ease-out duration-150"
              x-transition:enter-start="opacity-0 scale-95 translate-y-[-8px]"
@@ -50,7 +50,7 @@
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-95 translate-y-[-8px]"
              class="absolute right-0 top-12 z-50 w-64 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-xl">
-            
+
             <!-- Header User Info -->
             <div class="flex flex-col gap-0.5 pb-3">
                 <span class="text-base font-bold text-[#111827]">{{ config('mahasiswa.nama') }}</span>
@@ -61,7 +61,7 @@
 
             <div class="flex flex-col gap-2 pt-1">
                 <!-- Item 1: Profil Saya (Background Putih, Berubah Saat Hover) -->
-                <a href="{{ url('/profil') }}" 
+                <a href="{{ url('/profil') }}"
                    @click="dropdownOpen = false"
                    class="flex items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 text-xs font-medium text-[#111827] hover:bg-[#F3F4F6] transition duration-150">
                     <svg class="size-4 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +73,7 @@
                 <!-- Item 2: Keluar (Logout) -->
                 <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
-                    <button type="submit" 
+                    <button type="submit"
                             class="flex w-full items-center gap-3 rounded-xl bg-white px-3.5 py-2 text-xs font-medium text-[#EF4444] hover:bg-red-50 transition duration-150 cursor-pointer">
                         <svg class="size-4 text-[#EF4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

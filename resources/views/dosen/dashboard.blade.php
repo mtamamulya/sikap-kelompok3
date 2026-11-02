@@ -5,25 +5,8 @@
 @section('content')
 
 @php
-    // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
-    $stats = [
-        ['label' => 'Pengajaran',          'value' => 24, 'aria' => 'Buka pengajaran',                   'alert' => false],
-        ['label' => 'Penelitian',          'value' => 67, 'aria' => 'Buka penelitian',                   'alert' => false],
-        ['label' => 'Pengabdian',          'value' => 32, 'aria' => 'Buka pengabdian',                   'alert' => false],
-        ['label' => 'Menunggu Verifikasi', 'value' => 24, 'aria' => 'Buka kegiatan menunggu verifikasi', 'alert' => true],
-    ];
-
-    $perTahun = ['2022' => 8, '2023' => 17, '2024' => 9, '2025' => 20, '2026' => 14, '2027' => 16, '2028' => 7];
-    $max   = 20;
-    $ticks = [0, 5, 10, 15, 20];
-
-    $menunggu = [
-        ['nama' => 'Seminar Nasional AI',  'jenis' => 'Penelitian', 'tanggal' => '15 Agustus 2026', 'tanggal_urut' => '2026-08-15'],
-        ['nama' => 'Pelatihan Industri',   'jenis' => 'Pengabdian', 'tanggal' => '12 Agustus 2026', 'tanggal_urut' => '2026-08-12'],
-        ['nama' => 'Kunjungan Industri',   'jenis' => 'Pengabdian', 'tanggal' => '26 Juli 2026', 'tanggal_urut' => '2026-07-26'],
-        ['nama' => 'Pelatihan Industri',   'jenis' => 'Pengabdian', 'tanggal' => '11 Juli 2026', 'tanggal_urut' => '2026-07-11'],
-        ['nama' => 'Kuliah Tamu',          'jenis' => 'Pengajaran', 'tanggal' => '10 Juli 2026', 'tanggal_urut' => '2026-07-10'],
-    ];
+    $max = max(4, (int) ceil(max(array_values($perTahun) ?: [0]) / 4) * 4);
+    $ticks = [0, $max / 4, $max / 2, $max * 3 / 4, $max];
 @endphp
 
     {{-- Judul halaman --}}
@@ -38,7 +21,7 @@
             <div class="flex min-h-41 min-w-0 flex-[1_1_220px] flex-col justify-between rounded-lg bg-white p-3 shadow-sm">
                 <div class="flex items-start justify-between gap-2">
                     <span class="text-xl font-medium">{{ $s['label'] }}</span>
-                    <a href="#" aria-label="{{ $s['aria'] }}" class="flex rounded-full text-gray-900 hover:text-brand">
+                    <a href="{{ $s['url'] }}" aria-label="{{ $s['aria'] }}" class="flex rounded-full text-gray-900 hover:text-brand">
                         <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <circle cx="12" cy="12" r="9.5"/><path d="M9 15l6-6M10 9h5v5"/>
                         </svg>
@@ -107,33 +90,25 @@
             <a href="{{ route('pengajuan.dosen') }}" class="px-3 py-2 text-[15px] text-brand hover:underline">Lihat semua</a>
         </div>
 
-        <p id="urutan-kegiatan" role="status" aria-live="polite" class="text-sm text-gray-600">Urutan: Tanggal Diajukan, terbaru lebih dulu.</p>
-
         <div class="overflow-x-auto rounded-md border border-gray-300">
-            <table data-dashboard-sort aria-describedby="urutan-kegiatan" class="w-full min-w-[640px] table-fixed border-collapse text-sm">
+            <table class="w-full min-w-[640px] table-fixed border-collapse text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-left">
-                        @foreach (['nama' => 'Nama Kegiatan', 'jenis' => 'Jenis', 'tanggal' => 'Tanggal Diajukan'] as $kolom => $label)
-                            <th scope="col" aria-sort="{{ $kolom === 'tanggal' ? 'descending' : 'none' }}" class="border-b border-gray-300 px-2 py-2.5 font-medium">
-                                <button type="button" data-sort-key="{{ $kolom }}" data-sort-label="{{ $label }}"
-                                        class="flex w-full cursor-pointer items-center gap-2 rounded text-left hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
-                                    {{ $label }}
-                                    <span data-sort-icon aria-hidden="true">{{ $kolom === 'tanggal' ? '↓' : '↕' }}</span>
-                                </button>
-                            </th>
-                        @endforeach
+                        <th scope="col" class="border-b border-gray-300 px-2 py-2.5 font-medium">Nama Kegiatan</th>
+                        <th scope="col" class="border-b border-gray-300 px-2 py-2.5 font-medium">Jenis</th>
+                        <th scope="col" class="border-b border-gray-300 px-2 py-2.5 font-medium">Tanggal Diajukan</th>
                         <th scope="col" class="border-b border-gray-300 px-2 py-2.5 font-medium">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($menunggu as $k)
-                        <tr data-nama="{{ $k['nama'] }}" data-jenis="{{ $k['jenis'] }}" data-tanggal="{{ $k['tanggal_urut'] }}" class="border-b border-gray-300 last:border-b-0">
+                    @forelse ($menunggu as $k)
+                        <tr class="border-b border-gray-300 last:border-b-0">
                             <td class="px-2 py-2">{{ $k['nama'] }}</td>
                             <td class="px-2 py-2">{{ $k['jenis'] }}</td>
                             <td class="px-2 py-2">{{ $k['tanggal'] }}</td>
                             <td class="px-2 py-1">
                                 {{-- Semua baris sementara membuka contoh Detail Pengajuan Dosen kondisi Direview (id 2). Nanti diganti id kegiatan yang sebenarnya. --}}
-                                <a href="{{ route('pengajuan.dosen.show', 2) }}" aria-label="Lihat detail {{ $k['nama'] }}"
+                                <a href="{{ route('dosen.kegiatan.show', $k['id']) }}" aria-label="Lihat detail {{ $k['nama'] }}"
                                    class="flex size-10 items-center justify-center rounded-lg bg-blue-100 text-brand hover:bg-blue-200">
                                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>
@@ -141,7 +116,7 @@
                                 </a>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Belum ada kegiatan yang menunggu verifikasi.</td></tr>@endforelse
                 </tbody>
             </table>
         </div>

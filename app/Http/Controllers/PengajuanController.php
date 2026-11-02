@@ -348,7 +348,7 @@ class PengajuanController extends Controller
     {
         $submissions = $this->rows();
 
-        return view('dashboard', [
+        return view('pengajuan.dashboard', [
             'mahasiswa' => config('mahasiswa'),
             'totalPengajuan' => $submissions->count(),
             'totalKegiatan' => $submissions->count(),

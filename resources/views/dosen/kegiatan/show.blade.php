@@ -1,45 +1,15 @@
-@extends('layouts.app')
+@extends(request()->routeIs('dosen.*') ? 'layouts.app' : 'layouts.mahasiswa')
 
 @section('title', 'Detail Kegiatan')
 
 @section('content')
 
 @php
-    // DATA TIRUAN. $id berasal dari alamat (/kegiatan/{id}).
-    // Nanti diganti data kegiatan dari controller / database oleh tim backend.
-    $k = [
-        'kategori'      => 'Lomba',
-        'jenis'         => 'Kegiatan dosen',
-        'nama'          => 'Seminar nasional AI',
-        'penyelenggara' => 'Politeknik Negeri Semarang',
-        'tahun'         => 2026,
-        'mulai'         => '12 September 2026',
-        'selesai'       => '14 September 2026',
-        'status'        => 'Diajukan',
-    ];
-
     $warna = [
         'Diajukan'  => 'border-blue-200 bg-blue-100 text-blue-700',
         'Direvisi'  => 'border-orange-200 bg-orange-100 text-orange-700',
         'Disetujui' => 'border-green-200 bg-green-100 text-green-700',
         'Ditolak'   => 'border-red-200 bg-red-100 text-red-600',
-    ];
-
-    $anggota = [
-        ['nama' => 'Kuwat Santoso , S.T., M.Kom.', 'status' => 'Dosen'],
-        ['nama' => 'Mukhlis Pratama Mulya',        'status' => 'Mahasiswa'],
-    ];
-
-    // Dokumen. 'url' = alamat file untuk dilihat / diunduh ('#' = belum ada file sungguhan).
-    $dokumen = [
-        [
-            'file'       => 'Proposal kegiatan.pdf',
-            'url'        => '#',
-            'nama'       => 'Proposal Kegiatan',
-            'jenis'      => 'Proposal',
-            'keterangan' => 'Ini adalah proposal kegiatan seminar',
-            'tautan'     => null,
-        ],
     ];
 
     $sectionClass = 'flex flex-col gap-4.5 rounded-lg border border-gray-200 bg-white p-4.5';
@@ -49,18 +19,54 @@
     {{-- Judul halaman + tombol kembali --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-4xl font-bold tracking-tight">Detail Kegiatan</h1>
+            <h1 class="text-3xl font-bold tracking-tight">Detail Kegiatan</h1>
             <p class="text-2xl text-gray-400">Dashboard / Kegiatan / Detail Kegiatan</p>
         </div>
-        <a href="{{ route('kegiatan.index') }}"
-           class="mt-2 flex h-11 items-center gap-2 rounded-md bg-blue-100 px-4 text-base font-medium text-brand hover:bg-blue-200">
-            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-            Kembali
-        </a>
+        <div class="mt-2 flex items-center gap-3">
+            @if ($k['status'] === 'Direvisi')
+                <a href="{{ route('kegiatan.edit', $id ?? 1) }}"
+                   class="flex h-11 items-center gap-2 rounded-md bg-brand px-4 text-base font-medium text-white hover:bg-blue-700">
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
+                    Perbaiki kegiatan
+                </a>
+            @endif
+            <a href="{{ route('kegiatan.index') }}"
+               class="flex h-11 items-center gap-2 rounded-md bg-blue-100 px-4 text-base font-medium text-brand hover:bg-blue-200">
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                Kembali
+            </a>
+        </div>
     </div>
 
     {{-- Halaman ini hanya untuk membaca, jadi tidak ada formulir atau tombol simpan --}}
     <div class="flex flex-col gap-5 rounded-lg bg-white p-4.5 shadow-sm">
+
+        {{-- Pesan sesuai status pengajuan --}}
+        @if ($k['status'] === 'Diajukan')
+            <div role="status" class="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[15px] text-blue-800">
+                <svg class="mt-0.5 size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg>
+                <div><p class="font-semibold">Menunggu verifikasi</p><p>Pengajuan sudah terkirim dan sedang menunggu ditinjau.</p></div>
+            </div>
+        @elseif ($k['status'] === 'Direvisi')
+            <div role="status" class="flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50 p-4 text-[15px] text-orange-900">
+                <svg class="mt-0.5 size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
+                <div class="flex flex-col gap-1">
+                    <p class="font-semibold">Perlu direvisi</p>
+                    <p><span class="font-medium">Catatan revisi:</span> {{ $catatan }}</p>
+                    <p class="text-orange-800">Perbaiki data atau dokumen lewat tombol "Perbaiki kegiatan", lalu ajukan kembali.</p>
+                </div>
+            </div>
+        @elseif ($k['status'] === 'Disetujui')
+            <div role="status" class="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-[15px] text-green-800">
+                <svg class="mt-0.5 size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l3 3 5-6"/></svg>
+                <div><p class="font-semibold">Kegiatan disetujui</p><p>Pengajuan sudah diverifikasi dan kegiatan ini tercatat.</p></div>
+            </div>
+        @elseif ($k['status'] === 'Ditolak')
+            <div role="status" class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-[15px] text-red-800">
+                <svg class="mt-0.5 size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>
+                <div class="flex flex-col gap-1"><p class="font-semibold">Pengajuan ditolak</p><p><span class="font-medium">Alasan penolakan:</span> {{ $catatan }}</p></div>
+            </div>
+        @endif
 
         {{-- 1. INFORMASI KEGIATAN --}}
         <section class="{{ $sectionClass }}" aria-labelledby="h-info">
@@ -80,7 +86,7 @@
 
                 <div class="flex flex-col gap-2 md:col-span-2">
                     <dt class="text-[15px] font-medium">Status pengajuan</dt>
-                    <dd><span class="inline-block rounded-md border px-2 py-0.5 text-[13px] {{ $warna[$k['status']] }}">{{ $k['status'] }}</span></dd>
+                    <dd><span class="inline-block rounded-md border px-2 py-0.5 text-[13px] {{ $warna[$k['status']] ?? 'border-gray-200 bg-gray-100 text-gray-700' }}">{{ $k['status'] }}</span></dd>
                 </div>
             </dl>
         </section>
@@ -139,18 +145,21 @@
                                     <span class="truncate text-[15px]" title="{{ $d['file'] }}">{{ $d['file'] }}</span>
                                 </div>
 
+                                @if ($d['url'])
                                 <div class="flex items-center gap-2">
-                                    <a href="{{ $d['url'] }}" target="_blank" rel="noopener noreferrer"
-                                       class="flex h-9 items-center gap-1.5 rounded-lg bg-blue-100 px-3.5 text-sm font-medium text-brand hover:bg-blue-200">
+                                    <button type="button" x-data
+                                       x-on:click="$dispatch('buka-preview', { file: @js($d['file']), url: @js($d['url']), jenis: @js($d['jenis'] ?? '') })"
+                                       class="cursor-pointer flex h-9 items-center gap-1.5 rounded-lg bg-blue-100 px-3.5 text-sm font-medium text-brand hover:bg-blue-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
                                         Lihat
-                                    </a>
+                                    </button>
                                     <a href="{{ $d['url'] }}" download="{{ $d['file'] }}"
                                        class="flex h-9 items-center gap-1.5 rounded-lg border border-brand bg-white px-3.5 text-sm font-medium text-brand hover:bg-blue-50">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>
                                         Unduh
                                     </a>
                                 </div>
+                                @endif
                             </div>
                         </div>
 

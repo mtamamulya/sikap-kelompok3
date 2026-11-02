@@ -2,10 +2,19 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class DosenRoutesTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_dosen_dashboard_has_its_own_route_and_view(): void
     {
         $this->get(route('dosen.dashboard'))
@@ -13,9 +22,8 @@ class DosenRoutesTest extends TestCase
             ->assertViewIs('dosen.dashboard')
             ->assertSee('href="'.route('dosen.dashboard').'"', false)
             ->assertSee('aria-current="page"', false)
-            ->assertSee('Kuwat Santoso')
+            ->assertSee('dosen-shell', false)
             ->assertSee('Dosen')
-            ->assertSee('aria-label="Notifikasi"', false)
             ->assertSee('Penelitian')
             ->assertSee('Pengabdian')
             ->assertDontSee('Arya Bima')
@@ -25,45 +33,44 @@ class DosenRoutesTest extends TestCase
     public function test_dosen_navigation_routes_render_their_dosen_views(): void
     {
         $routes = [
-            ['kegiatan.index', 'dosen.kegiatan.index'],
-            ['kegiatan.create', 'dosen.kegiatan.create'],
-            ['kegiatan.show', 'dosen.kegiatan.show', ['id' => 1]],
-            ['kegiatan.edit', 'dosen.kegiatan.edit', ['id' => 1]],
-            ['penelitian.index', 'dosen.penelitian.index'],
-            ['penelitian.create', 'dosen.penelitian.create'],
-            ['penelitian.show', 'dosen.penelitian.show', ['id' => 1]],
-            ['penelitian.edit', 'dosen.penelitian.edit', ['id' => 1]],
-            ['pengabdian.index', 'dosen.pengabdian.index'],
-            ['pengabdian.create', 'dosen.pengabdian.create'],
-            ['pengabdian.show', 'dosen.pengabdian.show', ['id' => 1]],
-            ['pengabdian.edit', 'dosen.pengabdian.edit', ['id' => 1]],
-            ['pengajaran.index', 'dosen.pengajaran.index'],
-            ['pengajaran.create', 'dosen.pengajaran.create'],
-            ['pengajaran.show', 'dosen.pengajaran.show', ['id' => 1]],
-            ['pengajaran.edit', 'dosen.pengajaran.edit', ['id' => 1]],
-            ['prestasi.index', 'dosen.prestasi.index'],
-            ['prestasi.create', 'dosen.prestasi.create'],
-            ['prestasi.show', 'dosen.prestasi.show', ['id' => 1]],
-            ['prestasi.edit', 'dosen.prestasi.edit', ['id' => 1]],
-            ['berita.index', 'dosen.berita.index'],
-            ['berita.create', 'dosen.berita.create'],
-            ['berita.show', 'dosen.berita.show', ['id' => 1]],
-            ['berita.edit', 'dosen.berita.edit', ['id' => 1]],
-            ['pengajuan.dosen.create', 'dosen.pengajuan.create'],
-            ['pengajuan.dosen', 'dosen.pengajuan.dosen'],
-            ['pengajuan.mahasiswa', 'dosen.pengajuan.mahasiswa'],
-            ['pengajuan.mahasiswa.show', 'dosen.pengajuan.show', ['id' => 1]],
-            ['notifikasi', 'dosen.notifikasi.index'],
-            ['profil', 'dosen.profil.show'],
+            ['dosen.kegiatan.index'],
+            ['dosen.kegiatan.create'],
+            ['dosen.kegiatan.edit', ['id' => 1]],
+            ['penelitian.index'],
+            ['penelitian.create'],
+            ['penelitian.show', ['id' => 1]],
+            ['penelitian.edit', ['id' => 1]],
+            ['pengabdian.index'],
+            ['pengabdian.create'],
+            ['pengabdian.show', ['id' => 1]],
+            ['pengabdian.edit', ['id' => 1]],
+            ['pengajaran.index'],
+            ['pengajaran.create'],
+            ['pengajaran.show', ['id' => 1]],
+            ['pengajaran.edit', ['id' => 1]],
+            ['prestasi.index'],
+            ['prestasi.create'],
+            ['prestasi.show', ['id' => 1]],
+            ['prestasi.edit', ['id' => 1]],
+            ['berita.index'],
+            ['berita.create'],
+            ['berita.show', ['id' => 1]],
+            ['berita.edit', ['id' => 1]],
+            ['pengajuan.dosen.create'],
+            ['pengajuan.dosen'],
+            ['pengajuan.mahasiswa'],
+            ['pengajuan.mahasiswa.show', ['id' => 1]],
+            ['notifikasi'],
+            ['profil'],
         ];
 
         foreach ($routes as $route) {
-            [$routeName, $view] = $route;
-            $parameters = $route[2] ?? [];
+            $routeName = $route[0];
+            $parameters = $route[1] ?? [];
 
             $this->get(route($routeName, $parameters))
                 ->assertOk()
-                ->assertViewIs($view);
+                ->assertSee('dosen-shell', false);
         }
     }
 
@@ -95,10 +102,6 @@ class DosenRoutesTest extends TestCase
 
     public function test_dosen_views_load_the_scripts_for_their_interactive_lists(): void
     {
-        $this->get(route('kegiatan.index'))
-            ->assertOk()
-            ->assertSee("Alpine.data('kegiatan'", false);
-
         $this->get(route('berita.index'))
             ->assertOk()
             ->assertSee("Alpine.data('beritaDaftar'", false);

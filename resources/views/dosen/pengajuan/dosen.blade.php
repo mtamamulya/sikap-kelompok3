@@ -14,7 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak]{display:none !important}</style>
 </head>
-<body class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
+<body class="frontend-shell dosen-shell h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
 @php
     $pengajuanDosen = [
         ['id' => 1, 'nama' => 'Penyuluhan Literasi Digital', 'pengaju' => 'Filda Huwani Dewi', 'kategori' => 'Pengabdian', 'status' => 'Diajukan'],

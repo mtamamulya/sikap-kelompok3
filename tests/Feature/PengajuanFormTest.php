@@ -171,7 +171,7 @@ class PengajuanFormTest extends TestCase
         ];
 
         $response = $this->withSession(['pengajuan.items' => [$latestSubmission]])
-            ->get(route('dashboard'));
+            ->get(route('pengajuan.dashboard'));
 
         $response
             ->assertOk()
