@@ -1,8 +1,19 @@
-@extends('layouts.app')
+@extends('layouts.pengajuan-app')
 
 @section('title', 'Dashboard - Teknologi Rekayasa Komputer')
 
 @section('content')
+@php
+    $loginAt = now()->timezone(config('app.timezone'))->translatedFormat('d F Y, H:i');
+    $statusStyles = [
+        'Diajukan' => 'bg-[#DBEAFE] text-[#1D4ED8]',
+        'Direview' => 'bg-[#FFEDD5] text-[#B45309]',
+        'Disetujui' => 'bg-[#ECFDF5] text-[#047857]',
+        'Selesai' => 'bg-[#F3F4F6] text-[#6B7280]',
+        'Ditolak' => 'bg-[#FEE2E2] text-[#B91C1C]',
+        'Perlu revisi' => 'bg-[#FFEDD5] text-[#B45309]',
+    ];
+@endphp
 <div class="flex flex-col gap-6 p-4 md:px-6 md:py-8 lg:px-12 bg-[#F9FAFB]">
     
     <!-- Hero Profile Card (Dengan Efek Fill Transition Kiri-ke-Kanan & Kanan-ke-Kiri) -->
@@ -25,38 +36,34 @@
                         <img :src="dashAvatar" class="absolute inset-0 z-10 h-full w-full object-cover">
                     </template>
                     <template x-if="!dashAvatar">
-                        <span>A</span>
+                        <span>{{ strtoupper(\Illuminate\Support\Str::substr($mahasiswa['nama'], 0, 1)) }}</span>
                     </template>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
                     <div class="flex items-center gap-3">
-                        <h1 class="text-2xl font-extrabold text-[#111827] transition-colors duration-500 group-hover:text-white">Arya Bima</h1>
+                        <h1 class="text-2xl font-extrabold text-[#111827] transition-colors duration-500 group-hover:text-white">{{ $mahasiswa['nama'] }}</h1>
                         <span class="rounded-full bg-[#EFF6FF] px-3 py-1 text-xs font-semibold text-[#2563EB] border border-[#BFDBFE] transition-all duration-500 group-hover:bg-white/20 group-hover:text-white group-hover:border-white/30">Mahasiswa</span>
                     </div>
                     <p class="text-xs font-medium text-[#6B7280] transition-colors duration-500 group-hover:text-blue-100">
-                        NIM: <span class="font-semibold text-[#374151] group-hover:text-white">43325115</span> • Teknologi Rekayasa Komputer (Angkatan 2024)
+                        NIM: <span class="font-semibold text-[#374151] group-hover:text-white">{{ $mahasiswa['nim'] }}</span> • {{ $mahasiswa['prodi'] }} (Angkatan {{ $mahasiswa['angkatan'] }})
                     </p>
                     <div class="flex flex-wrap items-center gap-4 pt-1 text-xs text-[#6B7280] transition-colors duration-500 group-hover:text-blue-100">
                         <span class="flex items-center gap-1.5">
                             <span class="size-2 rounded-full bg-[#10B981] group-hover:bg-[#34D399]"></span>
-                            Status Akun: <strong class="text-[#047857] group-hover:text-white">Aktif</strong>
+                            Status Akun: <strong class="text-[#047857] group-hover:text-white">{{ $mahasiswa['status'] }}</strong>
                         </span>
                         <span>•</span>
-                        <span>Terakhir login: <strong class="text-[#374151] group-hover:text-white">12 Maret 2026, 09:15 WIB</strong></span>
+                        <span>Terakhir login: <strong class="text-[#374151] group-hover:text-white">{{ $loginAt }} WIB</strong></span>
                     </div>
                 </div>
             </div>
 
             <!-- Akses Cepat Kanan -->
-            <div class="flex items-center gap-3 border-t border-[#E5E7EB] pt-4 md:border-t-0 md:pt-0 transition-colors duration-500 group-hover:border-white/20">
-                <a href="{{ url('/profil') }}" class="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-xs font-semibold text-[#374151] shadow-xs transition-all duration-300 hover:bg-gray-50 group-hover:border-white/30 group-hover:bg-white/10 group-hover:text-white group-hover:hover:bg-white/20">
+            <div class="flex items-center border-t border-[#E5E7EB] pt-4 md:border-t-0 md:pt-0 transition-colors duration-500 group-hover:border-white/20">
+                <a href="{{ route('mahasiswa.profil') }}" class="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-xs font-semibold text-[#374151] shadow-xs transition-all duration-300 hover:bg-gray-50 group-hover:border-white/30 group-hover:bg-white/10 group-hover:text-white group-hover:hover:bg-white/20">
                     <svg class="size-4 text-[#6B7280] transition-colors duration-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     <span>Edit Profil</span>
-                </a>
-                <a href="{{ url('/kegiatan') }}" class="flex items-center gap-2 rounded-xl bg-[#2277FF] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-blue-600 group-hover:bg-white group-hover:text-[#2277FF]">
-                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Tambah Kegiatan</span>
                 </a>
             </div>
         </div>
@@ -71,10 +78,10 @@
                 <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider transition-colors duration-300 group-hover:text-[#111827]">TOTAL PENGAJUAN</span>
-                        <span class="rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10px] font-semibold text-[#2563EB]">Bulan ini</span>
+                        <span class="rounded-md bg-[#EFF6FF] px-2 py-0.5 text-[10px] font-semibold text-[#2563EB]">Semua data</span>
                     </div>
                     <div class="flex items-baseline gap-1.5">
-                        <span class="text-3xl font-bold text-[#111827] leading-none">12</span>
+                        <span class="text-3xl font-bold text-[#111827] leading-none">{{ $totalPengajuan }}</span>
                         <span class="text-[11px] font-medium text-[#9CA3AF]">Dokumen</span>
                     </div>
                 </div>
@@ -93,10 +100,10 @@
                 <div class="flex flex-col gap-1">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-semibold text-[#6B7280] uppercase tracking-wider transition-colors duration-300 group-hover:text-[#111827]">TOTAL KEGIATAN</span>
-                        <span class="rounded-md bg-[#FFFBEB] px-2 py-0.5 text-[10px] font-semibold text-[#D97706]">3 kegiatan</span>
+                        <span class="rounded-md bg-[#FFFBEB] px-2 py-0.5 text-[10px] font-semibold text-[#D97706]">{{ $totalKegiatan }} kegiatan</span>
                     </div>
                     <div class="flex items-baseline gap-1.5">
-                        <span class="text-3xl font-bold text-[#111827] leading-none">3</span>
+                        <span class="text-3xl font-bold text-[#111827] leading-none">{{ $totalKegiatan }}</span>
                         <span class="text-[11px] font-medium text-[#9CA3AF]">Kegiatan</span>
                     </div>
                 </div>
@@ -144,22 +151,22 @@
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">1</span>
-                <span class="text-xs font-semibold text-[#111827]">Pilih jenis dokumen</span>
+                <span class="text-xs font-semibold text-[#111827]">Pilih kategori kegiatan</span>
             </div>
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">2</span>
-                <span class="text-xs font-semibold text-[#111827]">Lengkapi data diri</span>
+                <span class="text-xs font-semibold text-[#111827]">Lengkapi data kegiatan</span>
             </div>
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">3</span>
-                <span class="text-xs font-semibold text-[#111827]">Unggah lampiran</span>
+                <span class="text-xs font-semibold text-[#111827]">Tambahkan tautan dokumen (opsional)</span>
             </div>
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">4</span>
-                <span class="text-xs font-semibold text-[#111827]">Periksa dan kirim</span>
+                <span class="text-xs font-semibold text-[#111827]">Periksa dan kirim pengajuan</span>
             </div>
         </div>
 
@@ -167,9 +174,9 @@
         <div class="flex flex-col gap-4 rounded-2xl bg-[#2277FF] p-6 text-white sm:flex-row sm:items-center sm:justify-between">
             <div class="flex flex-col gap-1">
                 <h3 class="text-xl font-bold">Buat pengajuan dokumen baru</h3>
-                <p class="text-xs text-blue-100">Pilih jenis dokumen, lengkapi data, dan unggah lampiran yang diperlukan untuk memulai proses pengajuan.</p>
+                <p class="text-xs text-blue-100">Pilih kategori, isi detail kegiatan, lalu tambahkan tautan dokumen pendukung jika diperlukan.</p>
             </div>
-            <a href="#" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 text-xs font-bold text-[#2277FF] hover:bg-blue-50 transition shadow-sm">
+            <a href="{{ route('pengajuan.create') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 text-xs font-bold text-[#2277FF] hover:bg-blue-50 transition shadow-sm">
                 Buat Pengajuan
             </a>
         </div>
@@ -182,29 +189,32 @@
                 <h2 class="text-lg font-bold text-[#111827]">Daftar pengajuan terbaru</h2>
                 <p class="text-xs text-[#6B7280]">Lihat status terbaru dari pengajuan dokumen Anda.</p>
             </div>
-            <a href="#" class="rounded-lg bg-[#EFF6FF] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-blue-100 transition">
+            <a href="{{ route('pengajuan.index') }}" class="rounded-lg bg-[#EFF6FF] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-blue-100 transition">
                 Lihat semua
             </a>
         </div>
 
-        <div class="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 transition hover:bg-gray-100/80">
-            <div class="flex items-center gap-4">
-                <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#DBEAFE] text-xs font-bold text-[#2563EB]">
-                    PJ
+        @forelse ($latestSubmissions as $submission)
+            <a href="{{ route('pengajuan.show', $submission['id']) }}" class="flex items-center justify-between gap-4 rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 transition hover:bg-gray-100/80">
+                <div class="flex min-w-0 items-center gap-4">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#DBEAFE] text-xs font-bold text-[#2563EB]">
+                        {{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($submission['category'], 0, 2)) }}
+                    </div>
+                    <div class="flex min-w-0 flex-col gap-0.5">
+                        <span class="truncate text-xs font-bold text-[#111827]">{{ $submission['title'] }}</span>
+                        <span class="text-[11px] text-[#6B7280]">{{ $submission['category'] }} · {{ $submission['type'] }}</span>
+                    </div>
                 </div>
-                <div class="flex flex-col gap-0.5">
-                    <span class="text-xs font-bold text-[#111827]">Pengajuan proposal penelitian internal</span>
-                    <span class="text-[11px] text-[#6B7280]">Proposal penelitian internal tentang pengembangan model pembelajaran berbasis teknologi.</span>
+                <div class="flex shrink-0 flex-col items-end gap-1">
+                    <span class="rounded-full px-2.5 py-0.5 text-[10px] font-semibold {{ $statusStyles[$submission['status']] ?? 'bg-[#F3F4F6] text-[#6B7280]' }}">
+                        {{ $submission['status'] }}
+                    </span>
+                    <span class="text-[11px] text-[#9CA3AF]">{{ $submission['submitted_at']->locale('id')->translatedFormat('d M Y') }}</span>
                 </div>
-            </div>
-            
-            <div class="flex flex-col items-end gap-1">
-                <span class="rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-[10px] font-semibold text-[#047857]">
-                    Diproses
-                </span>
-                <span class="text-[11px] text-[#9CA3AF]">12 Mar 2024</span>
-            </div>
-        </div>
+            </a>
+        @empty
+            <p class="rounded-xl border border-dashed border-[#D1D5DB] p-6 text-center text-sm text-[#6B7280]">Belum ada pengajuan. Pengajuan yang dibuat akan tampil di sini.</p>
+        @endforelse
     </section>
 </div>
 @endsection

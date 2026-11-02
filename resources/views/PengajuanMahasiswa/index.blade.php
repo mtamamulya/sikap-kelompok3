@@ -11,10 +11,10 @@
         'Perlu revisi' => ['badge' => 'bg-[#FFEDD5] text-[#B45309]', 'note' => 'Pengajuan perlu diperbaiki sebelum diproses.'],
     ];
     $cards = [
-        ['TOTAL PENGAJUAN', $all->count(), 'bg-[#2277FF]'],
-        ['DISETUJUI', $counts['Disetujui'] ?? 0, 'bg-[#8BC34A]'],
-        ['DIREVIEW', ($counts['Direview'] ?? 0) + ($counts['Diajukan'] ?? 0), 'bg-[#FF9B29]'],
-        ['SELESAI', $counts['Selesai'] ?? 0, 'bg-[#9CA3AF]'],
+        ['TOTAL PENGAJUAN', $all->count(), 'bg-[#2277FF]', 'bg-[#EFF6FF] text-[#2277FF]', 'documents'],
+        ['DISETUJUI', $counts['Disetujui'] ?? 0, 'bg-[#8BC34A]', 'bg-[#F0FDF4] text-[#65A30D]', 'approved'],
+        ['DIREVIEW', ($counts['Direview'] ?? 0) + ($counts['Diajukan'] ?? 0), 'bg-[#FF9B29]', 'bg-[#FFF7ED] text-[#EA580C]', 'review'],
+        ['SELESAI', $counts['Selesai'] ?? 0, 'bg-[#9CA3AF]', 'bg-[#F3F4F6] text-[#6B7280]', 'completed'],
     ];
     $guide = [
         'Dokumen pendukung bersifat opsional.',
@@ -31,7 +31,7 @@
 @endphp
 <div class="flex flex-col gap-6 px-3 py-5 sm:px-5 sm:py-6 lg:px-8 lg:py-7">
     <div class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        @foreach ($cards as [$label, $value, $accent])
+        @foreach ($cards as [$label, $value, $accent, $iconStyle, $icon])
             <div
                 x-data="{
                     rotateX: 0,
@@ -51,7 +51,20 @@
                 class="relative flex flex-col gap-0 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-2 pl-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-[transform,box-shadow] duration-200 ease-out hover:shadow-[0_14px_28px_rgba(0,0,0,0.14)] motion-reduce:transition-none lg:min-h-[108px] lg:justify-center lg:gap-1 lg:p-5 lg:pl-6"
             >
                 <span aria-hidden="true" class="absolute inset-y-0 left-0 w-2 {{ $accent }}"></span>
-                <div class="text-xs font-semibold text-[#4B5563] lg:text-base">{{ $label }}</div>
+                <div class="flex items-center justify-between gap-2">
+                    <div class="text-xs font-semibold text-[#4B5563] lg:text-base">{{ $label }}</div>
+                    <span aria-hidden="true" class="flex size-9 shrink-0 items-center justify-center rounded-xl {{ $iconStyle }}">
+                        @if ($icon === 'documents')
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h8"/></svg>
+                        @elseif ($icon === 'approved')
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="m9 12 2 2 4-4"/></svg>
+                        @elseif ($icon === 'review')
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                        @else
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+                        @endif
+                    </span>
+                </div>
                 <div class="text-[28px] font-bold leading-8 text-[#111827] lg:text-4xl lg:leading-10">{{ $value }}</div>
             </div>
         @endforeach

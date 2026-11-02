@@ -48,7 +48,7 @@
             @if ($status)<input type="hidden" name="status" value="{{ $status }}">@endif
             <label class="flex h-11 items-center gap-2 rounded-lg border border-[#E5E7EB] px-3 text-sm text-[#6B7280] focus-within:border-[#2563EB]">
                 <i class="ti ti-search text-lg"></i>
-                <input name="q" value="{{ $query }}" placeholder="Cari judul atau kategori berita..." class="min-w-0 flex-1 outline-none">
+                <input name="q" value="{{ $query }}" data-live-search placeholder="Cari judul atau kategori berita..." class="min-w-0 flex-1 outline-none">
             </label>
         </form>
 

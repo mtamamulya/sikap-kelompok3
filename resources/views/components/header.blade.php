@@ -13,11 +13,11 @@
             <!-- Avatar Profil dengan Auto Sync -->
             <div class="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#DCE7FB] text-sm font-semibold text-[#00235C]">
                 <img src="" alt="Avatar" class="global-avatar-sync absolute inset-0 z-10 h-full w-full object-cover" style="display: none;">
-                <span>A</span>
+                <span>{{ strtoupper(\Illuminate\Support\Str::substr(config('mahasiswa.nama'), 0, 1)) }}</span>
             </div>
 
             <span class="hidden text-left sm:block">
-                <span class="block text-sm font-semibold leading-5">Arya Bima</span>
+                <span class="block text-sm font-semibold leading-5">{{ config('mahasiswa.nama') }}</span>
                 <span class="block text-xs leading-4 text-[#6B7280]">Mahasiswa</span>
             </span>
             <svg class="size-5 text-[#0A0A0A] transition-transform duration-200" :class="menu ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>

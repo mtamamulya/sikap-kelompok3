@@ -50,7 +50,7 @@
                 <svg class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/>
                 </svg>
-                <input id="q" name="q" type="search" placeholder="Cari nama prestasi..."
+                <input id="q" name="q" type="search" data-table-live-search placeholder="Cari nama prestasi..."
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 

@@ -157,19 +157,111 @@ class PengajuanFormTest extends TestCase
 
     public function test_dashboard_renders_with_develop_pengajuan_routes(): void
     {
-        $this->get(route('dashboard'))
+        $latestSubmission = [
+            'id' => 999,
+            'title' => 'Pengabdian Uji Dashboard Terbaru',
+            'category' => 'Pengabdian',
+            'type' => 'Kegiatan Pengabdian',
+            'status' => 'Diajukan',
+            'submitted_at' => now()->toIso8601String(),
+            'data' => [],
+            'documents' => [],
+        ];
+
+        $response = $this->withSession(['pengajuan.items' => [$latestSubmission]])
+            ->get(route('dashboard'));
+
+        $response
             ->assertOk()
-            ->assertSee('TOTAL PENGAJUAN');
+            ->assertSee('TOTAL PENGAJUAN')
+            ->assertSee('id="desktop-mahasiswa-submenu"', false)
+            ->assertSee('id="mobile-pengajuan-nav"', false)
+            ->assertSee('ti-calendar-event')
+            ->assertSee('ti-news')
+            ->assertSee('x-data="{ open: true }"', false)
+            ->assertSee(config('mahasiswa.nama'))
+            ->assertSee(config('mahasiswa.nim'))
+            ->assertSee(now()->timezone(config('app.timezone'))->translatedFormat('d F Y, H:i'))
+            ->assertDontSee('12 Maret 2026')
+            ->assertDontSee('Tambah Kegiatan')
+            ->assertSee('Pilih kategori kegiatan')
+            ->assertSee('Lengkapi data kegiatan')
+            ->assertSee('Tambahkan tautan dokumen')
+            ->assertSee('Periksa dan kirim pengajuan')
+            ->assertSee('Pengabdian Uji Dashboard Terbaru')
+            ->assertSee('Diajukan')
+            ->assertSee('href="'.route('pengajuan.show', $latestSubmission['id']).'"', false)
+            ->assertDontSee('proposal penelitian internal');
+        $this->assertLessThan(
+            strpos($response->getContent(), 'Seminar Nasional Transformasi Digital Kampus'),
+            strpos($response->getContent(), 'Pengabdian Uji Dashboard Terbaru')
+        );
     }
 
     public function test_teammate_mahasiswa_pages_are_available(): void
     {
-        $this->get(route('mahasiswa.dashboard'))->assertOk();
+        $mahasiswaResponse = $this->get(route('mahasiswa.dashboard'));
+        $mahasiswaResponse
+            ->assertOk()
+            ->assertViewIs('mahasiswa.dashboard-mhs')
+            ->assertSee('Selamat')
+            ->assertSee('Buat pengajuan dokumen baru')
+            ->assertSee('href="'.route('pengajuan.create').'"', false)
+            ->assertDontSee('Unduh KHS')
+            ->assertSee('href="'.route('dashboard').'"', false)
+            ->assertSee('href="'.route('mahasiswa.index').'"', false)
+            ->assertSee('aria-current="page"', false)
+            ->assertSee('aria-label="Buka atau tutup submenu Mahasiswa"', false)
+            ->assertSee('cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js', false)
+            ->assertSee('cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css', false)
+            ->assertSee('Menu navigasi')
+            ->assertSee('bg-white text-[#1f66e5]', false)
+            ->assertSee('id="mobile-mahasiswa-submenu"', false)
+            ->assertSee('href="'.route('mahasiswa.mata-kuliah').'"', false)
+            ->assertSee('href="'.route('mahasiswa.prestasi').'"', false);
+        $this->assertSame(1, preg_match('/<div id="mobile-mahasiswa-submenu"[^>]*>(.*?)<\/div>/s', $mahasiswaResponse->getContent(), $mobileMahasiswaSubmenu));
+        $this->assertStringNotContainsString('Dashboard', $mobileMahasiswaSubmenu[1]);
+        $this->assertSame(2, substr_count($mobileMahasiswaSubmenu[1], '<a '));
+        foreach ([
+            ['route' => 'mahasiswa.mata-kuliah', 'icon' => 'ti-book-2'],
+            ['route' => 'mahasiswa.prestasi', 'icon' => 'ti-trophy'],
+        ] as $submenuItem) {
+            $submenuResponse = $this->get(route($submenuItem['route']));
+            $submenuResponse
+                ->assertOk()
+                ->assertSee($submenuItem['icon'])
+                ->assertSee(config('mahasiswa.nama'))
+                ->assertSee('aria-current="page"', false);
+            preg_match_all(
+                '/<a\b(?=[^>]*href="'.preg_quote(route('mahasiswa.index'), '/').'")[^>]*class="([^"]+)"/',
+                $submenuResponse->getContent(),
+                $mahasiswaLinkClasses
+            );
+            $this->assertCount(2, $mahasiswaLinkClasses[1]);
+            foreach ($mahasiswaLinkClasses[1] as $class) {
+                $this->assertDoesNotMatchRegularExpression('/(?:^|\s)bg-white(?:\s|$)/', $class);
+            }
+        }
+        $this->get(route('mahasiswa.index'))
+            ->assertOk()
+            ->assertViewIs('mahasiswa.dashboard-mhs');
         $this->get(route('mahasiswa.mata-kuliah'))->assertOk();
         $this->get(route('mahasiswa.mata-kuliah', ['tab' => 'berjalan']))->assertOk();
         $this->get(route('mahasiswa.mata-kuliah', ['tab' => 'riwayat']))->assertOk();
-        $this->get(route('mahasiswa.prestasi'))->assertOk();
+        $this->get(route('mahasiswa.prestasi'))
+            ->assertOk()
+            ->assertSee('md:hidden', false)
+            ->assertDontSee('Catat prestasi Anda dengan bukti yang lengkap');
         $this->get(route('mahasiswa.prestasi.tambah'))->assertOk();
+        $kegiatanResponse = $this->get(route('mahasiswa.kegiatan'));
+        $kegiatanResponse
+            ->assertOk()
+            ->assertSee('md:hidden', false)
+            ->assertSee('href="'.route('mahasiswa.kegiatan').'"', false);
+        $this->assertDoesNotMatchRegularExpression(
+            '/<a\b[^>]*href="'.preg_quote(route('mahasiswa.index'), '/').'"[^>]*aria-current="page"/s',
+            $kegiatanResponse->getContent()
+        );
     }
 
     public function test_berita_pages_and_draft_workflow_are_available(): void
