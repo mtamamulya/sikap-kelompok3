@@ -79,3 +79,4 @@ Route::get('/mahasiswa/prestasi/{prestasi}/edit', [MahasiswaController::class, '
 Route::delete('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiHapus'])->name('mahasiswa.prestasi.hapus');
 Route::put('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiUpdate'])->name('mahasiswa.prestasi.update');
 require __DIR__.'/pengajuan.php';
+require __DIR__.'/admin-kaprodi.php';
