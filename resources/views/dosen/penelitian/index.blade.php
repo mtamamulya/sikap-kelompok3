@@ -115,7 +115,7 @@
                                     </a>
                                     {{-- Hapus: nanti jadi <form method="POST"> dengan @csrf dan @method('DELETE') --}}
                                     <button type="button" aria-label="Hapus {{ $p['judul'] }}"
-                                            onclick="confirm('Hapus penelitian ini?')"
+                                            x-on:click="$dispatch('minta-hapus', { jenis: 'penelitian', nama: @js($p['judul']), action: '#' })"
                                             class="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-red-100 text-red-500 hover:bg-red-200">
                                         <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5"/></svg>
                                     </button>
@@ -149,4 +149,5 @@
         </nav>
     </section>
 
+    <x-modal-hapus />
 @endsection

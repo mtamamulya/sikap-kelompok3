@@ -142,8 +142,8 @@ class PengajuanFormTest extends TestCase
     {
         $this->get(route('pengajuan.dosen'))
             ->assertOk()
-            ->assertViewIs('dosen.pengajuan.dosen')
-            ->assertSee('<title>Pengajuan Dosen | DOSEN</title>', false)
+            ->assertViewIs('pengajuan.dosen')
+            ->assertSee('dosen-shell', false)
             ->assertSee('pengajuanDosen')
             ->assertSee('Penyuluhan Literasi Digital')
             ->assertSee('Seminar Nasional AI')
@@ -169,7 +169,7 @@ class PengajuanFormTest extends TestCase
         ];
 
         $response = $this->withSession(['pengajuan.items' => [$latestSubmission]])
-            ->get(route('dashboard'));
+            ->get(route('pengajuan.dashboard'));
 
         $response
             ->assertOk()

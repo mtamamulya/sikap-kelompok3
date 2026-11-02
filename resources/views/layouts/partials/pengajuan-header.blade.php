@@ -43,7 +43,7 @@
                         <span>Profil Saya</span>
                     </a>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}" @if (! Route::has('logout')) onsubmit="return false" @endif>
                         @csrf
                         <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-base font-semibold text-[#E5484D] transition hover:bg-[#FEF2F2]">
                             <svg class="size-5 text-[#E5484D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
