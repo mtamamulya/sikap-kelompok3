@@ -146,7 +146,9 @@ class PengajuanFormTest extends TestCase
             ->assertSee('<title>Pengajuan Dosen | DOSEN</title>', false)
             ->assertSee('Penyuluhan Literasi Digital')
             ->assertSee('Seminar Nasional AI')
-            ->assertSee(route('pengajuan.dosen.show', 1), false)
+            ->assertSee('Cari kegiatan atau nama dosen...')
+            ->assertSee('/pengajuan/dosen')
+            ->assertSee('${k.id}', false)
             ->assertDontSee('Seminar Nasional Transformasi Digital Kampus')
             ->assertDontSee('Tambah pengajuan')
             ->assertDontSee('Halaman sementara');

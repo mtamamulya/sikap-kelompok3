@@ -156,7 +156,7 @@
                     </div>
 
                     <div class="flex flex-col gap-4 p-3.5">
-                        <div class="flex flex-col gap-2">
+                        <!-- <div class="flex flex-col gap-2">
                             <span class="{{ $labelClass }}">File</span>
                             <label class="flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
                                 <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
@@ -171,7 +171,7 @@
                             <template x-if="d.errorFile">
                                 <p role="alert" class="text-sm text-red-600" x-text="d.errorFile"></p>
                             </template>
-                        </div>
+                        </div> -->
 
                         <div class="grid grid-cols-1 gap-4.5 md:grid-cols-2">
                             <div class="flex flex-col gap-2">
@@ -195,12 +195,12 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-2">
+                        <!-- <div class="flex flex-col gap-2">
                             <label :for="`ket-${d.id}`" class="{{ $labelClass }}">Keterangan</label>
                             <textarea :id="`ket-${d.id}`" :name="`dokumen[${i}][keterangan]`" rows="3" x-model="d.keterangan"
                                       placeholder="Keterangan singkat tentang dokumen ini"
                                       class="w-full resize-y rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-[15px] text-gray-900 placeholder:text-gray-400"></textarea>
-                        </div>
+                        </div> -->
 
                         <div class="flex flex-col gap-2">
                             <label :for="`tautan-${d.id}`" class="{{ $labelClass }}">Tautan dokumen (opsional)</label>

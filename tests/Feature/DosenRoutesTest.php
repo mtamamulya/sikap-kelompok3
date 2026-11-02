@@ -117,9 +117,13 @@ class DosenRoutesTest extends TestCase
             ->assertOk()
             ->assertViewIs('dosen.pengajuan.dosen')
             ->assertSee('<title>Pengajuan Dosen | DOSEN</title>', false)
-            ->assertSee('Daftar kegiatan yang diajukan oleh dosen.')
+            ->assertSee('role="tablist" aria-label="Status pengajuan"', false)
+            ->assertSee('Cari kegiatan atau nama dosen...')
+            ->assertSee('aria-label="Tahapan pengajuan"', false)
             ->assertSee('Penyuluhan Literasi Digital')
-            ->assertSee('Seminar Nasional AI');
+            ->assertSee('Seminar Nasional AI')
+            ->assertSee('Tinjau')
+            ->assertSee("Alpine.data('pengajuanDosen'", false);
 
         $this->get(route('pengajuan.mahasiswa'))
             ->assertOk()
