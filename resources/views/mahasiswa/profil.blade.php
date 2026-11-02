@@ -4,12 +4,12 @@
 
 @section('content')
 @php
-    $nama     = $mahasiswa->nama     ?? 'Arya Bima';
-    $angkatan = $mahasiswa->angkatan ?? '2024';
-    $email    = $mahasiswa->email    ?? 'aryabima@mhs.polines.ac.id';
-    $nim      = $mahasiswa->nim      ?? '43325115';
-    $prodi    = $mahasiswa->prodi    ?? 'Teknologi Rekayasa Komputer';
-    $status   = $mahasiswa->status   ?? 'Aktif';
+    $nama     = $mahasiswa->nama     ?? config('mahasiswa.nama');
+    $angkatan = $mahasiswa->angkatan ?? config('mahasiswa.angkatan');
+    $email    = $mahasiswa->email    ?? config('mahasiswa.email');
+    $nim      = $mahasiswa->nim      ?? config('mahasiswa.nim');
+    $prodi    = $mahasiswa->prodi    ?? config('mahasiswa.prodi');
+    $status   = $mahasiswa->status   ?? config('mahasiswa.status');
 
     [$local, $domain] = explode('@', $email, 2);
     $maskedEmail = substr($local, 0, 1).str_repeat('*', max(strlen($local) - 1, 3)).'@'.$domain;

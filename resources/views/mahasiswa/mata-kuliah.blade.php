@@ -36,7 +36,7 @@
 <div class="flex flex-col gap-6">
     {{-- Judul halaman --}}
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px]">Mata Kuliah</h1>
+        <h1 class="text-2xl font-bold leading-tight tracking-[-0.2px] sm:text-[32px] sm:leading-[38px]">Mata Kuliah</h1>
         <p class="text-base text-[#6B7280]">{{ $subjudul }}</p>
     </div>
 
@@ -104,7 +104,7 @@
                   class="grid grid-cols-1 gap-3 rounded-xl border border-[#EEF0F3] bg-[#F9FAFB] p-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_180px_180px_180px_88px]">
                 <div class="flex h-10 items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3.5 transition-colors focus-within:border-[#27F] sm:col-span-2 xl:col-span-1">
                     <svg class="size-4 shrink-0 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M21 21l-6-6"/></svg>
-                    <input type="search" name="q" value="{{ $filter['q'] }}" placeholder="Cari mata kuliah..."
+                    <input type="search" name="q" value="{{ $filter['q'] }}" data-live-search placeholder="Cari mata kuliah..."
                            class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#A8A8A8]">
                 </div>
 
@@ -143,7 +143,7 @@
         @endif
 
         {{-- Tabel: gaya sama dengan dashboard mahasiswa. Lebar kolom dikunci, tinggi minimum setara 10 baris --}}
-        <div class="{{ $tab === 'berjalan' ? '' : 'min-h-[452px]' }} overflow-x-auto rounded-lg border border-[#E5E7EB]">
+        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block {{ $tab === 'berjalan' ? '' : 'md:min-h-[452px]' }}">
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
                     <col class="w-[30%]">
@@ -177,6 +177,33 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="flex flex-col gap-3 md:hidden">
+            @forelse ($rows as $r)
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3.5">
+                    <div class="min-w-0">
+                        <h3 class="break-words text-sm font-semibold text-[#111827]">{{ $r['mk'] }}</h3>
+                        <p class="mt-1 break-words text-xs text-[#6B7280]">{{ $r['dosen'] }}</p>
+                    </div>
+                    <dl class="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div>
+                            <dt class="text-[#6B7280]">Tingkat</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">Tingkat {{ $r['tingkat'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[#6B7280]">Semester</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $r['periode'] }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="text-[#6B7280]">{{ $tab === 'berjalan' ? 'SKS' : 'Tahun Akademik' }}</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $tab === 'berjalan' ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</dd>
+                        </div>
+                    </dl>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">Tidak ada mata kuliah yang cocok dengan filter.</p>
+            @endforelse
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B7280]">

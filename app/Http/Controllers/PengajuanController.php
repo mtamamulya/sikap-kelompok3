@@ -35,7 +35,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-03-12',
                 'description' => 'Partisipasi dalam Kompetisi Mahasiswa Informatika Politeknik Nasional 2026.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Nasional',
             ],
             [
@@ -49,7 +49,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-04-16',
                 'description' => 'Pengajuan dukungan untuk mengikuti kompetisi pengembangan aplikasi tingkat nasional.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Nasional',
             ],
             [
@@ -63,7 +63,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-05-06',
                 'description' => 'Pengembangan prototipe perangkat pemantau kualitas udara berbasis IoT.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Nasional',
             ],
             [
@@ -103,7 +103,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-06-21',
                 'description' => 'Kompetisi karya inovasi teknologi tepat guna tingkat provinsi.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Provinsi',
             ],
             [
@@ -156,7 +156,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-09-13',
                 'description' => 'Kompetisi perancangan antarmuka dan pengalaman pengguna aplikasi layanan publik.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Nasional',
             ],
             [
@@ -183,7 +183,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-10-12',
                 'description' => 'Kompetisi robotika untuk mahasiswa politeknik tingkat nasional.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Nasional',
             ],
             [
@@ -209,7 +209,7 @@ class PengajuanController extends Controller
                 'end_date' => '2026-11-08',
                 'description' => 'Kompetisi keamanan siber dengan kategori capture the flag.',
                 'participation' => 'Tim',
-                'members' => [['name' => 'Arya Bima', 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
+                'members' => [['name' => config('mahasiswa.nama'), 'role' => 'Ketua'], ['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota']],
                 'level' => 'Nasional',
             ],
             [
@@ -344,6 +344,18 @@ class PengajuanController extends Controller
         return $this->renderIndex($request, 'PengajuanMahasiswa.index');
     }
 
+    public function dashboard()
+    {
+        $submissions = $this->rows();
+
+        return view('dashboard', [
+            'mahasiswa' => config('mahasiswa'),
+            'totalPengajuan' => $submissions->count(),
+            'totalKegiatan' => $submissions->count(),
+            'latestSubmissions' => $submissions->take(3),
+        ]);
+    }
+
     private function renderIndex(Request $request, string $view)
     {
         $all = $this->rows();
@@ -404,7 +416,7 @@ class PengajuanController extends Controller
         $d = $row['submitted_at'];
         $mine = $id > 100;
         $meta = [
-            'Diajukan' => [$mine ? $d : $d->copy()->setTime(9, 0), 'Arya Bima', 'Pengajuan dikirim untuk ditinjau.'],
+            'Diajukan' => [$mine ? $d : $d->copy()->setTime(9, 0), config('mahasiswa.nama'), 'Pengajuan dikirim untuk ditinjau.'],
             'Direview' => [$mine ? $d->copy()->addMinutes(5) : $d->copy()->setTime(13, 0), 'Tim administrasi', 'Verifikasi persyaratan dan periode pengajuan.'],
             'Diterima' => [$d->copy()->addDay()->setTime(10, 15), 'Reviewer akademik', 'Pengajuan disetujui. Menunggu penerbitan dokumen hasil.'],
             'Ditolak' => [$d->copy()->addDay()->setTime(10, 30), 'Reviewer akademik', 'Pengajuan di luar periode penerimaan. Proses dihentikan.'],
@@ -416,7 +428,11 @@ class PengajuanController extends Controller
             'title' => $s, 'at' => $meta[$s][0], 'actor' => $meta[$s][1], 'note' => $meta[$s][2],
         ]);
 
-        $student = ['name' => 'Arya Bima', 'nim' => '43325115', 'prodi' => 'Teknologi Rekayasa Komputer'];
+        $student = [
+            'name' => config('mahasiswa.nama'),
+            'nim' => config('mahasiswa.nim'),
+            'prodi' => config('mahasiswa.prodi'),
+        ];
 
         $files = collect($item['documents'] ?? [])->map(fn ($f) => [
             'name' => $f['name'] ?? 'Dokumen pendukung',

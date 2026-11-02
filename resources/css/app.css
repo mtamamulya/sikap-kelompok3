@@ -15,6 +15,15 @@ html {
     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 180ms;
+}
+
 input, select, textarea, button {
     font-family: inherit;
 }
@@ -27,4 +36,11 @@ input, select, textarea, button {
 @media (max-width: 639px) {
     main h1.text-4xl { font-size: 1.875rem; line-height: 2.25rem; }
     main p.text-2xl  { font-size: 1.125rem; line-height: 1.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 1ms;
+    }
 }

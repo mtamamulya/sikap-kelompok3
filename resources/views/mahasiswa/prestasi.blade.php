@@ -37,7 +37,7 @@
 
     $bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    $namaMhs = $nama ?? 'Arya Bima';
+    $namaMhs = $nama ?? config('mahasiswa.nama');
 
     // Prestasi tim yang dibuat orang lain, di mana mahasiswa ini hanya DITAG sebagai anggota.
     // Untuk prestasi ini hanya tombol "lihat" yang tersedia (tanpa edit dan hapus).
@@ -213,7 +213,7 @@
 
         {{-- Tabel: 7 kolom, lebar dikunci (table-fixed + colgroup), tinggi baris tetap 80px,
              tinggi minimum = header 44px + 8 baris x 80px + border 2px --}}
-        <div class="min-h-[686px] overflow-x-auto rounded-xl border border-[#E5E7EB]">
+        <div class="hidden overflow-x-auto rounded-xl border border-[#E5E7EB] md:block md:min-h-[686px]">
             <table class="w-full min-w-[900px] table-fixed border-collapse">
                 <colgroup>
                     <col class="w-[26%]"> {{-- Prestasi / lomba --}}
@@ -312,7 +312,59 @@
             </table>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6B7280]">
+        <div class="flex flex-col gap-3 md:hidden">
+            <div x-show="terfilter.length === 0" x-cloak class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">
+                <span x-show="semua.length === 0">Belum ada prestasi yang tercatat.</span>
+                <span x-show="semua.length > 0">Tidak ada prestasi yang cocok dengan filter.</span>
+                <button type="button" x-show="semua.length > 0" x-on:click="reset()" class="ml-1 font-semibold text-[#0062FF] hover:underline">Reset filter</button>
+            </div>
+            <template x-for="p in tampil" :key="p.id">
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+                    <div class="min-w-0">
+                        <div class="break-words text-sm font-semibold leading-5 text-[#111827]" x-text="p.nama"></div>
+                        <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#6B7280]">
+                            <span x-text="p.kategori + ' • ' + p.bentuk"></span>
+                            <span x-show="p.ditag" class="rounded-md bg-[#EEF4FF] px-1.5 py-0.5 text-[11px] font-semibold text-[#0162DD]">Ditag</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full bg-[#F3F4F6] px-2.5 py-1 text-xs font-semibold text-[#111827]" x-text="p.capaian"></span>
+                        <span class="rounded-md border border-[#E5E7EB] px-2 py-1 text-xs font-medium text-[#374151]" x-text="p.tingkat"></span>
+                        <span class="rounded-full border px-2.5 py-1 text-xs font-medium"
+                              x-bind:class="p.jenis === 'Akademik' ? 'border-[#B8D0FA] bg-[#EEF4FF] text-[#0162DD]' : 'border-[#F5D9A8] bg-[#FFF7E6] text-[#B25E09]'"
+                              x-text="p.jenis"></span>
+                    </div>
+                    <div class="flex min-w-0 items-start justify-between gap-3 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div class="min-w-0">
+                            <div class="break-words font-medium text-[#374151]" x-text="p.penyelenggara"></div>
+                            <div class="mt-1 text-[#6B7280]" x-text="p.tahun"></div>
+                        </div>
+                        <div class="flex shrink-0 items-center gap-2">
+                            <button type="button" title="Lihat detail dan bukti" aria-label="Lihat detail dan bukti"
+                                    x-on:click="lihatBukti(p)"
+                                    class="{{ $aksiBtn }} size-10 bg-[#E0EAFD] text-[#2277FF] hover:bg-[#CDDEFB] focus-visible:outline-[#2277FF]">
+                                {!! $icon('eye', 'size-[18px]') !!}
+                            </button>
+                            <template x-if="p.bisaUbah">
+                                <a x-bind:href="urlEdit(p)" title="Edit prestasi" aria-label="Edit prestasi"
+                                   class="{{ $aksiBtn }} size-10 bg-[#FDEBD3] text-[#F59E0B] hover:bg-[#FBDDB4] focus-visible:outline-[#F59E0B]">
+                                    {!! $icon('pencil', 'size-[18px]') !!}
+                                </a>
+                            </template>
+                            <template x-if="p.bisaUbah">
+                                <button type="button" title="Hapus prestasi" aria-label="Hapus prestasi"
+                                        x-on:click="mintaHapus(p)"
+                                        class="{{ $aksiBtn }} size-10 bg-[#FBCBCB] text-[#FF3F3F] hover:bg-[#F8B4B4] focus-visible:outline-[#FF3F3F]">
+                                    {!! $icon('trash', 'size-[18px]') !!}
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </article>
+            </template>
+        </div>
+
+        <div class="flex flex-col gap-3 text-xs text-[#6B7280] sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span x-text="terfilter.length
                     ? `${dari}–${sampai} dari ${terfilter.length} prestasi ditampilkan`
@@ -321,22 +373,13 @@
                         class="font-semibold text-[#0062FF] hover:underline">Pulihkan data contoh</button>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button type="button" class="{{ $pageBtn }}" x-on:click="halaman--" x-bind:disabled="halaman <= 1">Sebelumnya</button>
                 <span x-text="`Halaman ${halaman} dari ${totalHalaman}`"></span>
                 <button type="button" class="{{ $pageBtn }}" x-on:click="halaman++" x-bind:disabled="halaman >= totalHalaman">Berikutnya</button>
             </div>
         </div>
     </section>
-
-    {{-- Tips --}}
-    <div class="flex items-start gap-3 rounded-xl bg-[#EFF6FF] p-4 text-[#003385]">
-        <span class="mt-0.5 shrink-0">{!! $icon('award') !!}</span>
-        <div class="flex flex-col gap-0.5">
-            <span class="text-sm font-semibold">Catat prestasi Anda dengan bukti yang lengkap</span>
-            <p class="text-[13px] leading-[1.5]">Prestasi dapat ditambahkan dari kegiatan sebelumnya atau secara mandiri tanpa kegiatan terkait.</p>
-        </div>
-    </div>
 
     {{-- Form tersembunyi untuk menghapus (dipakai saat route hapus sudah dibuat) --}}
     <form x-ref="formHapus" method="POST" action="#" class="hidden">

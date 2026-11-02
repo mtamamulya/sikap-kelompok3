@@ -28,11 +28,11 @@
                     <img :src="userAvatar" class="size-full object-cover">
                 </template>
                 <template x-if="!userAvatar">
-                    <span>A</span>
+                    <span>{{ strtoupper(\Illuminate\Support\Str::substr(config('mahasiswa.nama'), 0, 1)) }}</span>
                 </template>
             </div>
             <div class="hidden flex-col text-left sm:flex">
-                <span class="text-xs font-bold text-[#111827]">Arya Bima</span>
+                <span class="text-xs font-bold text-[#111827]">{{ config('mahasiswa.nama') }}</span>
                 <span class="text-[10px] text-[#6B7280]">Mahasiswa</span>
             </div>
             <svg class="size-4 text-[#6B7280] transition-transform duration-200" :class="dropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,7 @@
             
             <!-- Header User Info -->
             <div class="flex flex-col gap-0.5 pb-3">
-                <span class="text-base font-bold text-[#111827]">Arya Bima</span>
+                <span class="text-base font-bold text-[#111827]">{{ config('mahasiswa.nama') }}</span>
                 <span class="text-xs text-[#6B7280]">Mahasiswa</span>
             </div>
 

@@ -169,7 +169,7 @@
                 <h3 class="text-xl font-bold">Buat pengajuan dokumen baru</h3>
                 <p class="text-xs text-blue-100">Pilih jenis dokumen, lengkapi data, dan unggah lampiran yang diperlukan untuk memulai proses pengajuan.</p>
             </div>
-            <a href="#" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 text-xs font-bold text-[#2277FF] hover:bg-blue-50 transition shadow-sm">
+            <a href="{{ route('pengajuan.create') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 text-xs font-bold text-[#2277FF] hover:bg-blue-50 transition shadow-sm">
                 Buat Pengajuan
             </a>
         </div>
@@ -182,7 +182,7 @@
                 <h2 class="text-lg font-bold text-[#111827]">Daftar pengajuan terbaru</h2>
                 <p class="text-xs text-[#6B7280]">Lihat status terbaru dari pengajuan dokumen Anda.</p>
             </div>
-            <a href="#" class="rounded-lg bg-[#EFF6FF] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-blue-100 transition">
+            <a href="{{ route('pengajuan.index') }}" class="rounded-lg bg-[#EFF6FF] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-blue-100 transition">
                 Lihat semua
             </a>
         </div>

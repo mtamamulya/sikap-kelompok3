@@ -1,17 +1,15 @@
 @php
-    $mhsActive = request()->is('mahasiswa*', 'profil');
+    $mhsActive = request()->routeIs('mahasiswa.*');
 
     $menuMhs = [
-        ['label' => 'Mata kuliah',        'url' => url('/mahasiswa/mata-kuliah'), 'match' => 'mahasiswa/mata-kuliah*'],
-        ['label' => 'Prestasi mahasiswa', 'url' => url('/mahasiswa/prestasi'),    'match' => 'mahasiswa/prestasi*'],
+        ['label' => 'Mata kuliah', 'url' => route('mahasiswa.mata-kuliah'), 'routes' => ['mahasiswa.mata-kuliah*']],
+        ['label' => 'Prestasi mahasiswa', 'url' => route('mahasiswa.prestasi'), 'routes' => ['mahasiswa.prestasi*']],
     ];
-    $subAktif = collect($menuMhs)->contains(fn ($i) => request()->is($i['match']));
+    $subAktif = collect($menuMhs)->contains(fn ($i) => request()->routeIs(...$i['routes']));
 
     $navItem = 'flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition-all duration-200';
     $navIcon = 'size-5 shrink-0';
-    
-    // Cek apakah sedang berada di halaman Dashboard
-    $isDashboard = request()->is('/') || request()->is('dashboard*');
+    $isDashboard = request()->routeIs('dashboard');
 @endphp
 
 {{-- ================= SIDEBAR (ASIDE) ================= --}}
@@ -27,7 +25,7 @@
     <nav class="flex flex-col gap-1.5 text-[15px] text-white">
         
         <!-- Dashboard -->
-        <a href="{{ url('/dashboard') }}" 
+        <a href="{{ route('dashboard') }}"
            class="{{ $navItem }} {{ $isDashboard ? 'bg-white font-bold text-[#3565ed] shadow-xs' : 'text-white/90 hover:bg-white hover:text-[#3565ed] hover:font-bold hover:shadow-xs' }}">
             <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h6v6h-6z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6h-6z"/><path d="M14 14h6v6h-6z"/>
@@ -36,7 +34,7 @@
         </a>
 
         <!-- Pengajuan -->
-        <a href="#" 
+        <a href="{{ route('pengajuan.index') }}"
            class="{{ $navItem }} {{ request()->is('pengajuan*') ? 'bg-white font-bold text-[#3565ed] shadow-xs' : 'text-white/90 hover:bg-white hover:text-[#3565ed] hover:font-bold hover:shadow-xs' }}">
             <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/>
@@ -46,27 +44,26 @@
 
         {{-- ===== Grup Submenu Mahasiswa ===== --}}
         <div x-data="{ openMhs: {{ $mhsActive ? 'true' : 'false' }} }" class="flex flex-col gap-1.5">
-            <div class="flex items-center rounded-xl transition-all duration-200
-                        {{ $subAktif ? 'bg-white/15 text-white' : ($mhsActive ? 'bg-white font-bold text-[#3565ed] shadow-xs' : 'text-white/90 hover:bg-white hover:text-[#3565ed] hover:font-bold hover:shadow-xs') }}">
-                
-                <a href="#" class="flex flex-1 items-center gap-3 rounded-l-xl px-3.5 py-2.5">
+            <div class="flex items-center rounded-xl transition-all duration-200 {{ $mhsActive ? 'bg-white/15 text-white' : '' }}">
+                <a href="{{ route('mahasiswa.index') }}" @if ($mhsActive) aria-current="page" @endif
+                   class="flex flex-1 items-center gap-3 rounded-l-xl px-3.5 py-2.5 {{ $mhsActive && ! $subAktif ? 'bg-white font-bold text-[#3565ed] shadow-xs' : 'text-white/90 hover:bg-white hover:text-[#3565ed] hover:font-bold hover:shadow-xs' }}">
                     <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M8 21v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/><path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M17 10h2a2 2 0 0 1 2 2v1"/><path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M3 13v-1a2 2 0 0 1 2-2h2"/>
                     </svg>
                     <span class="flex-1">Mahasiswa</span>
                 </a>
-
                 <button type="button" x-on:click="openMhs = !openMhs" :aria-expanded="openMhs"
-                        aria-label="Buka atau tutup submenu Mahasiswa" class="rounded-r-xl px-3 py-2.5">
+                        aria-label="Buka atau tutup submenu Mahasiswa"
+                        class="flex items-center rounded-r-xl px-3 py-2.5 text-white hover:bg-white/10">
                     <svg class="size-4 transition-transform duration-200" :class="openMhs && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M6 9l6 6l6-6"/>
                     </svg>
                 </button>
             </div>
 
-            <div x-show="openMhs" x-cloak x-transition class="flex flex-col gap-1.5">
+            <div id="mahasiswa-submenu" x-show="openMhs" x-cloak x-transition class="flex flex-col gap-1.5">
                 @foreach ($menuMhs as $item)
-                    @php $aktif = request()->is($item['match']); @endphp
+                    @php $aktif = request()->routeIs(...$item['routes']); @endphp
                     <a href="{{ $item['url'] }}" @if ($aktif) aria-current="page" @endif
                        class="rounded-xl py-2 pl-11 pr-3 text-sm transition-all duration-200
                               {{ $aktif ? 'bg-white font-bold text-[#3565ed] shadow-xs' : 'text-white/80 hover:bg-white hover:text-[#3565ed] hover:font-bold hover:shadow-xs' }}">

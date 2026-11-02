@@ -50,7 +50,7 @@ class MahasiswaController extends Controller
         );
 
         return view('mahasiswa.dashboard-mhs', [
-            'nama' => 'Arya Bima',
+            'nama' => config('mahasiswa.nama'),
             'ringkasan' => [
                 'tahun_akademik' => '2026/2027',
                 'jenis_semester' => 'Ganjil',
@@ -115,8 +115,8 @@ class MahasiswaController extends Controller
             })->values();
 
         return view('mahasiswa.mata-kuliah', [
-            'nama' => 'Arya Bima',
-            'profil' => ['nim' => '43325115', 'prodi' => 'Teknologi Rekayasa Komputer'],
+            'nama' => config('mahasiswa.nama'),
+            'profil' => ['nim' => config('mahasiswa.nim'), 'prodi' => config('mahasiswa.prodi')],
             'tab' => $tab,
             'rows' => $rows,
             'filter' => $filter,
@@ -167,8 +167,8 @@ class MahasiswaController extends Controller
         })->values();
 
         return view('mahasiswa.prestasi', [
-            'nama' => 'Arya Bima',
-            'profil' => ['nim' => '43325115', 'prodi' => 'Teknologi Rekayasa Komputer'],
+            'nama' => config('mahasiswa.nama'),
+            'profil' => ['nim' => config('mahasiswa.nim'), 'prodi' => config('mahasiswa.prodi')],
             'rows' => $rows,
             'total' => $semua->count(),
             'filter' => $filter,
@@ -188,14 +188,14 @@ class MahasiswaController extends Controller
     public function prestasiTambah()
     {
         return view('mahasiswa.prestasi-tambah', [
-            'nama' => 'Arya Bima',
-            'profil' => ['nim' => '43325115', 'prodi' => 'Teknologi Rekayasa Komputer'],
+            'nama' => config('mahasiswa.nama'),
+            'profil' => ['nim' => config('mahasiswa.nim'), 'prodi' => config('mahasiswa.prodi')],
             'tingkatList' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'],
             'capaianList' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'],
             'jenisList' => ['Akademik', 'Nonakademik'],
             'jenisDokList' => ['Sertifikat', 'Piagam penghargaan', 'Surat tugas', 'Surat keterangan penyelenggara', 'Foto kegiatan', 'Lainnya'],
             // DATA DUMMY: ganti dengan daftar mahasiswa dari database (untuk pencarian anggota tim)
-            'daftarMahasiswa' => ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', 'Arya Bima', 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'],
+            'daftarMahasiswa' => ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', config('mahasiswa.nama'), 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'],
             'peranList' => ['Ketua', 'Anggota'],
             // DATA DUMMY: ganti dengan daftar kegiatan dari database
             'kegiatanList' => [

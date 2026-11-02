@@ -101,12 +101,12 @@
     $allActivities = array_merge($page1, $page2, $page3);
 @endphp
 
-<div x-data="kegiatanApp(@js($allActivities))" class="flex flex-col gap-6 p-4 md:px-6 md:py-8 lg:px-12 bg-[#F9FAFB]">
+<div x-data="kegiatanApp(@js($allActivities))" class="flex flex-col gap-6">
     
     <!-- Grid Ringkasan Kegiatan -->
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         @foreach($summaryCards as $c)
-            <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#D1D5DB]">
+            <div class="group relative min-w-0 overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D1D5DB] hover:shadow-md sm:p-5">
                 <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: {{ $c['border_accent'] }};"></div>
                 
                 <div class="flex items-center justify-between pl-2">
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Grafik Kegiatan per Semester (Dengan Efek Hover Fokus & Zoom Card) -->
-    <section class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:scale-[1.01] hover:shadow-lg hover:border-[#D1D5DB]">
+    <section class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:border-[#D1D5DB] hover:shadow-lg sm:p-4 lg:hover:scale-[1.01]">
         <div class="flex flex-col gap-0.5">
             <h2 class="text-xl font-bold text-[#111827]">Kegiatan per semester</h2>
             <p class="text-sm leading-[1.5] text-[#6B7280]">
@@ -143,7 +143,7 @@
             </div>
             <span>0 — 20 kegiatan</span>
         </div>
-        <div class="flex h-[110px] items-end gap-3 pt-2">
+        <div class="flex h-[110px] min-w-0 items-end gap-2 pt-2 sm:gap-3">
             <div class="flex h-full w-8 flex-col items-end justify-between pb-4 text-[12px] text-[#6B7280]">
                 <span>20</span><span>15</span><span>10</span><span>5</span><span>0</span>
             </div>
@@ -267,7 +267,7 @@
         </div>
 
         <!-- Tabel Daftar Kegiatan -->
-        <div class="overflow-x-auto rounded-xl border border-[#E5E7EB]">
+        <div class="hidden overflow-x-auto rounded-xl border border-[#E5E7EB] md:block">
             <div class="min-w-[760px]">
                 <div class="flex gap-4 bg-[#F9FAFB] px-4 py-2.5 text-xs font-semibold text-[#6B7280] uppercase tracking-wider border-b border-[#E5E7EB]">
                     <div class="flex-1">Nama Kegiatan/Jenis Kegiatan</div>
@@ -305,6 +305,34 @@
                     </div>
                 </template>
             </div>
+        </div>
+
+        <div class="flex flex-col gap-3 md:hidden">
+            <div x-show="paginatedData.length === 0" x-cloak class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">
+                Tidak ada kegiatan yang sesuai dengan filter Anda.
+            </div>
+            <template x-for="(a, index) in paginatedData" :key="index">
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+                    <div class="flex min-w-0 items-start gap-3">
+                        <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2563EB]" x-text="showAll ? index + 1 : ((page - 1) * itemsPerPage) + index + 1"></span>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="break-words text-sm font-semibold text-[#111827]" x-text="a.name"></h3>
+                            <p class="mt-1 text-xs text-[#6B7280]" x-text="a.type"></p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-[#EEF0F3] pt-3">
+                        <div class="flex min-w-0 flex-col gap-1">
+                            <span class="text-xs text-[#6B7280]" x-text="a.date"></span>
+                            <span class="w-fit rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]">Selesai</span>
+                            <span x-show="a.note" class="break-words text-xs text-[#6B7280]" x-text="a.note"></span>
+                        </div>
+                        <button type="button" @click="openModal(a)" class="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg bg-[#EFF6FF] px-3 text-xs font-semibold text-[#2563EB] hover:bg-blue-100">
+                            Lihat detail
+                            <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0-7 7m7-7H3"></path></svg>
+                        </button>
+                    </div>
+                </article>
+            </template>
         </div>
 
         <!-- Footer Info & Pagination -->
@@ -392,7 +420,7 @@
                                 <span class="text-[10px] font-bold tracking-widest text-[#1E3A8A] uppercase">FORUM INOVASI TEKNOLOGI</span>
                                 <h4 class="text-sm font-black tracking-wider text-[#1E3A8A] uppercase">SERTIFIKAT PENGHARGAAN</h4>
                                 <span class="text-[10px] text-[#6B7280] mt-2">Diberikan kepada</span>
-                                <span class="text-base font-bold text-[#111827] border-b border-[#E5E7EB] pb-0.5 px-4">Arya Bima</span>
+                                <span class="text-base font-bold text-[#111827] border-b border-[#E5E7EB] pb-0.5 px-4">{{ config('mahasiswa.nama') }}</span>
                                 <p class="text-[10px] text-[#4B5563] mt-1 max-w-[280px]">
                                     sebagai <span class="font-semibold text-[#111827]" x-text="activeItem?.capaian || 'Peserta'"></span> pada <span class="font-semibold text-[#111827]" x-text="activeItem?.name"></span> tingkat <span class="font-semibold text-[#111827]" x-text="activeItem?.tingkat || 'Nasional'"></span>
                                 </p>
