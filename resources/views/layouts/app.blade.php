@@ -12,12 +12,12 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- Alpine.js: untuk interaksi kecil (dropdown, tambah/hapus baris, dll.) --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+    {{-- Alpine.js dimuat melalui resources/js/app.js. --}}
 </head>
-<body class="h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
+@php $namaDosen = request()->user()?->dosen?->nama ?? 'Pratinjau dosen'; @endphp
+<body class="frontend-shell dosen-shell h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
 {{-- menu = status menu samping di layar kecil (HP / tablet). Di layar lebar menu selalu tampil. --}}
-<div class="flex h-full" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
+<div class="flex h-full" data-frontend-shell data-menu-state="menu" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
 
     {{-- Latar gelap di belakang menu (layar kecil). Klik = tutup menu. --}}
     <div x-show="menu" x-cloak x-transition.opacity x-on:click="menu = false"
@@ -25,11 +25,12 @@
 
     {{-- SIDEBAR (berisi logo) di kiri, setinggi layar --}}
     <x-sidebar />
+    <a class="skip-link" href="#main-content">Lewati navigasi</a>
 
     {{-- KANAN: header + isi halaman. Hanya <main> yang bisa di-scroll. --}}
     <div class="flex min-w-0 flex-1 flex-col">
     {{-- HEADER --}}
-    <header class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-3 bg-white px-4 py-3 lg:gap-x-6 lg:px-6 lg:py-3.5">
+    <header data-frontend-header class="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-3 bg-white px-4 py-3 lg:gap-x-6 lg:px-6 lg:py-3.5">
         {{-- Tombol menu: hanya tampil di layar kecil. Logo ada di sidebar. --}}
         <button type="button" x-on:click="menu = true" aria-label="Buka menu" aria-controls="menu-utama" :aria-expanded="menu"
                 class="-ml-1 flex size-10 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:hidden">
@@ -55,15 +56,15 @@
                 <button type="button" x-on:click="akun = !akun" aria-haspopup="menu" aria-controls="menu-akun" :aria-expanded="akun"
                         class="-m-1 flex cursor-pointer items-center gap-2.5 rounded-lg p-1 hover:bg-gray-100"
                         :class="akun ? 'bg-gray-100' : ''">
-                    {{-- Kalau file public/images/kuwat.jpg ada, fotonya dipakai. Kalau tidak, tampil inisial. --}}
-                    @if (file_exists(public_path('images/kuwat.jpg')))
-                        <img src="{{ asset('images/kuwat.jpg') }}" alt="" class="size-[34px] rounded-full object-cover">
+                    {{-- Kalau file public/images/kuwat.jpeg ada, fotonya dipakai. Kalau tidak, tampil inisial. --}}
+                    @if (file_exists(public_path('images/kuwat.jpeg')))
+                        <img src="{{ asset('images/kuwat.jpeg') }}" alt="" class="size-[34px] rounded-full object-cover">
                     @else
                         <span class="flex size-[34px] items-center justify-center rounded-full bg-red-600 text-[13px] font-semibold text-white">KS</span>
                     @endif
                     <span class="hidden max-w-40 flex-col text-left leading-tight sm:flex">
                         {{-- nanti diganti data user yang login --}}
-                        <span class="truncate text-sm font-semibold">Kuwat Santoso</span>
+                        <span class="truncate text-sm font-semibold">{{ $namaDosen }}</span>
                         <span class="text-xs text-gray-600">Dosen</span>
                     </span>
                     <svg class="size-4 shrink-0 text-gray-500 transition-transform" :class="akun ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -75,7 +76,7 @@
                      class="absolute top-full right-0 z-40 mt-3 w-64 rounded-xl border border-gray-100 bg-white p-4 shadow-lg">
                     <div class="flex flex-col gap-0.5 pb-3">
                         {{-- nanti diganti data user yang login --}}
-                        <p class="truncate text-[15px] font-bold" title="Kuwat Santoso">Kuwat Santoso</p>
+                        <p class="truncate text-[15px] font-bold" title="{{ $namaDosen }}">{{ $namaDosen }}</p>
                         <p class="text-sm text-gray-500">Dosen</p>
                     </div>
 
@@ -85,19 +86,15 @@
                             <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
                             Profil Saya
                         </a>
-                        {{-- Keluar: nanti jadi form POST logout dengan @csrf. Sekarang cukup tautan. --}}
-                        <a href="#" role="menuitem"
-                           class="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] text-red-600 hover:bg-red-50">
-                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2H9M14 8l4 4-4 4M18 12H9"/></svg>
-                            Keluar
-                        </a>
+                        {{-- Autentikasi dikelola kelompok 1; tidak menambah alur login/logout di sini. --}}
+                        <a href="{{ route('dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-        <main class="flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12">
+        <main id="main-content" tabindex="-1" class="frontend-main flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12">
             @yield('content')
         </main>
     </div>

@@ -1,61 +1,15 @@
-@extends('layouts.app')
+@extends(request()->routeIs('dosen.*') ? 'layouts.app' : 'layouts.mahasiswa')
 
 @section('title', 'Detail Kegiatan')
 
 @section('content')
 
 @php
-    // DATA TIRUAN. $id berasal dari alamat (/kegiatan/{id}).
-    // Nanti diganti data kegiatan dari controller / database oleh tim backend.
-    // Contoh data. Urutannya sama dengan daftar di halaman Kegiatan (id 1–10), jadi ikon mata di baris ke-2
-    // membuka contoh "Direvisi", baris ke-3 contoh "Disetujui", dst. Isi halaman menyesuaikan statusnya.
-    $contoh = [
-        1  => ['nama' => 'Seminar nasional AI',  'kategori' => 'Lomba',              'jenis' => 'Kegiatan dosen',       'mulai' => '12 September 2026', 'selesai' => '14 September 2026', 'status' => 'Diajukan',  'catatan' => null],
-        2  => ['nama' => 'Pelatihan industri',   'kategori' => 'Magang',             'jenis' => 'Kegiatan Prodi',       'mulai' => '20 Agustus 2026',   'selesai' => '22 Agustus 2026',   'status' => 'Direvisi',  'catatan' => 'Lampirkan surat tugas yang sudah ditandatangani dan perjelas jadwal kegiatan.'],
-        3  => ['nama' => 'Kunjungan industri',   'kategori' => 'Kunjungan Industri', 'jenis' => 'Prodi dan mahasiswa', 'mulai' => '3 Agustus 2026',    'selesai' => '3 Agustus 2026',    'status' => 'Disetujui', 'catatan' => null],
-        4  => ['nama' => 'Lomba karya ilmiah',   'kategori' => 'Lomba',              'jenis' => 'Kegiatan mahasiswa',   'mulai' => '15 Juli 2026',      'selesai' => '16 Juli 2026',      'status' => 'Ditolak',   'catatan' => 'Lomba tidak termasuk daftar kegiatan yang diakui program studi.'],
-        5  => ['nama' => 'Computer Vision',      'kategori' => 'Lomba',              'jenis' => 'Kegiatan mahasiswa',   'mulai' => '3 Agustus 2026',    'selesai' => '5 Agustus 2026',    'status' => 'Diajukan',  'catatan' => null],
-        6  => ['nama' => 'Sistem Operasi',       'kategori' => 'Kunjungan Industri', 'jenis' => 'Prodi dan mahasiswa', 'mulai' => '3 Agustus 2026',    'selesai' => '3 Agustus 2026',    'status' => 'Direvisi',  'catatan' => 'Daftar anggota belum lengkap. Tambahkan mahasiswa yang ikut.'],
-        7  => ['nama' => 'Jaringan Komputer',    'kategori' => 'Lomba',              'jenis' => 'Kegiatan Prodi',       'mulai' => '12 September 2026', 'selesai' => '14 September 2026', 'status' => 'Disetujui', 'catatan' => null],
-        8  => ['nama' => 'Sistem Basis Data',    'kategori' => 'Lomba',              'jenis' => 'Kegiatan dosen',       'mulai' => '12 September 2026', 'selesai' => '14 September 2026', 'status' => 'Ditolak',   'catatan' => 'Jadwal bentrok dengan kegiatan fakultas pada tanggal yang sama.'],
-        9  => ['nama' => 'Sistem Operasi',       'kategori' => 'Kunjungan Industri', 'jenis' => 'Prodi dan mahasiswa', 'mulai' => '20 Agustus 2026',   'selesai' => '20 Agustus 2026',   'status' => 'Diajukan',  'catatan' => null],
-        10 => ['nama' => 'Internet of Things',   'kategori' => 'Magang',             'jenis' => 'Prodi dan mahasiswa',  'mulai' => '3 Agustus 2026',    'selesai' => '30 September 2026', 'status' => 'Direvisi',  'catatan' => 'Dokumen proposal belum memuat rencana anggaran.'],
-    ];
-    $c = $contoh[max(1, min(10, (int) ($id ?? 1)))];
-    $k = [
-        'kategori'      => $c['kategori'],
-        'jenis'         => $c['jenis'],
-        'nama'          => $c['nama'],
-        'penyelenggara' => 'Politeknik Negeri Semarang',
-        'tahun'         => 2026,
-        'mulai'         => $c['mulai'],
-        'selesai'       => $c['selesai'],
-        'status'        => $c['status'],
-    ];
-    $catatan = $c['catatan'];   // catatan revisi / alasan penolakan dari reviewer
-
     $warna = [
         'Diajukan'  => 'border-blue-200 bg-blue-100 text-blue-700',
         'Direvisi'  => 'border-orange-200 bg-orange-100 text-orange-700',
         'Disetujui' => 'border-green-200 bg-green-100 text-green-700',
         'Ditolak'   => 'border-red-200 bg-red-100 text-red-600',
-    ];
-
-    $anggota = [
-        ['nama' => 'Kuwat Santoso , S.T., M.Kom.', 'status' => 'Dosen'],
-        ['nama' => 'Mukhlis Pratama Mulya',        'status' => 'Mahasiswa'],
-    ];
-
-    // Dokumen. 'url' = alamat file untuk dilihat / diunduh ('#' = belum ada file sungguhan).
-    $dokumen = [
-        [
-            'file'       => 'Proposal kegiatan.pdf',
-            'url'        => '#',
-            'nama'       => 'Proposal Kegiatan',
-            'jenis'      => 'Proposal',
-            'keterangan' => 'Ini adalah proposal kegiatan seminar',
-            'tautan'     => null,
-        ],
     ];
 
     $sectionClass = 'flex flex-col gap-4.5 rounded-lg border border-gray-200 bg-white p-4.5';
@@ -132,7 +86,7 @@
 
                 <div class="flex flex-col gap-2 md:col-span-2">
                     <dt class="text-[15px] font-medium">Status pengajuan</dt>
-                    <dd><span class="inline-block rounded-md border px-2 py-0.5 text-[13px] {{ $warna[$k['status']] }}">{{ $k['status'] }}</span></dd>
+                    <dd><span class="inline-block rounded-md border px-2 py-0.5 text-[13px] {{ $warna[$k['status']] ?? 'border-gray-200 bg-gray-100 text-gray-700' }}">{{ $k['status'] }}</span></dd>
                 </div>
             </dl>
         </section>
@@ -191,6 +145,7 @@
                                     <span class="truncate text-[15px]" title="{{ $d['file'] }}">{{ $d['file'] }}</span>
                                 </div>
 
+                                @if ($d['url'])
                                 <div class="flex items-center gap-2">
                                     <button type="button" x-data
                                        x-on:click="$dispatch('buka-preview', { file: @js($d['file']), url: @js($d['url']), jenis: @js($d['jenis'] ?? '') })"
@@ -204,6 +159,7 @@
                                         Unduh
                                     </a>
                                 </div>
+                                @endif
                             </div>
                         </div>
 

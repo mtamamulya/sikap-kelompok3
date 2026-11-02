@@ -1,135 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'SIKAP')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>[x-cloak]{display:none !important}</style>
-</head>
-<body class="bg-[#F9FAFB] text-[#111827] antialiased">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title','Dashboard mahasiswa') · SIKAP</title><link rel="icon" href="{{ asset('images/logo_trk.png') }}"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">@vite(['resources/css/app.css','resources/js/app.js'])@stack('styles')</head>
 @php
-    $namaUser  = $nama ?? 'Arya Bima';
-    $roleUser  = 'Mahasiswa';
-    $inisial   = strtoupper(mb_substr($namaUser, 0, 1));
-    $mhsActive = request()->routeIs('mahasiswa.*', 'profil');
-
-    // Submenu grup Mahasiswa; 'match' dipakai untuk status aktif (termasuk sub-tab)
-    $menuMhs = [
-        ['label' => 'Mata kuliah',        'route' => 'mahasiswa.mata-kuliah', 'match' => 'mahasiswa.mata-kuliah*'],
-        ['label' => 'Prestasi mahasiswa', 'route' => 'mahasiswa.prestasi',    'match' => 'mahasiswa.prestasi*'],
-    ];
-    $subAktif = collect($menuMhs)->contains(fn ($i) => request()->routeIs($i['match']));
-
-    // Kelas yang dipakai berulang di menu sidebar
-    $navItem = 'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-white/10';
-    $navIcon = 'size-5 shrink-0';
+    $namaUser = $nama ?? request()->user()?->mahasiswa?->nama ?? 'Belum masuk';
+    $inisial = strtoupper(mb_substr($namaUser,0,1));
+    $studentMenus = [['Dashboard','dashboard'],['Pengajuan','pengajuan.mahasiswa'],['Kegiatan','kegiatan.index']];
 @endphp
-
-<div class="min-h-screen" x-data="{ sidebar: false }" x-on:keydown.escape.window="sidebar = false">
-
-    {{-- Overlay (mobile) --}}
-    <div x-show="sidebar" x-cloak x-transition.opacity class="fixed inset-0 z-30 bg-black/40 lg:hidden" x-on:click="sidebar = false"></div>
-
-    {{-- ================= SIDEBAR ================= --}}
-    <aside class="fixed inset-y-0 left-0 z-40 flex w-[240px] flex-col gap-6 overflow-y-auto bg-linear-to-b from-[#1f66e5] from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% px-3 py-5 text-white transition-transform duration-200"
-           :class="sidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-
-        <a href="{{ route('mahasiswa.dashboard') }}" class="flex items-center gap-2.5 px-2">
-            <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0">
-            <span class="text-[13px] font-bold leading-[1.3] text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
-        </a>
-
-        <nav class="flex flex-col gap-1.5 text-[15px] text-white">
-            <a href="{{ route('mahasiswa.dashboard') }}" class="{{ $navItem }}">
-                <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6h-6z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6h-6z"/><path d="M14 14h6v6h-6z"/></svg>
-                Dashboard
-            </a>
-
-            <a href="#" class="{{ $navItem }}">
-                <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
-                Pengajuan
-            </a>
-
-            {{-- ===== Grup Mahasiswa ===== --}}
-            <div x-data="{ openMhs: {{ $mhsActive ? 'true' : 'false' }} }" class="flex flex-col gap-1.5">
-                <div class="flex items-center rounded-lg transition-colors
-                            {{ $subAktif ? 'bg-white/15 text-white' : ($mhsActive ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'hover:bg-white/10') }}">
-                    {{-- Klik teks: buka halaman dashboard mahasiswa --}}
-                    <a href="{{ route('mahasiswa.dashboard') }}" class="flex flex-1 items-center gap-3 rounded-l-lg px-3 py-2.5">
-                        <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M8 21v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/><path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M17 10h2a2 2 0 0 1 2 2v1"/><path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M3 13v-1a2 2 0 0 1 2-2h2"/></svg>
-                        <span class="flex-1">Mahasiswa</span>
-                    </a>
-                    {{-- Klik panah: buka/tutup submenu --}}
-                    <button type="button" x-on:click="openMhs = !openMhs" :aria-expanded="openMhs"
-                            aria-label="Buka atau tutup submenu Mahasiswa" class="rounded-r-lg px-3 py-2.5">
-                        <svg class="size-4 transition-transform" :class="openMhs && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>
-                    </button>
-                </div>
-
-                <div x-show="openMhs" x-cloak x-transition class="flex flex-col gap-1.5">
-                    @foreach ($menuMhs as $item)
-                        @php
-                            $href  = Route::has($item['route']) ? route($item['route']) : '#';
-                            $aktif = request()->routeIs($item['match']);
-                        @endphp
-                        <a href="{{ $href }}" @if ($aktif) aria-current="page" @endif
-                           class="rounded-lg py-2 pl-11 pr-3 text-sm transition-colors
-                                  {{ $aktif ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'bg-white/10 text-white hover:bg-white/20' }}">
-                            {{ $item['label'] }}
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-            {{-- ===== Akhir grup Mahasiswa ===== --}}
-
-            <a href="#" class="{{ $navItem }}">
-                <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3-5a9 9 0 0 0 6-8a3 3 0 0 0-3-3a9 9 0 0 0-8 6a6 6 0 0 0-5 3"/><path d="M7 14a6 6 0 0 0-3 6a6 6 0 0 0 6-3"/><path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/></svg>
-                Kegiatan
-            </a>
+<body class="frontend-shell mahasiswa-shell bg-[#F9FAFB] text-[#111827] antialiased">
+<div class="min-h-screen" data-frontend-shell data-menu-state="sidebar" x-data="{ sidebar:false }" x-on:keydown.escape.window="sidebar=false">
+    <div x-show="sidebar" x-cloak x-transition.opacity class="fixed inset-0 z-30 bg-black/40 lg:hidden" x-on:click="sidebar=false" aria-hidden="true"></div>
+    <aside id="student-navigation" data-frontend-navigation :data-open="sidebar ? 'true' : 'false'" class="student-sidebar max-lg:invisible max-lg:data-[open=true]:visible fixed inset-y-0 left-0 z-40 flex w-60 flex-col overflow-y-auto border-r border-gray-100 bg-white p-3 transition-transform duration-200" :class="sidebar?'translate-x-0':'-translate-x-full lg:translate-x-0'">
+        <div class="flex items-center justify-between gap-2 pb-6 pt-2"><a class="flex items-center gap-2 text-[#003385]" href="{{ route('dashboard') }}"><img src="{{ asset('images/logo_trk.png') }}" class="h-10 w-auto shrink-0" alt="Logo TRK"><span class="text-xs font-bold leading-tight">TEKNOLOGI<br>REKAYASA KOMPUTER</span></a><button type="button" class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 lg:hidden" aria-label="Tutup menu" x-on:click="sidebar=false">×</button></div>
+        <nav class="flex flex-1 flex-col gap-2" aria-label="Menu mahasiswa">
+            @foreach($studentMenus as [$label,$route])<a class="student-nav-link {{ request()->routeIs($route,$route.'.*')?'is-active':'' }}" href="{{ route($route) }}" @if(request()->routeIs($route,$route.'.*'))aria-current="page"@endif>{{ $label }}</a>@endforeach
+            <details><summary class="student-nav-link cursor-pointer">Mahasiswa</summary><div class="flex flex-col gap-1 pl-3">@foreach(['Mata kuliah'=>'mahasiswa.mata-kuliah','Prestasi mahasiswa'=>'mahasiswa.prestasi'] as $label=>$route)@if(Route::has($route))<a class="student-nav-link" href="{{ route($route) }}">{{ $label }}</a>@else<span class="student-nav-link text-gray-400" aria-disabled="true" title="Halaman belum terhubung">{{ $label }} <small class="text-[10px]">Belum terhubung</small></span>@endif @endforeach</div></details>
         </nav>
+        <a href="{{ route('dosen.dashboard') }}" class="student-nav-link mt-6 text-brand">Tampilan dosen</a>
     </aside>
-
-    <div class="lg:pl-[240px]">
-        {{-- ================= TOPBAR ================= --}}
-        <header class="sticky top-0 z-20 flex items-center gap-3 border-b border-[#E5E7EB] bg-white px-4 py-3 sm:px-8">
-            <button type="button" class="rounded-md border border-[#E5E7EB] bg-white p-2 lg:hidden" x-on:click="sidebar = true" aria-label="Buka menu">
-                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
-            </button>
-
-            {{-- Kolom pencarian (nonaktif). Hapus tanda komentar di bawah kalau mau dipakai lagi.
-            <form action="#" method="GET" class="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-[#A8A8A8] bg-white px-4 py-2 focus-within:border-[#27F]">
-                <svg class="size-5 shrink-0 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M21 21l-6-6"/></svg>
-                <input type="search" name="cari" placeholder="Cari" class="min-w-0 flex-1 bg-transparent text-base text-[#0A0A0A] outline-none placeholder:text-[#A8A8A8]">
-            </form>
-            --}}
-
-            {{-- ml-auto: dorong blok profil (foto, nama, role) ke kanan --}}
-            <div class="relative ml-auto" x-data="{ menu: false }" x-on:click.outside="menu = false">
-                <button type="button" x-on:click="menu = !menu" :aria-expanded="menu"
-                        class="flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-[#F9FAFB]">
-                    <span class="flex size-10 items-center justify-center rounded-full bg-[#DCE7FB] text-sm font-semibold text-[#00235C]">{{ $inisial }}</span>
-                    <span class="hidden text-left sm:block">
-                        <span class="block text-sm font-semibold leading-5">{{ $namaUser }}</span>
-                        <span class="block text-xs leading-4 text-[#6B7280]">{{ $roleUser }}</span>
-                    </span>
-                    <svg class="size-5 text-[#0A0A0A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>
-                </button>
-                <div x-show="menu" x-cloak x-transition class="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border border-[#E5E7EB] bg-white py-1 shadow-lg">
-                    <a href="{{ route('profil') }}" class="block px-4 py-2 text-sm hover:bg-[#F2F6FD]">Profil saya</a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-[#FF3F3F] hover:bg-[#FFF1F1]">Keluar</button>
-                    </form>
-                </div>
-            </div>
+    <a href="#main-content" class="skip-link">Lewati navigasi</a>
+    <div class="min-w-0 lg:pl-60">
+        <header data-frontend-header class="sticky top-0 z-20 flex min-h-[68px] items-center gap-3 border-b border-gray-100 bg-white px-4 py-3 sm:px-6">
+            <button type="button" x-on:click="sidebar=true" aria-label="Buka menu" aria-controls="student-navigation" :aria-expanded="sidebar" class="flex size-10 items-center justify-center rounded-lg border border-gray-200 lg:hidden"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+            <div class="ml-auto flex items-center gap-3"><span class="flex size-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-brand">{{ $inisial }}</span><span class="hidden text-sm sm:block"><strong class="block">{{ $namaUser }}</strong><span class="text-xs text-gray-500">Mahasiswa</span></span></div>
         </header>
-
-        <main class="mx-auto w-full max-w-[1280px] px-4 pb-10 pt-6 sm:px-8">
-            @yield('content')
-        </main>
+        <main id="main-content" tabindex="-1" class="frontend-main mx-auto w-full max-w-[1440px] px-4 pb-10 pt-6 sm:px-6">@yield('content')</main>
     </div>
-</div>
-</body>
-</html>
+</div>@stack('scripts')
+</body></html>

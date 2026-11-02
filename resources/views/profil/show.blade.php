@@ -17,8 +17,8 @@
         'akun'    => 'Aktif',
     ];
 
-    // Foto: dipakai kalau file public/images/kuwat.jpg ada, kalau tidak tampil inisial.
-    $foto = file_exists(public_path('images/kuwat.jpg')) ? asset('images/kuwat.jpg') : null;
+    // Foto: dipakai kalau file public/images/kuwat.jpeg ada, kalau tidak tampil inisial.
+    $foto = file_exists(public_path('images/kuwat.jpeg')) ? asset('images/kuwat.jpeg') : null;
 
     $info = [
         'Email akun'               => $user['email'],
@@ -163,7 +163,7 @@
 
         <!-- Container Tab dengan Scroll Horizontal -->
         <div class="w-full border-b border-gray-200">
-            <div role="tablist" aria-label="Jenis aktivitas" 
+            <div role="tablist" aria-label="Jenis aktivitas"
                 class="flex overflow-x-auto whitespace-nowrap gap-4 no-scrollbar">
                 @foreach (array_keys($aktivitas) as $nama)
                     <button type="button" role="tab" id="tab-{{ $nama }}"
@@ -172,7 +172,7 @@
                             :class="tab === '{{ $nama }}' ? 'border-brand text-gray-900 font-medium' : 'border-transparent text-gray-400 hover:text-gray-700'"
                             class="-mb-px flex shrink-0 cursor-pointer items-center gap-2 border-b-2 pb-3 pt-1 text-sm transition-colors">
                         <span>{{ $nama }}</span>
-                        
+
                         {{-- Badge Angka --}}
                         <span x-show="tab === '{{ $nama }}'" x-cloak
                             class="flex size-5 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white"
