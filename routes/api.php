@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,12 +25,12 @@ Route::get('/ping', function () {
     ], 200);
 });
 
-Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-    return response()->json([
-        'success' => true,
-        'message' => 'Data profil user berhasil diambil',
-        'data' => $request->user(),
-    ], 200);
+// Autentikasi API (token Sanctum)
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('api.login');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+    Route::get('/me', [AuthController::class, 'me'])->name('api.me');
 });
 
 /*
