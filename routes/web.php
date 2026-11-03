@@ -50,7 +50,7 @@ Route::get('/pengajuan/dosen/baru', [PengajuanController::class, 'createDosen'])
 Route::post('/pengajuan/dosen', [PengajuanController::class, 'storeDosen'])->name('pengajuan.dosen.store');
 Route::view('/pengajuan/dosen', 'dosen.pengajuan.dosen')->name('pengajuan.dosen');
 Route::view('/pengajuan/dosen/{id}', 'dosen.pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('pengajuan.dosen.show');
-Route::view('/pengajuan/mahasiswa', 'dosen.pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
+// Route::view('/pengajuan/mahasiswa', 'dosen.pengajuan.mahasiswa')->name('pengajuan.mahasiswa');
 Route::view('/pengajuan/mahasiswa/{id}', 'dosen.pengajuan.show', ['asal' => 'mahasiswa'])->whereNumber('id')->name('pengajuan.mahasiswa.show');
 
 Route::view('/berita', 'dosen.berita.index')->name('berita.index');
