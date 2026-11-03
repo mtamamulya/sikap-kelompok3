@@ -1,5 +1,5 @@
 @php
-    $mhsActive = request()->is('mahasiswa*', 'profil');
+    $mhsActive = request()->is('mahasiswa*', 'profil*');
 
     $menuMhs = [
         ['label' => 'Mata kuliah',        'url' => url('/mahasiswa/mata-kuliah'), 'match' => 'mahasiswa/mata-kuliah*'],

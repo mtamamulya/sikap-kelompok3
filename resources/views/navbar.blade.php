@@ -1,5 +1,5 @@
 @php
-    $mhsActive = request()->is('mahasiswa*', 'profil');
+    $mhsActive = request()->is('mahasiswa*', 'profil*');
 
     $menuMhs = [
         ['label' => 'Mata kuliah',        'url' => url('/mahasiswa/mata-kuliah'), 'match' => 'mahasiswa/mata-kuliah*'],
@@ -15,8 +15,8 @@
 <aside class="hidden w-60 shrink-0 flex-col gap-6 overflow-y-auto bg-linear-to-b from-[#1f66e5] from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% px-3 py-5 text-white lg:flex sticky top-0 h-screen">
 
     <!-- Logo & Brand Header -->
-    <a href="{{ url('/') }}" class="flex items-center gap-2.5 px-2">
-        <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0" onerror="this.src='https://api.builder.io/api/v1/image/assets/TEMP/89ec6d5eff0263da1bc98643370f3576302d902a?width=92'">
+    <a href="{{ route('dosen.dashboard') }}" class="flex items-center gap-2.5 px-2 hover:opacity-90 transition-opacity">
+        <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0" onerror="this.onerror=null; this.src='https://api.builder.io/api/v1/image/assets/TEMP/89ec6d5eff0263da1bc98643370f3576302d902a?width=92';">
         <span class="text-[13px] font-bold leading-[1.3] text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
     </a>
 

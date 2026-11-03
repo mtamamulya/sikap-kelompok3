@@ -50,7 +50,7 @@
         </div>
 
         {{-- Daftar, dikelompokkan per waktu --}}
-        <div class="flex max-w-4xl flex-col gap-5">
+        <div class="flex w-full flex-col gap-5">
             <template x-for="g in grup" :key="g.judul">
                 <section :aria-label="g.judul" class="flex flex-col gap-2">
                     <h2 class="text-sm font-semibold tracking-wide text-gray-500" x-text="g.judul"></h2>

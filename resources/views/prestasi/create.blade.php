@@ -298,7 +298,7 @@
                     </div>
 
                     <div class="flex flex-col gap-4 p-3.5">
-                        <div class="flex flex-col gap-2">
+                        <!-- <div class="flex flex-col gap-2">
                             <span class="{{ $labelClass }}">File {!! $wajib !!}</span>
                             <label class="relative flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
                                 <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
@@ -313,6 +313,29 @@
                             <template x-if="d.errorFile">
                                 <p role="alert" class="text-sm text-red-600" x-text="d.errorFile"></p>
                             </template>
+                        </div> -->
+
+                        <div class="grid grid-cols-1 gap-4.5 md:grid-cols-2">
+                            <div class="flex flex-col gap-2">
+                                <label :for="`nama-${d.id}`" class="{{ $labelClass }}">Nama dokumen</label>
+                                <input :id="`nama-${d.id}`" :name="`dokumen[${i}][nama]`" type="text" required x-model="d.nama"
+                                       placeholder="Contoh : Proposal pengabdian" class="{{ $inputClass }}">
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label :for="`jenis-${d.id}`" class="{{ $labelClass }}">Jenis dokumen</label>
+                                <div class="relative">
+                                    <select :id="`jenis-${d.id}`" :name="`dokumen[${i}][jenis]`" required x-model="d.jenis" class="{{ $selectClass }}">
+                                        <option value="">Pilih jenis dokumen</option>
+                                        <option>Proposal</option>
+                                        <option>Laporan Kemajuan</option>
+                                        <option>Laporan Akhir</option>
+                                        <option>Surat Tugas</option>
+                                        <option>Luaran</option>
+                                        <option>Lainnya</option>
+                                    </select>
+                                    {!! $chevron !!}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex flex-col gap-2">

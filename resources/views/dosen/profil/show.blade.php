@@ -73,7 +73,7 @@
             <p class="text-2xl text-gray-400">Dashboard / Profil</p>
         </div>
         <div class="mt-2 flex items-center gap-3">
-            <a href="{{ route('dashboard') }}"
+            <a href="{{ route('dosen.dashboard') }}"
                class="flex h-11 items-center gap-2 rounded-md bg-blue-100 px-4 text-base font-medium text-brand hover:bg-blue-200">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
                 Kembali
