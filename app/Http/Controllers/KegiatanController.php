@@ -55,7 +55,7 @@ class KegiatanController extends Controller
                 'jenis' => $k->prestasi?->jenis_prestasi ?? '—',
                 'bentuk' => $k->anggota_count > 1 ? 'Tim' : 'Individu',
                 'penyelenggara' => $k->detail?->penyelenggara ?? '—',
-                'detail_url' => route('kegiatan.show', $k->getKey()),
+                'detail_url' => route($request->routeIs('dosen.*') ? 'dosen.kegiatan.show' : 'kegiatan.show', $k->getKey()),
                 'documents' => $k->dokumen->map(fn ($d) => [
                     'name' => $d->nama_file,
                     'type' => $d->tipe_dokumen,
