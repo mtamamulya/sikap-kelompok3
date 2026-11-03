@@ -70,8 +70,30 @@ class DosenRoutesTest extends TestCase
 
             $this->get(route($routeName, $parameters))
                 ->assertOk()
-                ->assertSee('dosen-shell', false);
+                ->assertSee('class="frontend-shell dosen-shell', false)
+                ->assertDontSee('class="frontend-shell mahasiswa-shell', false);
         }
+    }
+
+    public function test_dosen_activity_list_uses_its_own_content_instead_of_student_summary(): void
+    {
+        $this->get(route('dosen.kegiatan.index'))
+            ->assertOk()
+            ->assertViewIs('dosen.kegiatan.index')
+            ->assertSee('class="frontend-shell dosen-shell', false)
+            ->assertSee('Ajukan Kegiatan')
+            ->assertSee('Status kegiatan')
+            ->assertDontSee('class="frontend-shell mahasiswa-shell', false)
+            ->assertDontSee('Kegiatan per semester')
+            ->assertDontSee('masa perkuliahan')
+            ->assertDontSee('LOMBA')
+            ->assertDontSee('VOLUNTEER')
+            ->assertDontSee('MAGANG');
+
+        $this->get(route('kegiatan.index'))
+            ->assertOk()
+            ->assertSee('class="frontend-shell mahasiswa-shell', false)
+            ->assertSee('Kegiatan per semester');
     }
 
     public function test_dosen_berita_list_keeps_detail_and_edit_links_in_dosen_routes(): void
