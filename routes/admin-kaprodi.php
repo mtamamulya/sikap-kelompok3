@@ -55,15 +55,15 @@ use App\Http\Controllers\KaprodiTandaTanganController;
 
 
 // ---------- Publik ----------
-Route::view('/', 'home')->name('home');
+Route::view('/trk', 'home')->name('home');
 Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('mata-kuliah');
 Route::get('/mata-kuliah/data', [MataKuliahController::class, 'data'])->name('mata-kuliah.data');
 Route::get('/akreditasi', [AkreditasiController::class, 'index'])->name('akreditasi');
 Route::get('/kurikulum', [KurikulumController::class, 'index'])->name('kurikulum');
 Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas');
-Route::get('/kabar', [PublicBeritaController::class, 'index'])->name('berita.index');
-Route::get('/kabar/{slug}', [PublicBeritaController::class, 'show'])->name('berita.show');
-Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+Route::get('/kabar', [PublicBeritaController::class, 'index'])->name('publik.berita.index');
+Route::get('/kabar/{slug}', [PublicBeritaController::class, 'show'])->name('publik.berita.show');
+Route::get('/prestasi-trk', [PrestasiController::class, 'index'])->name('publik.prestasi.index');
 
 // ---------- Login & Pemulihan ----------
 Route::view('/login', 'login')->name('login');
