@@ -2,7 +2,8 @@
     Skrip bersama untuk tabel daftar (Penelitian, Pengabdian, Pengajaran, Prestasi, Kegiatan).
     Taruh <x-tabel-js /> sekali di halaman daftar. Isinya:
       - quickSort : pengurutan QUICK SORT (versi 3 bagian: lebih kecil / sama / lebih besar dari pivot)
-      - tabelData : tambahan untuk komponen Alpine halaman: urut kolom, pagination, jumlah baris per halaman
+      - tabelData : tambahan untuk komponen Alpine halaman: urut kolom, menu kolom (filter nilai, urut naik/turun),
+                    pagination, jumlah baris per halaman. Data halaman harus bernama "daftar".
 
     Cara pakai di halaman:
         Alpine.data('penelitian', (daftar) => tabelData({
@@ -38,6 +39,9 @@
 
     // Menempelkan fitur tabel ke komponen halaman. Getter halaman (terfilter) ikut terbawa.
     window.tabelData = function (halaman, opsi = {}) {
+        // Getter terfilter milik halaman (pencarian / tab) disimpan dulu, lalu dibungkus supaya
+        // filter nilai per kolom dari menu kolom ikut diterapkan di atasnya.
+        const asli = Object.getOwnPropertyDescriptor(halaman, 'terfilter');
         const tambahan = {
             perHalaman: opsi.perHalaman || 5,
             ukuran: [5, 10, 25, 50],
@@ -55,6 +59,61 @@
                 }
                 this.halaman = 1;
             },
+            urutSet(kolom, arah) { this.urutKolom = kolom; this.urutArah = arah; this.halaman = 1; },
+            urutHapus() { this.urutKolom = ''; this.urutArah = 'asc'; this.halaman = 1; },
+
+            // ---- Menu kolom: filter nilai (seperti DataTables) ----
+            pilihan: {},        // kolom => daftar nilai yang dipilih. Kolom yang tidak ada di sini = tidak difilter.
+            menuBuka: '',       // nama kolom yang menunya sedang terbuka
+            menuX: 0, menuY: 0, // posisi menu di layar
+            cariMenu: '',       // kata pencarian di dalam menu
+
+            bukaMenu(kolom, tombol) {
+                if (this.menuBuka === kolom) { this.menuBuka = ''; return; }
+                const r = tombol.getBoundingClientRect(), lebar = 256;
+                this.menuX = Math.max(8, Math.min(r.right - lebar, window.innerWidth - lebar - 8));
+                this.menuY = r.bottom + 4;
+                this.cariMenu = '';
+                this.menuBuka = kolom;
+            },
+            // Teks nilai sebuah baris pada kolom tertentu (dipakai untuk daftar filter dan pencocokan).
+            nilaiTeks(kolom, k) {
+                let v = k[kolom];
+                if ((v === undefined || v === null) && this.kunci[kolom]) v = this.kunci[kolom](k);
+                if (Array.isArray(v)) v = v.join(', ');
+                return v === undefined || v === null ? '' : String(v);
+            },
+            // Semua nilai unik pada kolom (dari seluruh data), diurutkan.
+            nilaiUnik(kolom) {
+                const unik = [...new Set((this.daftar || []).map((k) => this.nilaiTeks(kolom, k)))];
+                return unik.sort((a, b) => this.bandingkan(a, b));
+            },
+            daftarMenu(kolom) {
+                const q = this.cariMenu.trim().toLowerCase();
+                return this.nilaiUnik(kolom).filter((n) => q === '' || n.toLowerCase().includes(q));
+            },
+            adaFilter(kolom) { return Object.prototype.hasOwnProperty.call(this.pilihan, kolom); },
+            dipilih(kolom, nilai) { return !this.adaFilter(kolom) || this.pilihan[kolom].includes(nilai); },
+            toggleNilai(kolom, nilai) {
+                const semua = this.nilaiUnik(kolom);
+                let sekarang = this.adaFilter(kolom) ? [...this.pilihan[kolom]] : [...semua];
+                sekarang = sekarang.includes(nilai) ? sekarang.filter((x) => x !== nilai) : [...sekarang, nilai];
+                const baru = { ...this.pilihan };
+                if (sekarang.length === semua.length) delete baru[kolom]; else baru[kolom] = sekarang;
+                this.pilihan = baru;
+                this.halaman = 1;
+            },
+            pilihSemua(kolom) { const baru = { ...this.pilihan }; delete baru[kolom]; this.pilihan = baru; this.halaman = 1; },
+            kosongkan(kolom) { this.pilihan = { ...this.pilihan, [kolom]: [] }; this.halaman = 1; },
+
+            // Daftar dari halaman (tab / pencarian), lalu disaring lagi oleh filter kolom.
+            get terfilter() {
+                const dasar = asli && asli.get ? asli.get.call(this) : (this.daftar || []);
+                const aktif = Object.keys(this.pilihan);
+                if (!aktif.length) return dasar;
+                return dasar.filter((k) => aktif.every((kol) => this.pilihan[kol].includes(this.nilaiTeks(kol, k))));
+            },
+
             ariaUrut(kolom) {
                 return this.urutKolom === kolom ? (this.urutArah === 'asc' ? 'ascending' : 'descending') : 'none';
             },
