@@ -45,3 +45,4 @@ Route::prefix('integrasi')
     });
 
 Route::get('/berita', [BeritaController::class, 'index']);
+require __DIR__.'/api-admin-kaprodi.php';

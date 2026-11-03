@@ -58,4 +58,10 @@ return [
         ],
 
     ],
+    'data_source' => env('DATA_SOURCE', 'json'),
+    'prodi' => [
+        'kode' => env('PRODI_KODE', 'TRK'),
+        'nama' => env('PRODI_NAMA', 'Teknologi Rekayasa Komputer'),
+        'jenjang' => env('PRODI_JENJANG', 'D4'),   // D3 atau D4; sesuaikan
+    ],
 ];

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Repositories\AkreditasiStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 /** Akreditasi (admin saja). Hanya SATU akreditasi yang boleh aktif. */
 class AdminAkreditasiController extends Controller
@@ -19,7 +18,7 @@ class AdminAkreditasiController extends Controller
         return view('admin.akreditasi', [
             'akreditasi' => $akreditasi,
             'lembagaList' => AkreditasiStore::LEMBAGA,
-            'peringkatList' => AkreditasiStore::PERINGKAT,
+
         ]);
     }
 
@@ -68,14 +67,14 @@ class AdminAkreditasiController extends Controller
     {
         return $request->validate([
             'lembaga' => ['required', 'string', 'max:80'],
-            'peringkat' => ['required', Rule::in(AkreditasiStore::PERINGKAT)],
+
             'nomor_sk' => ['nullable', 'string', 'max:120'],
             'year' => ['required', 'digits:4', 'integer', 'between:1990,2100'],
             'berlaku_sampai' => ['nullable', 'date'],
             'pdf' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
         ], [
             'lembaga.required' => 'Lembaga akreditasi wajib diisi.',
-            'peringkat.required' => 'Peringkat wajib dipilih.',
+
             'year.required' => 'Tahun terbit wajib diisi.',
             'year.digits' => 'Tahun terbit harus 4 angka, mis. 2026.',
             'year.between' => 'Tahun terbit tidak valid.',
