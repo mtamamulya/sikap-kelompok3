@@ -32,7 +32,7 @@
     {{-- Judul halaman + tombol tambah --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-4xl font-bold tracking-tight">Pengabdian</h1>
+            <h1 class="text-3xl font-bold tracking-tight">Pengabdian</h1>
             <p class="text-2xl text-gray-400">Dashboard / Pengabdian</p>
         </div>
         <a href="{{ route('pengabdian.create') }}" class="mt-2 flex h-11 items-center gap-2 rounded-md bg-brand px-4 text-base font-medium text-white hover:bg-blue-700">
@@ -50,11 +50,11 @@
                 <svg class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/>
                 </svg>
-                <input id="q" name="q" type="search" data-table-live-search placeholder="Cari judul pengabdian..."
+                <input id="q" name="q" type="search" placeholder="Cari judul pengabdian..."
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full sm:w-46">
                 <label for="tahun" class="sr-only">Filter tahun</label>
                 <select id="tahun" name="tahun" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>

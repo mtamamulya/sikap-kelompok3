@@ -72,7 +72,7 @@ class KegiatanController extends Controller
             'anggota.user.mahasiswa', 'anggota.user.dosen', 'anggota.user.role',
         ])->findOrFail($id);
 
-        return view('kegiatan.show', [
+        return view($request->routeIs('dosen.*') ? 'dosen.kegiatan.show' : 'kegiatan.show', [
             'id' => $kegiatan->getKey(),
             'catatan' => $kegiatan->statusTerkini?->catatan_revisi,
             'k' => [
