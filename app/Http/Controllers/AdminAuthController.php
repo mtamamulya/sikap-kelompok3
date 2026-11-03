@@ -4,22 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-/**
- * Login SIMULASI untuk admin dan kaprodi (satu form /login).
- * Nanti ganti dengan Auth::attempt() + tabel users + kolom role.
- */
 class AdminAuthController extends Controller
 {
-    /** role => [config akun, key session, route tujuan] */
-    private const ROLE = [
-        'admin'   => ['admin.akun',   'admin',   'admin.dashboard'],
-        'kaprodi' => ['kaprodi.akun', 'kaprodi', 'kaprodi.dashboard'],
-    ];
-
+    /**
+     * Memproses login pengguna dari satu pintu (/login)
+     * dan mengarahkan ke dashboard masing-masing sesuai id_role.
+     */
     public function login(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        // 1. Validasi Input
+        $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ], [
@@ -28,33 +24,42 @@ class AdminAuthController extends Controller
             'password.required' => 'Sandi wajib diisi.',
         ]);
 
-        foreach (self::ROLE as [$cfg, $key, $tujuan]) {
-            $akun = config($cfg);
-
-            if (strcasecmp($data['email'], $akun['email']) !== 0) {
-                continue;
-            }
-
-            if (! hash_equals($akun['password'], $data['password'])) {
-                return back()->withInput($request->only('email'))->withErrors(['password' => 'Email atau sandi salah.']);
-            }
-
+        // 2. Coba Auth via Database
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            $request->session()->forget(array_column(self::ROLE, 1));   // satu sesi = satu peran
-            $request->session()->put($key, ['email' => $akun['email'], 'nama' => $akun['nama']]);
 
-            return redirect()->route($tujuan);
+            $user = Auth::user();
+
+            // Sesi kompatibilitas untuk middleware lama
+            if ($user->id_role == 1) {
+                $request->session()->put('admin', ['email' => $user->email, 'nama' => 'Admin']);
+            } elseif ($user->id_role == 2) {
+                $request->session()->put('kaprodi', ['email' => $user->email, 'nama' => 'Kaprodi']);
+            }
+
+            // 3. Pengalihan Dashboard Berdasarkan id_role
+            return match ((int) $user->id_role) {
+                1 => redirect()->route('admin.dashboard'),
+                2 => redirect()->route('kaprodi.dashboard'),
+                3 => redirect()->route('dosen.dashboard'),
+                4 => redirect()->route('mahasiswa.dashboard'),
+                default => redirect()->route('home'),
+            };
         }
 
-        // Akun selain admin/kaprodi belum tersedia (login dosen/mahasiswa menyusul).
+        // 4. Jika Gagal
         return back()->withInput($request->only('email'))
-            ->withErrors(['email' => 'Akun belum terdaftar. Login dosen dan mahasiswa belum tersedia.']);
+            ->withErrors(['email' => 'Email atau sandi yang Anda masukkan salah.']);
     }
 
-    /** Dipakai admin.logout dan kaprodi.logout. */
+    /**
+     * Memproses keluar (logout) dari sistem.
+     */
     public function logout(Request $request): RedirectResponse
     {
-        $request->session()->forget(array_column(self::ROLE, 1));
+        Auth::logout();
+
+        $request->session()->forget(['admin', 'kaprodi']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

@@ -203,7 +203,7 @@ class PengajuanFormTest extends TestCase
         );
     }
 
-    public function skip_test_teammate_mahasiswa_pages_are_available(): void
+    public function test_teammate_mahasiswa_pages_are_available(): void
     {
         $mahasiswaResponse = $this->get(route('mahasiswa.dashboard'));
         $mahasiswaResponse

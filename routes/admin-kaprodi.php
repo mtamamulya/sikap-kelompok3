@@ -55,7 +55,7 @@ use App\Http\Controllers\KaprodiTandaTanganController;
 
 
 // ---------- Publik ----------
-Route::view('/trk', 'home')->name('home');
+//Route::view('/trk', 'home')->name('home');
 Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('mata-kuliah');
 Route::get('/mata-kuliah/data', [MataKuliahController::class, 'data'])->name('mata-kuliah.data');
 Route::get('/akreditasi', [AkreditasiController::class, 'index'])->name('akreditasi');
