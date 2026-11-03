@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends(request()->routeIs('dosen.*') ? 'layouts.app' : 'layouts.mahasiswa')
 
 @section('title', 'Kegiatan - Teknologi Rekayasa Komputer')
 

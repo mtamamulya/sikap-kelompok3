@@ -69,8 +69,9 @@ class DosenRoutesTest extends TestCase
             $parameters = $route[1] ?? [];
 
             $this->get(route($routeName, $parameters))
-                ->assertOk();
-            // ->assertSee('dosen-shell', false);
+                ->assertOk()
+                ->assertSee('class="frontend-shell dosen-shell', false)
+                ->assertDontSee('class="frontend-shell mahasiswa-shell', false);
         }
     }
 
