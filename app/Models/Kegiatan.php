@@ -35,6 +35,12 @@ class Kegiatan extends Model
             ->latestOfMany('tanggal_status');
     }
 
+    public function timeline(): HasMany
+    {
+        return $this->hasMany(Timeline::class, 'id_kegiatan', 'id_kegiatan')
+            ->orderBy('tanggal_status')->orderBy('id_timeline');
+    }
+
     public function scopeUntukUser(Builder $query, ?User $user): Builder
     {
         if (! $user) {
