@@ -107,6 +107,22 @@
 
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function syncGlobalAvatar() {
+            const savedAvatar = localStorage.getItem('user_avatar_base64');
+            if (savedAvatar) {
+                const avatars = document.querySelectorAll('.global-avatar-sync');
+                avatars.forEach(img => {
+                    img.src = savedAvatar;
+                    img.style.display = 'block';
+                });
+            }
+        }
+        syncGlobalAvatar();
+        window.addEventListener('avatar-updated', syncGlobalAvatar);
+    });
+</script>
 @stack('scripts')
 </body>
 </html>

@@ -1,7 +1,10 @@
-@extends('layouts.pengajuan-app')
+@extends('layouts.app')
 @section('title', $item ? 'Edit Pengajuan' : 'Pengajuan Kegiatan Baru')
 @section('content')
 @php
+    $isDosen = request()->routeIs('pengajuan.dosen.create');
+    $indexRoute = $isDosen ? 'pengajuan.dosen' : 'pengajuan.index';
+    $storeRoute = $isDosen ? 'pengajuan.dosen.store' : 'pengajuan.store';
     $d = $item['data'] ?? [];
     $v = fn ($k, $def = '') => old($k, $d[$k] ?? $def);
     $input = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13px] outline-none placeholder:text-[#9CA3AF] focus:border-[#2277FF]';
@@ -22,7 +25,9 @@
         'Pengabdian' => 'Lokasi Pengabdian',
     ];
     $levels = ['Kabupaten', 'Provinsi', 'Nasional', 'Internasional'];
-    $cancelUrl = $item ? route('pengajuan.show', $item['id']) : route('pengajuan.index');
+    $cancelUrl = $item
+        ? route($isDosen ? 'pengajuan.dosen.show' : 'pengajuan.show', $item['id'])
+        : route($indexRoute);
 @endphp
 <div class="flex flex-col gap-6 px-4 pb-10 pt-7 sm:px-6 lg:px-12"
      x-data="{
@@ -65,7 +70,7 @@
      x-init="$nextTick(() => check()); $watch('category', () => setTimeout(() => check(), 60)); $watch('participation', () => setTimeout(() => check(), 60)); $watch('members', () => check()); $watch('documents', () => check(), { deep: true })">
     <div class="flex flex-col gap-[18px]">
         <div class="flex flex-wrap gap-2.5 text-[13px]">
-            <a href="{{ route('pengajuan.index') }}" class="text-[#6B7280]">Kegiatan</a>
+            <a href="{{ route($indexRoute) }}" class="text-[#6B7280]">Kegiatan</a>
             <span class="text-[#9CA3AF]">/</span>
             <span class="text-[#6B7280]">{{ $item ? 'Edit Pengajuan' : 'Pengajuan Baru' }}</span>
             <span class="text-[#9CA3AF]">/</span>
@@ -77,7 +82,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ $item ? route('pengajuan.update', $item['id']) : route('pengajuan.store') }}" x-ref="form"
+    <form method="POST" action="{{ $item ? route('pengajuan.update', $item['id']) : route($storeRoute) }}" x-ref="form"
           @input="check()" @change="check()"
           @submit="if (!ok) { $event.preventDefault(); } else { submitting = true; }"
           class="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]">

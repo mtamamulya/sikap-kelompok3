@@ -70,13 +70,13 @@
                             <td class="px-2.5 py-3"><span :class="warna[b.status]" class="inline-block rounded-md border px-2 py-0.5 text-[13px]" x-text="b.status"></span></td>
                             <td class="px-2.5 py-2">
                                 <div class="flex items-center gap-3">
-                                    <a :href="`{{ url('/pengajuan/berita') }}/${b.id}`" :aria-label="`Lihat detail ${b.judul}`"
+                                    <a :href="`{{ url('/berita') }}/${b.id}`" :aria-label="`Lihat detail ${b.judul}`"
                                        class="flex size-8 items-center justify-center rounded-lg bg-blue-100 text-brand hover:bg-blue-200">
                                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
                                     </a>
                                     {{-- Edit hanya untuk berita yang masih bisa diubah: Draft dan Direvisi --}}
                                     <template x-if="b.status === 'Draft' || b.status === 'Direvisi'">
-                                        <a :href="`{{ url('/pengajuan/berita') }}/${b.id}/edit`" :aria-label="`Edit ${b.judul}`"
+                                        <a :href="`{{ url('/berita') }}/${b.id}/edit`" :aria-label="`Edit ${b.judul}`"
                                            class="flex size-8 items-center justify-center rounded-lg bg-orange-100 text-orange-400 hover:bg-orange-200">
                                             <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
                                         </a>
