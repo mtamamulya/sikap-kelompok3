@@ -7,7 +7,8 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard');
+// Ganti redirect otomatis ini dengan Landing Page TRK
+Route::view('/', 'home')->name('home');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');
@@ -75,6 +76,7 @@ Route::view('/navbar', 'navbar')->name('navbar');
 
 Route::get('/pengajuan/dashboard', [PengajuanController::class, 'dashboard'])->name('pengajuan.dashboard');
 Route::get('/mahasiswa', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.index');
+
 Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
 Route::get('/mahasiswa/mata-kuliah', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'semua')->name('mahasiswa.mata-kuliah');
 Route::get('/mahasiswa/mata-kuliah/semester-berjalan', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'berjalan')->name('mahasiswa.mata-kuliah.berjalan');
@@ -89,3 +91,4 @@ Route::delete('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'pr
 Route::put('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiUpdate'])->name('mahasiswa.prestasi.update');
 
 require __DIR__.'/pengajuan.php';
+require __DIR__.'/admin-kaprodi.php';

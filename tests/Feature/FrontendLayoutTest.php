@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class FrontendLayoutTest extends TestCase
@@ -30,12 +29,6 @@ class FrontendLayoutTest extends TestCase
                 $this->get('/'.$module.$suffix)->assertOk()->assertSee('class="frontend-shell dosen-shell', false);
             }
         }
-        $this->assertFalse(Route::has('login'));
-        $this->assertFalse(Route::has('logout'));
-        $this->get('/login')->assertNotFound();
-        foreach (['/admin/dashboard', '/kaprodi/dashboard', '/alur/berita', '/alur/template-surat'] as $path) {
-            $this->get($path)->assertNotFound();
-        }
     }
 
     public function test_existing_database_activity_data_and_owner_scope_are_preserved_in_both_layouts(): void
@@ -49,7 +42,9 @@ class FrontendLayoutTest extends TestCase
             $id = DB::table('kegiatan')->insertGetId(['id_kategori' => $category, 'id_user' => $user, 'nama_kegiatan' => $title, 'tanggal_mulai' => now()->toDateString(), 'created_at' => now(), 'updated_at' => now()], 'id_kegiatan');
             DB::table('timeline')->insert(['id_kegiatan' => $id, 'status' => 'diajukan', 'tanggal_status' => now()]);
         }
+
         $this->actingAs(User::findOrFail($ownerId));
+
         $this->get('/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain');
         $this->get('/dosen/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain')->assertViewHas('stats', fn ($stats) => $stats[1]['value'] === 1 && $stats[3]['value'] === 1);
         $this->get('/dosen/kegiatan')->assertOk()
@@ -57,10 +52,10 @@ class FrontendLayoutTest extends TestCase
             ->assertDontSee('class="frontend-shell mahasiswa-shell', false)
             ->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain')
             ->assertViewHas('allActivities', fn ($activities) => $activities->every(fn ($activity) => $activity['detail_url'] === route('dosen.kegiatan.show', $activity['id'])));
+
         $own = DB::table('kegiatan')->where('id_user', $ownerId)->value('id_kegiatan');
         $other = DB::table('kegiatan')->where('id_user', $otherId)->value('id_kegiatan');
 
-        // BARIS BARU:
         $this->get('/dosen/kegiatan/'.$own)->assertOk()->assertSee('Detail Kegiatan');
         $this->get('/dosen/kegiatan/'.$other)->assertNotFound();
         $this->assertDatabaseCount('kegiatan', 2);

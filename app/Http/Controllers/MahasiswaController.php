@@ -72,8 +72,6 @@ class MahasiswaController extends Controller
     {
         abort_unless(in_array($tab, ['semua', 'berjalan', 'riwayat'], true), 404);
 
-        // DATA DUMMY: ganti dengan query Eloquent / API Kelompok 1
-        // Format: [mata kuliah, dosen, tingkat, periode, tahun akademik]
         $arsip = collect([
             ['Kecerdasan Buatan',  'Angga Wahyu Wibowo', 2, 'Ganjil', '2026/2027'],
             ['Jaringan Komputer',  'Kuwat Santoso',      2, 'Ganjil', '2026/2027'],
@@ -87,7 +85,6 @@ class MahasiswaController extends Controller
             ['Internet of Things', 'Tahan Prahara',      2, 'Ganjil', '2026/2027'],
         ])->map(fn ($r) => ['mk' => $r[0], 'dosen' => $r[1], 'tingkat' => $r[2], 'periode' => $r[3], 'tahun' => $r[4], 'sks' => null]);
 
-        // Format: [mata kuliah, dosen, tingkat, periode, SKS]
         $berjalan = collect([
             ['Kecerdasan Buatan',  'Angga Wahyu Wibowo', 2, 'Ganjil', 2],
             ['Jaringan Komputer',  'Kuwat Santoso',      2, 'Ganjil', 4],
@@ -104,7 +101,6 @@ class MahasiswaController extends Controller
             'tahun' => (string) $request->query('tahun'),
         ];
 
-        // Tab "berjalan" = paket semester, tanpa filter. Tab lain memakai keempat filter.
         $rows = $tab === 'berjalan'
             ? $berjalan
             : $arsip->filter(function ($r) use ($filter) {
@@ -134,7 +130,6 @@ class MahasiswaController extends Controller
 
     public function prestasi(Request $request)
     {
-        // DATA DUMMY: ganti dengan query Eloquent / API Kelompok 1
         $semua = collect([
             [
                 'nama' => 'Lomba Inovasi Internet of Things', 'bidang' => 'Teknologi', 'bentuk' => 'Tim',
@@ -194,10 +189,8 @@ class MahasiswaController extends Controller
             'capaianList' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'],
             'jenisList' => ['Akademik', 'Nonakademik'],
             'jenisDokList' => ['Sertifikat', 'Piagam penghargaan', 'Surat tugas', 'Surat keterangan penyelenggara', 'Foto kegiatan', 'Lainnya'],
-            // DATA DUMMY: ganti dengan daftar mahasiswa dari database (untuk pencarian anggota tim)
             'daftarMahasiswa' => ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', config('mahasiswa.nama'), 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'],
             'peranList' => ['Ketua', 'Anggota'],
-            // DATA DUMMY: ganti dengan daftar kegiatan dari database
             'kegiatanList' => [
                 ['label' => 'KMIPN VIII 2026 • Lomba',        'nama' => 'KMIPN VIII 2026',        'penyelenggara' => 'Puspresnas'],
                 ['label' => 'Lomba inovasi IoT 2026 • Lomba', 'nama' => 'Lomba Inovasi IoT 2026', 'penyelenggara' => 'Forum Inovasi Teknologi'],
@@ -210,25 +203,11 @@ class MahasiswaController extends Controller
     {
         $data = $this->validasiPrestasi($request);
 
-        // TODO: simpan ke database. Untuk file bukti beserta jenisnya:
-        // foreach ($request->file('dokumen', []) as $i => $f) {
-        //     $path  = $f->store('prestasi', 'public');
-        //     $jenis = $request->input("jenis_dokumen.$i");
-        // }
-        // Anggota tim (jika bentuk = Tim): $request->input('anggota', []) berisi [['nama' => ..., 'peran' => ...], ...]
-
         return redirect()->route('mahasiswa.prestasi')->with('status', 'Prestasi berhasil disimpan.');
     }
 
-    /**
-     * Halaman edit: memakai ulang form tambah, tetapi terisi data prestasi yang sudah ada.
-     * Route: GET /mahasiswa/prestasi/{prestasi}/edit  (mahasiswa.prestasi.edit)
-     */
     public function prestasiEdit(string $prestasi)
     {
-        // DATA DUMMY: ganti dengan Prestasi::findOrFail($prestasi), lalu pastikan prestasi ini milik
-        // mahasiswa yang login (bukan anggota yang hanya ditag):
-        // abort_unless($data->mahasiswa_id === auth()->id(), 403);
         $data = [
             'id' => $prestasi,
             'sumber' => 'sebelumnya',
@@ -258,38 +237,18 @@ class MahasiswaController extends Controller
         return $this->prestasiTambah()->with('prestasi', $data);
     }
 
-    /**
-     * Simpan perubahan prestasi.
-     * Route: PUT /mahasiswa/prestasi/{prestasi}  (mahasiswa.prestasi.update)
-     */
     public function prestasiUpdate(Request $request, string $prestasi)
     {
-        // abort_unless(prestasi ini milik mahasiswa yang login, 403);
         $data = $this->validasiPrestasi($request);
-
-        // TODO: perbarui data di database.
-        // Dokumen lama yang dihapus pengguna: $request->input('dokumen_hapus', []) berisi id dokumen.
-        // Dokumen baru: $request->file('dokumen', []) dan $request->input('jenis_dokumen', []).
 
         return redirect()->route('mahasiswa.prestasi')->with('status', 'Prestasi berhasil diperbarui.');
     }
 
-    /**
-     * Hapus prestasi.
-     * Route: DELETE /mahasiswa/prestasi/{prestasi}  (mahasiswa.prestasi.hapus)
-     */
     public function prestasiHapus(string $prestasi)
     {
-        // TODO: $data = Prestasi::findOrFail($prestasi);
-        //       abort_unless($data->mahasiswa_id === auth()->id(), 403); // anggota yang ditag tidak boleh menghapus
-        //       $data->delete();
-
         return redirect()->route('mahasiswa.prestasi')->with('status', 'Prestasi berhasil dihapus.');
     }
 
-    /**
-     * Aturan validasi bersama untuk tambah dan edit prestasi.
-     */
     private function validasiPrestasi(Request $request): array
     {
         $tingkat = ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'];
