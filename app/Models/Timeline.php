@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Timeline extends Model
 {
@@ -17,5 +18,10 @@ class Timeline extends Model
         return [
             'tanggal_status' => 'datetime',
         ];
+    }
+
+    public function kegiatan(): BelongsTo
+    {
+        return $this->belongsTo(Kegiatan::class, 'id_kegiatan', 'id_kegiatan');
     }
 }
