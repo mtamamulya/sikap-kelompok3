@@ -202,6 +202,7 @@ class MahasiswaController extends Controller
     public function prestasiSimpan(Request $request)
     {
         $data = $this->validasiPrestasi($request);
+
         return redirect()->route('mahasiswa.prestasi')->with('status', 'Prestasi berhasil disimpan.');
     }
 
@@ -239,6 +240,7 @@ class MahasiswaController extends Controller
     public function prestasiUpdate(Request $request, string $prestasi)
     {
         $data = $this->validasiPrestasi($request);
+
         return redirect()->route('mahasiswa.prestasi')->with('status', 'Prestasi berhasil diperbarui.');
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\AdminBeritaStore;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -23,7 +24,7 @@ class AdminBeritaController extends Controller
         $berita = $this->store->find($id);
         abort_unless($berita, 404);
 
-        $tanggal = $berita['tanggal'] ? \Carbon\Carbon::parse($berita['tanggal'])->locale('id') : null;
+        $tanggal = $berita['tanggal'] ? Carbon::parse($berita['tanggal'])->locale('id') : null;
         $kata = str_word_count(strip_tags($berita['isi']));
 
         return view('admin.berita-detail', [

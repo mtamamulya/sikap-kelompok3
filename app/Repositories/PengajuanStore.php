@@ -49,6 +49,7 @@ class PengajuanStore
                 $out[] = $this->baris($r);
             }
         }
+
         return $out;
     }
 
@@ -61,6 +62,7 @@ class PengajuanStore
                 $out[] = $this->baris($r);
             }
         }
+
         return $out;
     }
 
@@ -138,9 +140,10 @@ class PengajuanStore
         if (! $p->surat_pengajuan_path) {
             return null;
         }
+
         return [
             'nama' => $p->surat_pengajuan_nama ?: basename($p->surat_pengajuan_path),
-            'url'  => Storage::disk('public')->url($p->surat_pengajuan_path),
+            'url' => Storage::disk('public')->url($p->surat_pengajuan_path),
         ];
     }
 
@@ -149,13 +152,13 @@ class PengajuanStore
     private function baris(array $r): array
     {
         return [
-            'id'            => $r['id'],
-            'nama'          => $r['nama'],
-            'kategori'      => $r['kategori'],
-            'pengaju'       => $r['pengaju'],
-            'tanggal'       => $this->tanggalIndo($r['tanggal']),
-            'status'        => $r['status'],
-            'semester'      => $r['semester'],
+            'id' => $r['id'],
+            'nama' => $r['nama'],
+            'kategori' => $r['kategori'],
+            'pengaju' => $r['pengaju'],
+            'tanggal' => $this->tanggalIndo($r['tanggal']),
+            'status' => $r['status'],
+            'semester' => $r['semester'],
             'jenis_pengaju' => $r['jenis_pengaju'],
         ];
     }
@@ -243,18 +246,19 @@ class PengajuanStore
         $out = [];
         foreach ($baris as $i => $b) {
             $identitas = $b['jenis_pengaju'] === 'Dosen'
-                ? '19800101201010100' . ($i + 1)
-                : '3.34.23.' . str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT);
+                ? '19800101201010100'.($i + 1)
+                : '3.34.23.'.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT);
 
             $out[] = array_merge(self::KOSONG, $b, [
-                'id'            => $i + 1,
-                'identitas'     => $identitas,
+                'id' => $i + 1,
+                'identitas' => $identitas,
                 'penyelenggara' => 'Politeknik Negeri Semarang',
-                'lokasi'        => 'Politeknik Negeri Semarang',
-                'anggota'       => $anggota($b['nama']),
-                'dokumen'       => $dokumen,
+                'lokasi' => 'Politeknik Negeri Semarang',
+                'anggota' => $anggota($b['nama']),
+                'dokumen' => $dokumen,
             ]);
         }
+
         return $out;
     }
 }

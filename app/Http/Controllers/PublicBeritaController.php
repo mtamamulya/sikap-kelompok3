@@ -14,7 +14,7 @@ class PublicBeritaController extends Controller
         $semua = collect(config('berita', []))->values();
 
         $perHalaman = 4;
-        $halaman    = LengthAwarePaginator::resolveCurrentPage();
+        $halaman = LengthAwarePaginator::resolveCurrentPage();
 
         $berita = new LengthAwarePaginator(
             $semua->forPage($halaman, $perHalaman)->values(),
@@ -24,7 +24,7 @@ class PublicBeritaController extends Controller
             ['path' => $request->url()]
         );
 
-        $terbaru  = $semua->take(3);
+        $terbaru = $semua->take(3);
         $prestasi = $semua->where('kategori', 'Prestasi')->take(3);
 
         return view('berita-index', compact('berita', 'terbaru', 'prestasi'));

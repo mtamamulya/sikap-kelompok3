@@ -1,61 +1,57 @@
-﻿<?php
+<?php
 
-use Illuminate\Support\Facades\Route;
-
-// ---------- Controller Publik & Landing ----------
-use App\Http\Controllers\PublicBeritaController; // Hasil rename dari BeritaController
-use App\Http\Controllers\MataKuliahController;
-use App\Http\Controllers\AkreditasiController;
-use App\Http\Controllers\KurikulumController;
-use App\Http\Controllers\FasilitasController;
-use App\Http\Controllers\PrestasiController;
-use App\Http\Controllers\PemulihanController;
-use App\Http\Controllers\AdminAuthController;
-
-// ---------- Controller Admin ----------
-use App\Http\Middleware\AdminOnly;
-use App\Http\Controllers\LandingDashboardController; // Hasil rename dari DashboardController
-use App\Http\Controllers\LandingMahasiswaController; // Hasil rename dari MahasiswaController
 use App\Http\Controllers\AdminAkreditasiController;
+// ---------- Controller Publik & Landing ----------
+use App\Http\Controllers\AdminAuthController; // Hasil rename dari BeritaController
+use App\Http\Controllers\AdminBeritaController;
+use App\Http\Controllers\AdminKegiatanDosenDetailShowController;
+use App\Http\Controllers\AdminKegiatanMahasiswaDetailShowController;
 use App\Http\Controllers\AdminKurikulumController;
 use App\Http\Controllers\AdminMataKuliahController;
-use App\Http\Controllers\DosenController;
-use App\Http\Controllers\KegiatanMahasiswaController;
-use App\Http\Controllers\KegiatanDosenController;
-use App\Http\Controllers\KegiatanLaporanController;
-use App\Http\Controllers\KegiatanHapusController;
-use App\Http\Controllers\AdminKegiatanMahasiswaDetailShowController;
-use App\Http\Controllers\AdminKegiatanDosenDetailShowController;
-use App\Http\Controllers\JenisDokumenController;
-use App\Http\Controllers\KategoriKegiatanController;
-use App\Http\Controllers\AdminBeritaController;
 use App\Http\Controllers\AdminPengajuanController;
-use App\Http\Controllers\AdminTinjauPengajuanController;
-use App\Http\Controllers\AdminProfilController;
 use App\Http\Controllers\AdminPrestasiController;
-
-// ---------- Controller Kaprodi ----------
-use App\Http\Middleware\KaprodiOnly;
+// ---------- Controller Admin ----------
+use App\Http\Controllers\AdminProfilController;
+use App\Http\Controllers\AdminTinjauPengajuanController; // Hasil rename dari DashboardController
+use App\Http\Controllers\AkreditasiController; // Hasil rename dari MahasiswaController
+use App\Http\Controllers\DosenController;
+use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\JenisDokumenController;
+use App\Http\Controllers\KaprodiBeritaController;
 use App\Http\Controllers\KaprodiDashboardController;
-use App\Http\Controllers\KaprodiKurikulumController;
-use App\Http\Controllers\KaprodiMataKuliahController;
 use App\Http\Controllers\KaprodiDosenController;
-use App\Http\Controllers\KaprodiMahasiswaController;
+use App\Http\Controllers\KaprodiJenisDokumenController;
+use App\Http\Controllers\KaprodiKategoriKegiatanController;
 use App\Http\Controllers\KaprodiKegiatanDosenController;
+use App\Http\Controllers\KaprodiKegiatanDosenDetailShowController;
 use App\Http\Controllers\KaprodiKegiatanMahasiswaController;
 use App\Http\Controllers\KaprodiKegiatanMahasiswaDetailShowController;
-use App\Http\Controllers\KaprodiKegiatanDosenDetailShowController;
-use App\Http\Controllers\KaprodiBeritaController;
-use App\Http\Controllers\KaprodiKategoriKegiatanController;
-use App\Http\Controllers\KaprodiJenisDokumenController;
+use App\Http\Controllers\KaprodiKurikulumController;
+use App\Http\Controllers\KaprodiMahasiswaController;
+use App\Http\Controllers\KaprodiMataKuliahController;
 use App\Http\Controllers\KaprodiPengajuanController;
-use App\Http\Controllers\KaprodiProfilController;
 use App\Http\Controllers\KaprodiPrestasiController;
+// ---------- Controller Kaprodi ----------
+use App\Http\Controllers\KaprodiProfilController;
 use App\Http\Controllers\KaprodiTandaTanganController;
-
+use App\Http\Controllers\KategoriKegiatanController;
+use App\Http\Controllers\KegiatanDosenController;
+use App\Http\Controllers\KegiatanHapusController;
+use App\Http\Controllers\KegiatanLaporanController;
+use App\Http\Controllers\KegiatanMahasiswaController;
+use App\Http\Controllers\KurikulumController;
+use App\Http\Controllers\LandingDashboardController;
+use App\Http\Controllers\LandingMahasiswaController;
+use App\Http\Controllers\MataKuliahController;
+use App\Http\Controllers\PemulihanController;
+use App\Http\Controllers\PrestasiController;
+use App\Http\Controllers\PublicBeritaController;
+use App\Http\Middleware\AdminOnly;
+use App\Http\Middleware\KaprodiOnly;
+use Illuminate\Support\Facades\Route;
 
 // ---------- Publik ----------
-//Route::view('/trk', 'home')->name('home');
+// Route::view('/trk', 'home')->name('home');
 Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('mata-kuliah');
 Route::get('/mata-kuliah/data', [MataKuliahController::class, 'data'])->name('mata-kuliah.data');
 Route::get('/akreditasi', [AkreditasiController::class, 'index'])->name('akreditasi');
@@ -183,7 +179,7 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
         'admin.prestasi',
         'admin.prestasi.create',
         'admin.prestasi.show',
-        'admin.prestasi.edit'
+        'admin.prestasi.edit',
     ];
 
     foreach (config('admin.menu') as $m) {

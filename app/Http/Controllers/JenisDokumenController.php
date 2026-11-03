@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class JenisDokumenController extends Controller
 {
-    public function __construct(private JenisDokumenStore $store)
-    {
-    }
+    public function __construct(private JenisDokumenStore $store) {}
 
     public function index()
     {
@@ -59,11 +57,11 @@ class JenisDokumenController extends Controller
     private function validasi(Request $request): array
     {
         return $request->validate([
-            'name'        => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:255'],
         ], [
             'name.required' => 'Nama jenis dokumen wajib diisi.',
-            'name.max'      => 'Nama jenis dokumen maksimal 100 karakter.',
+            'name.max' => 'Nama jenis dokumen maksimal 100 karakter.',
         ]);
     }
 

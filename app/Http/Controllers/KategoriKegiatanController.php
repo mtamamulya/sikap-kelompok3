@@ -9,14 +9,12 @@ use Illuminate\Validation\Rule;
 
 class KategoriKegiatanController extends Controller
 {
-    public function __construct(private KategoriKegiatanStore $store)
-    {
-    }
+    public function __construct(private KategoriKegiatanStore $store) {}
 
     public function index()
     {
         return view('admin.kategori-kegiatan', [
-            'rows'  => $this->store->all(),
+            'rows' => $this->store->all(),
             'jenis' => KategoriKegiatanStore::JENIS,
         ]);
     }
@@ -25,7 +23,7 @@ class KategoriKegiatanController extends Controller
     public function create()
     {
         return view('admin.kategori-kegiatan-form', [
-            'row'   => null,
+            'row' => null,
             'jenis' => KategoriKegiatanStore::JENIS,
         ]);
     }
@@ -38,7 +36,7 @@ class KategoriKegiatanController extends Controller
         abort_if(! $row, 404);
 
         return view('admin.kategori-kegiatan-form', [
-            'row'   => $row,
+            'row' => $row,
             'jenis' => KategoriKegiatanStore::JENIS,
         ]);
     }
@@ -96,15 +94,15 @@ class KategoriKegiatanController extends Controller
     private function validasi(Request $request): array
     {
         return $request->validate([
-            'name'           => ['required', 'string', 'max:100'],
-            'jenis'          => ['required', Rule::in(KategoriKegiatanStore::JENIS)],
-            'description'    => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
+            'jenis' => ['required', Rule::in(KategoriKegiatanStore::JENIS)],
+            'description' => ['nullable', 'string', 'max:255'],
             'template_surat' => ['nullable', 'string'],
         ], [
-            'name.required'  => 'Nama kategori wajib diisi.',
-            'name.max'       => 'Nama kategori maksimal 100 karakter.',
+            'name.required' => 'Nama kategori wajib diisi.',
+            'name.max' => 'Nama kategori maksimal 100 karakter.',
             'jenis.required' => 'Jenis kegiatan wajib dipilih.',
-            'jenis.in'       => 'Jenis kegiatan tidak valid.',
+            'jenis.in' => 'Jenis kegiatan tidak valid.',
         ]);
     }
 

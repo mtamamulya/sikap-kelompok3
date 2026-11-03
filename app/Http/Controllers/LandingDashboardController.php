@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 class LandingDashboardController extends Controller
 {
     public function index()
@@ -36,7 +38,7 @@ class LandingDashboardController extends Controller
     }
 
     /** Halaman menu sidebar yang isinya belum dibuat. */
-    public function placeholder(\Illuminate\Http\Request $request)
+    public function placeholder(Request $request)
     {
         $nama = $request->route()->getName();
         $judul = 'Halaman';

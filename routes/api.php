@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\BeritaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\BeritaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,11 +17,11 @@ Route::get('/ping', function () {
     return response()->json([
         'success' => true,
         'message' => 'Service Kelompok 3 Aktif',
-        'data'    => [
-            'status'  => 'ok',
+        'data' => [
+            'status' => 'ok',
             'service' => 'sikap-kelompok3',
-            'time'    => now()->toIso8601String(),
-        ]
+            'time' => now()->toIso8601String(),
+        ],
     ], 200);
 });
 
@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
     return response()->json([
         'success' => true,
         'message' => 'Data profil user berhasil diambil',
-        'data'    => $request->user(),
+        'data' => $request->user(),
     ], 200);
 });
 

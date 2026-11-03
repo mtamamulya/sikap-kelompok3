@@ -14,7 +14,7 @@ class PrestasiController extends Controller
         $semua = collect(config('prestasi', []))->values();
 
         $perHalaman = 8;
-        $halaman    = LengthAwarePaginator::resolveCurrentPage();
+        $halaman = LengthAwarePaginator::resolveCurrentPage();
 
         $prestasi = new LengthAwarePaginator(
             $semua->forPage($halaman, $perHalaman)->values(),

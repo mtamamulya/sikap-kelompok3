@@ -43,7 +43,7 @@ class JenisDokumenStore
     public function create(string $name, ?string $description): array
     {
         $rows = $this->all();
-        $id   = $rows ? max(array_column($rows, 'id')) + 1 : 1;
+        $id = $rows ? max(array_column($rows, 'id')) + 1 : 1;
 
         $row = ['id' => $id, 'name' => $name, 'description' => $description ?? ''];
         $rows[] = $row;
@@ -58,7 +58,7 @@ class JenisDokumenStore
 
         foreach ($rows as &$r) {
             if ((string) $r['id'] === $id) {
-                $r['name']        = $name;
+                $r['name'] = $name;
                 $r['description'] = $description ?? '';
                 $this->write($rows);
 
@@ -71,8 +71,8 @@ class JenisDokumenStore
 
     public function delete(string $id): bool
     {
-        $rows  = $this->all();
-        $baru  = array_values(array_filter($rows, fn ($r) => (string) $r['id'] !== $id));
+        $rows = $this->all();
+        $baru = array_values(array_filter($rows, fn ($r) => (string) $r['id'] !== $id));
 
         if (count($baru) === count($rows)) {
             return false;

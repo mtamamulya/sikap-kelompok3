@@ -47,16 +47,16 @@ class KategoriKegiatanStore
     public function create(string $name, string $jenis, ?string $description, ?string $template_surat = null): array
     {
         $rows = $this->all();
-        $id   = $rows ? max(array_column($rows, 'id')) + 1 : 1;
+        $id = $rows ? max(array_column($rows, 'id')) + 1 : 1;
 
         $row = [
-            'id'             => $id, 
-            'name'           => $name, 
-            'jenis'          => $jenis, 
-            'description'    => $description ?? '',
-            'template_surat' => $template_surat ?? ''
+            'id' => $id,
+            'name' => $name,
+            'jenis' => $jenis,
+            'description' => $description ?? '',
+            'template_surat' => $template_surat ?? '',
         ];
-        
+
         $rows[] = $row;
         $this->write($rows);
 
@@ -69,11 +69,11 @@ class KategoriKegiatanStore
 
         foreach ($rows as &$r) {
             if ((string) $r['id'] === $id) {
-                $r['name']           = $name;
-                $r['jenis']          = $jenis;
-                $r['description']    = $description ?? '';
+                $r['name'] = $name;
+                $r['jenis'] = $jenis;
+                $r['description'] = $description ?? '';
                 $r['template_surat'] = $template_surat ?? '';
-                
+
                 $this->write($rows);
 
                 return $r;

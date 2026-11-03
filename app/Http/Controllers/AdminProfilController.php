@@ -15,11 +15,11 @@ class AdminProfilController extends Controller
         $s = is_array($s) ? $s : [];
 
         $p = [
-            'nama'   => $s['nama']  ?? 'Admin TRK',
-            'email'  => $s['email'] ?? 'trk@admin.polines.ac.id',
-            'nip'    => $s['nip']   ?? '-',
-            'peran'  => 'Admin',
-            'unit'   => $s['unit']  ?? 'Prodi Teknologi Rekayasa Komputer',
+            'nama' => $s['nama'] ?? 'Admin TRK',
+            'email' => $s['email'] ?? 'trk@admin.polines.ac.id',
+            'nip' => $s['nip'] ?? '-',
+            'peran' => 'Admin',
+            'unit' => $s['unit'] ?? 'Prodi Teknologi Rekayasa Komputer',
             'kampus' => 'Politeknik Negeri Semarang',
             'status' => 'Aktif',
         ];

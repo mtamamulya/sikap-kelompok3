@@ -21,7 +21,8 @@ use Illuminate\Validation\ValidationException;
 class TandaTanganStore
 {
     private const FILE = 'kaprodi/tanda-tangan.json';
-    private const DIR  = 'kaprodi/tanda-tangan';
+
+    private const DIR = 'kaprodi/tanda-tangan';
 
     /** Kunci kaprodi yang sedang login (TODO-DB: ganti dengan id_user). */
     public static function kunci(): string
@@ -46,14 +47,14 @@ class TandaTanganStore
     /** Simpan (atau ganti) tanda tangan. PNG di-encode ulang lewat GD bila tersedia. */
     public function simpan(string $kunci, UploadedFile $file): array
     {
-        $isi  = $this->bersihkan($file);
+        $isi = $this->bersihkan($file);
         $disk = Storage::disk('local');
-        $path = self::DIR . '/' . Str::uuid() . '.png';
+        $path = self::DIR.'/'.Str::uuid().'.png';
 
         $disk->put($path, $isi);
 
         $semua = $this->semua();
-        $lama  = $semua[$kunci]['path'] ?? null;
+        $lama = $semua[$kunci]['path'] ?? null;
 
         $semua[$kunci] = ['path' => $path, 'diunggah_pada' => now()->toIso8601String()];
         $this->tulis($semua);
@@ -73,7 +74,7 @@ class TandaTanganStore
             return null;
         }
 
-        $tujuan = 'surat/tanda-tangan/' . $idPengajuan . '-' . Str::random(8) . '.png';
+        $tujuan = 'surat/tanda-tangan/'.$idPengajuan.'-'.Str::random(8).'.png';
         Storage::disk('local')->copy($row['path'], $tujuan);
 
         return $tujuan;
@@ -84,7 +85,7 @@ class TandaTanganStore
     private function bersihkan(UploadedFile $file): string
     {
         $mentah = (string) file_get_contents($file->getRealPath());
-        $info   = @getimagesizefromstring($mentah);
+        $info = @getimagesizefromstring($mentah);
 
         if (! $info || $info[2] !== IMAGETYPE_PNG) {
             throw ValidationException::withMessages(['tanda_tangan' => 'File harus berupa gambar PNG yang valid.']);

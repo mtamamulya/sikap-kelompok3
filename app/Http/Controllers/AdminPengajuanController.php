@@ -7,9 +7,7 @@ use App\Repositories\PengajuanStore;
 /** Daftar pengajuan sisi admin: hanya yang masih perlu ditinjau (Diajukan / Direvisi). */
 class AdminPengajuanController extends Controller
 {
-    public function __construct(private PengajuanStore $pengajuan)
-    {
-    }
+    public function __construct(private PengajuanStore $pengajuan) {}
 
     public function index()
     {

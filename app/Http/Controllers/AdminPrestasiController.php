@@ -19,12 +19,12 @@ class AdminPrestasiController extends Controller
     public function show($id)
     {
         $rows = $this->daftar();
-        
+
         // Mencari 1 data prestasi yang id-nya sesuai dengan parameter $id dari URL
         $prestasi = collect($rows)->firstWhere('id', (int) $id);
 
         // Jika data tidak ditemukan, tampilkan error 404
-        if (!$prestasi) {
+        if (! $prestasi) {
             abort(404);
         }
 
@@ -50,7 +50,7 @@ class AdminPrestasiController extends Controller
         $rows = $this->daftar();
         $prestasi = collect($rows)->firstWhere('id', (int) $id);
 
-        if (!$prestasi) {
+        if (! $prestasi) {
             abort(404);
         }
 
@@ -96,14 +96,14 @@ class AdminPrestasiController extends Controller
             $j = $judul[$i % count($judul)];
             $u = $unggah[$i % count($unggah)];
             $rows[] = [
-                'id'         => $i + 1,
-                'nama'       => $j[0],
-                'kategori'   => $j[1],
+                'id' => $i + 1,
+                'nama' => $j[0],
+                'kategori' => $j[1],
                 'pengunggah' => $u[0],
-                'tipe'       => $u[1],
-                'anggota'    => $u[2],
-                'tanggal'    => (($i % 27) + 1).' '.$bulan[$i % 10].' 2026',
-                'semester'   => $i % 2 === 0 ? 'Ganjil' : 'Genap',
+                'tipe' => $u[1],
+                'anggota' => $u[2],
+                'tanggal' => (($i % 27) + 1).' '.$bulan[$i % 10].' 2026',
+                'semester' => $i % 2 === 0 ? 'Ganjil' : 'Genap',
             ];
         }
 

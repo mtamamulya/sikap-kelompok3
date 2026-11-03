@@ -24,16 +24,15 @@ class KaprodiPengajuanController extends Controller
 {
     private const STATUS = [
         'setujui' => 'Disetujui',
-        'revisi'  => 'Direvisi',
-        'tolak'   => 'Ditolak',
+        'revisi' => 'Direvisi',
+        'tolak' => 'Ditolak',
     ];
 
     public function __construct(
         private PengajuanStore $pengajuan,
         private SuratPersetujuanStore $surat,
         private TandaTanganStore $ttd,
-    ) {
-    }
+    ) {}
 
     /** Daftar: semua pengajuan yang pernah dikirim admin ke kaprodi */
     public function index()
@@ -44,16 +43,16 @@ class KaprodiPengajuanController extends Controller
     /** Detail + pratinjau surat + tombol tanda tangan */
     public function show(string $id)
     {
-        $p    = $this->untukKaprodi($id);
+        $p = $this->untukKaprodi($id);
         $snap = $this->surat->find((string) $p->id);
 
         $sudahTtd = $p->status === 'Disetujui' && ! empty($snap['tanda_tangan_path']);
-        $bisaTtd  = $p->status === PengajuanStore::MENUNGGU_TTD && $snap !== null;
+        $bisaTtd = $p->status === PengajuanStore::MENUNGGU_TTD && $snap !== null;
         $ttdAktif = $this->ttd->aktif(TandaTanganStore::kunci()) !== null;
 
         // Surat final memakai salinan di surat; sebelum itu, pratinjau memakai tanda tangan aktif
         if ($sudahTtd) {
-            $ttdUrl = route('kaprodi.pengajuan.ttd', $p->id) . '?v=' . strtotime((string) ($snap['ditandatangani_pada'] ?? 'now'));
+            $ttdUrl = route('kaprodi.pengajuan.ttd', $p->id).'?v='.strtotime((string) ($snap['ditandatangani_pada'] ?? 'now'));
         } else {
             $ttdUrl = $ttdAktif ? route('kaprodi.tanda-tangan.gambar') : null;
         }
@@ -61,26 +60,26 @@ class KaprodiPengajuanController extends Controller
         [$namaKaprodi, $nipKaprodi] = $this->identitasKaprodi($snap, $sudahTtd);
 
         return view('kaprodi.tinjau-pengajuan', [
-            'id'              => (string) $p->id,
-            'judul'           => $p->nama,
-            'status'          => $p->status,
-            'info'            => $this->pengajuan->info($p),
-            'anggota'         => $this->pengajuan->anggota($p),
-            'dokumen'         => $this->pengajuan->dokumen($p),
-            'riwayat'         => $p->riwayat,
-            'catatan'         => $p->catatan_kaprodi,
-            'nomorSurat'      => $p->nomor_surat,
-            'isiSurat'        => ! empty($snap['isi_surat']) ? nl2br(e($snap['isi_surat'])) : null,
-            'tanggalSurat'    => $snap['tanggal_surat'] ?? null,
-            'adaLampiran'     => (bool) ($snap['lampiran_peserta'] ?? false),
-            'peserta'         => $snap['peserta'] ?? [],
+            'id' => (string) $p->id,
+            'judul' => $p->nama,
+            'status' => $p->status,
+            'info' => $this->pengajuan->info($p),
+            'anggota' => $this->pengajuan->anggota($p),
+            'dokumen' => $this->pengajuan->dokumen($p),
+            'riwayat' => $p->riwayat,
+            'catatan' => $p->catatan_kaprodi,
+            'nomorSurat' => $p->nomor_surat,
+            'isiSurat' => ! empty($snap['isi_surat']) ? nl2br(e($snap['isi_surat'])) : null,
+            'tanggalSurat' => $snap['tanggal_surat'] ?? null,
+            'adaLampiran' => (bool) ($snap['lampiran_peserta'] ?? false),
+            'peserta' => $snap['peserta'] ?? [],
             'lampiranDokumen' => array_column($snap['lampiran_dokumen'] ?? [], 'nama'),
-            'namaKaprodi'     => $namaKaprodi,
-            'nipKaprodi'      => $nipKaprodi,
-            'ttdUrl'          => $ttdUrl,
-            'ttdAktif'        => $ttdAktif,
-            'sudahTtd'        => $sudahTtd,
-            'bisaTtd'         => $bisaTtd,
+            'namaKaprodi' => $namaKaprodi,
+            'nipKaprodi' => $nipKaprodi,
+            'ttdUrl' => $ttdUrl,
+            'ttdAktif' => $ttdAktif,
+            'sudahTtd' => $sudahTtd,
+            'bisaTtd' => $bisaTtd,
         ]);
     }
 
@@ -90,18 +89,18 @@ class KaprodiPengajuanController extends Controller
         $p = $this->untukKaprodi($id);
 
         $data = $request->validate([
-            'aksi'    => ['required', 'in:setujui,revisi,tolak'],
+            'aksi' => ['required', 'in:setujui,revisi,tolak'],
             'catatan' => ['nullable', 'string', 'max:1000', 'required_if:aksi,revisi,tolak'],
         ], [
             'catatan.required_if' => 'Catatan wajib diisi saat meminta revisi atau menolak.',
-            'catatan.max'         => 'Catatan maksimal 1000 karakter.',
+            'catatan.max' => 'Catatan maksimal 1000 karakter.',
         ]);
 
         if ($p->status !== PengajuanStore::MENUNGGU_TTD) {
             return back()->withErrors(['aksi' => 'Pengajuan ini tidak sedang menunggu tanda tangan.']);
         }
 
-        $status  = self::STATUS[$data['aksi']];
+        $status = self::STATUS[$data['aksi']];
         $catatan = trim((string) ($data['catatan'] ?? ''));
         $tanggal = Carbon::now()->locale('id')->translatedFormat('d F Y');
 
@@ -118,13 +117,13 @@ class KaprodiPengajuanController extends Controller
 
             [$nama, $nip] = $this->identitasKaprodi($snap, false);
 
-            $snap['tanda_tangan_path']   = $salinan;
+            $snap['tanda_tangan_path'] = $salinan;
             $snap['ditandatangani_pada'] = Carbon::now()->toIso8601String();
-            $snap['kaprodi']             = ['nama' => $nama, 'nip' => $nip];
+            $snap['kaprodi'] = ['nama' => $nama, 'nip' => $nip];
             $this->surat->save((string) $p->id, $snap);
 
             $this->pengajuan->simpanKeputusan($p, [
-                'status'          => 'Disetujui',
+                'status' => 'Disetujui',
                 'catatan_kaprodi' => null,
             ], "Ditandatangani dan disetujui oleh Kaprodi, {$tanggal}");
 
@@ -134,13 +133,13 @@ class KaprodiPengajuanController extends Controller
         }
 
         // Revisi / tolak: kembali ke admin (catatan tampil di halaman admin)
-        $baris = "{$status} oleh Kaprodi, {$tanggal}" . ($catatan !== '' ? ": {$catatan}" : '');
+        $baris = "{$status} oleh Kaprodi, {$tanggal}".($catatan !== '' ? ": {$catatan}" : '');
 
         $this->pengajuan->simpanKeputusan($p, [
-            'status'          => $status,
-            'catatan'         => $catatan !== '' ? $catatan : null,
+            'status' => $status,
+            'catatan' => $catatan !== '' ? $catatan : null,
             'catatan_kaprodi' => $catatan !== '' ? $catatan : null,
-            'nomor_surat'     => null,
+            'nomor_surat' => null,
         ], $baris);
 
         return redirect()
@@ -151,14 +150,14 @@ class KaprodiPengajuanController extends Controller
     /** Gambar tanda tangan pada surat yang SUDAH ditandatangani (salinan snapshot) */
     public function ttdSurat(string $id)
     {
-        $p    = $this->untukKaprodi($id);
+        $p = $this->untukKaprodi($id);
         $snap = $this->surat->find((string) $p->id);
         $path = $snap['tanda_tangan_path'] ?? null;
 
         abort_unless($path && Storage::disk('local')->exists($path), 404);
 
         return Storage::disk('local')->response($path, null, [
-            'Cache-Control'          => 'private, no-cache',
+            'Cache-Control' => 'private, no-cache',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }

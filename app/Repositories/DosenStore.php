@@ -20,7 +20,9 @@ use Illuminate\Support\Str;
 class DosenStore
 {
     public const JABATAN = ['Asisten Ahli', 'Lektor', 'Lektor Kepala', 'Guru Besar'];
+
     public const GOLONGAN = ['III/a', 'III/b', 'III/c', 'III/d', 'IV/a', 'IV/b', 'IV/c', 'IV/d', 'IV/e'];
+
     public const ROLE = ['dosen' => 'Dosen', 'kaprodi' => 'Kaprodi'];
 
     private const PATH = 'admin/dosen.json';

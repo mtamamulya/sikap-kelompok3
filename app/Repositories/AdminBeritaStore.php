@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 class AdminBeritaStore
 {
     public const KEGIATAN = ['Prestasi Mahasiswa', 'Prestasi Dosen', 'Kunjungan Industri', 'Info Akademik', 'Lomba', 'Magang'];
+
     public const STATUS = ['Publish', 'Draft', 'Pengajuan'];
 
     /** TODO-DB: ganti dengan query tabel kegiatan (mahasiswa/dosen yang sudah divalidasi). */

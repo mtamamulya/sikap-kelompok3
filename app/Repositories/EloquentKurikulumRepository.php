@@ -27,7 +27,7 @@ class EloquentKurikulumRepository implements KurikulumRepository
                 'id' => (string) $k->id,
                 'nama' => $k->nama,
                 'pdf_url' => Storage::disk('public')->url($k->pdf_path),
-                'file_name' => str($k->nama)->slug() . '.pdf',
+                'file_name' => str($k->nama)->slug().'.pdf',
             ])
             ->all();
     }

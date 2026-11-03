@@ -19,15 +19,15 @@ class KaprodiTandaTanganController extends Controller
         $request->validate([
             'tanda_tangan' => ['required', 'file', 'mimetypes:image/png', 'max:1024', 'dimensions:max_width=2000,max_height=2000'],
         ], [
-            'tanda_tangan.required'   => 'Pilih gambar tanda tangan terlebih dahulu.',
-            'tanda_tangan.mimetypes'  => 'Tanda tangan harus berupa PNG.',
-            'tanda_tangan.max'        => 'Ukuran tanda tangan maksimal 1 MB.',
+            'tanda_tangan.required' => 'Pilih gambar tanda tangan terlebih dahulu.',
+            'tanda_tangan.mimetypes' => 'Tanda tangan harus berupa PNG.',
+            'tanda_tangan.max' => 'Ukuran tanda tangan maksimal 1 MB.',
             'tanda_tangan.dimensions' => 'Dimensi gambar maksimal 2000 x 2000 piksel.',
         ]);
 
         $store->simpan(TandaTanganStore::kunci(), $request->file('tanda_tangan'));
 
-        return response()->json(['url' => route('kaprodi.tanda-tangan.gambar') . '?v=' . time()]);
+        return response()->json(['url' => route('kaprodi.tanda-tangan.gambar').'?v='.time()]);
     }
 
     /** GET /kaprodi/tanda-tangan/gambar : tanda tangan aktif kaprodi yang sedang login */
@@ -37,7 +37,7 @@ class KaprodiTandaTanganController extends Controller
         abort_unless($row, 404);
 
         return Storage::disk('local')->response($row['path'], null, [
-            'Cache-Control'          => 'private, no-cache',
+            'Cache-Control' => 'private, no-cache',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }

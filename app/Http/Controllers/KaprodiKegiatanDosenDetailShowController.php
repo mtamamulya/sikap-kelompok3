@@ -39,10 +39,10 @@ class KaprodiKegiatanDosenDetailShowController extends Controller
 
     private function susunDetail(array $row): array
     {
-        $judul   = $this->ambil($row, ['kegiatan', 'nama_kegiatan', 'nama', 'judul', 'name', 'title']);
+        $judul = $this->ambil($row, ['kegiatan', 'nama_kegiatan', 'nama', 'judul', 'name', 'title']);
         $pengaju = $this->ambil($row, ['dosen', 'pengaju', 'nama_dosen']);
         $tanggal = $this->ambil($row, ['tanggal', 'tgl', 'date']);
-        $status  = $this->ambil($row, ['status'], 'Diajukan');
+        $status = $this->ambil($row, ['status'], 'Diajukan');
 
         // Riwayat: pakai bawaan data bila ada, kalau tidak disusun dari data yang tersedia.
         $riwayat = $row['riwayat'] ?? [
@@ -51,16 +51,16 @@ class KaprodiKegiatanDosenDetailShowController extends Controller
         ];
 
         return [
-            'judul'         => $judul,
-            'status'        => $status,
-            'pengaju'       => $pengaju,
-            'kategori'      => $this->ambil($row, ['kategori', 'category']),
-            'jenis'         => 'Kegiatan dosen',
+            'judul' => $judul,
+            'status' => $status,
+            'pengaju' => $pengaju,
+            'kategori' => $this->ambil($row, ['kategori', 'category']),
+            'jenis' => 'Kegiatan dosen',
             'penyelenggara' => $this->ambil($row, ['penyelenggara', 'organizer']),
-            'tanggal'       => $tanggal,
-            'anggota'       => $row['anggota'] ?? [['nama' => $pengaju, 'status' => 'Pengaju']],
-            'dokumen'       => $row['dokumen'] ?? [],
-            'riwayat'       => $riwayat,
+            'tanggal' => $tanggal,
+            'anggota' => $row['anggota'] ?? [['nama' => $pengaju, 'status' => 'Pengaju']],
+            'dokumen' => $row['dokumen'] ?? [],
+            'riwayat' => $riwayat,
         ];
     }
 }

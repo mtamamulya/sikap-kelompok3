@@ -15,11 +15,11 @@ class KaprodiProfilController extends Controller
         $s = is_array($s) ? $s : [];
 
         $p = [
-            'nama'   => $s['nama']  ?? 'Kaprodi TRK',
-            'email'  => $s['email'] ?? 'trk@kaprodi.polines.ac.id',
-            'nip'    => $s['nip']   ?? '-',
-            'peran'  => 'Kaprodi',
-            'unit'   => $s['unit']  ?? 'Prodi Teknologi Rekayasa Komputer',
+            'nama' => $s['nama'] ?? 'Kaprodi TRK',
+            'email' => $s['email'] ?? 'trk@kaprodi.polines.ac.id',
+            'nip' => $s['nip'] ?? '-',
+            'peran' => 'Kaprodi',
+            'unit' => $s['unit'] ?? 'Prodi Teknologi Rekayasa Komputer',
             'kampus' => 'Politeknik Negeri Semarang',
             'status' => 'Aktif',
         ];

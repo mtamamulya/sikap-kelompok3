@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 class AkreditasiStore
 {
     public const PERINGKAT = ['Unggul', 'Baik Sekali', 'Baik'];
+
     public const LEMBAGA = ['BAN-PT', 'LAM INFOKOM', 'LAMEMBA', 'LAM TEKNIK'];
 
     private const PATH = 'admin/akreditasi.json';
