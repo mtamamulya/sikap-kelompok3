@@ -1,7 +1,7 @@
 /* Shared presentation rules for the existing student pages and Naya's lecturer UI. */
 .frontend-main{min-width:0;overflow-wrap:anywhere}
 .frontend-main :where(.grid,.flex)>:where(div,section,article,aside,form,dl){min-width:0}
-.frontend-main :where(section,article,fieldset,form,main){max-width:100%}
+.frontend-main :where(section,article,fieldset,form,main):not([class*="max-w-"]){max-width:100%}
 .frontend-main img{max-width:100%}
 .frontend-main :where(input,select,textarea){min-width:0;max-width:100%}
 .frontend-shell :where(a,button,input,select,textarea,summary):focus-visible{outline:3px solid #2277ff;outline-offset:3px}

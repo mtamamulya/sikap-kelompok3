@@ -6,8 +6,8 @@
     // DATA TIRUAN. $id berasal dari alamat (/pengajaran/{id}/edit).
     // Nanti diganti data pengajaran dari controller / database oleh tim backend.
     $daftarTahunAkademik = ['2025/2026 Ganjil', '2025/2026 Genap', '2024/2025 Ganjil', '2024/2025 Genap'];
-    $daftarProdi  = ['D3 Teknik Informatika', 'D4 Teknik Informatika', 'D4 Teknologi Rekayasa Komputer', 'D3 Teknik Elektronika', 'D4 Teknik Telekomunikasi'];
-    $daftarKelas  = ['TI-1A', 'TI-1B', 'TI-1C', 'TI-2A', 'TI-2B', 'TI-2C', 'TI-3A', 'TI-3B', 'TI-3C'];
+    $daftarProdi  = ['D3 Teknik Informatika', 'D4 Teknik Informatika', 'Teknologi Rekayasa Komputer', 'D3 Teknik Elektronika', 'D4 Teknik Telekomunikasi'];
+    $daftarKelas  = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
     $daftarMatkul = ['Kecerdasan Buatan', 'Jaringan Komputer', 'Sistem Basis Data', 'Internet of Things', 'Computer Vision', 'Sistem Operasi'];
 
     // Dosen pengampu = akun yang login. Nanti diganti nama user dari backend.
@@ -25,7 +25,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-4xl font-bold tracking-tight">Edit Pengajaran</h1>
+        <h1 class="text-3xl font-bold tracking-tight">Edit Pengajaran</h1>
         <p class="text-2xl text-gray-400">Dashboard / Pengajaran / Edit Pengajaran</p>
     </div>
 
@@ -140,7 +140,7 @@
         <section class="{{ $sectionClass }}" aria-labelledby="h-dokumen">
             <div class="flex items-center gap-2.5">
                 <span class="{{ $numClass }}">3</span>
-                <h2 id="h-dokumen" class="text-[15px] font-semibold">Unggah Dokumen</h2>
+                <h2 id="h-dokumen" class="text-[15px] font-semibold">Dokumen Pendukung</h2>
             </div>
 
             <template x-for="(d, i) in dokumen" :key="d.id">
@@ -158,26 +158,6 @@
                     </div>
 
                     <div class="flex flex-col gap-4 p-3.5">
-                        <div class="flex flex-col gap-2">
-                            <span class="{{ $labelClass }}">File</span>
-                            <label class="flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
-                                <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
-                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
-                                       x-on:change="pilihFile($event, d)">
-                                {{-- nama file lama, supaya backend tahu file lama dipertahankan kalau tidak ada file baru --}}
-                                <input type="hidden" :name="`dokumen[${i}][file_lama]`" :value="d.fileLama">
-                                <span class="flex items-center gap-2 text-[13px] font-medium text-brand">
-                                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 7.97M12 20v-8M9 15l3-3 3 3"/></svg>
-                                    <span x-text="d.namaFile || 'Pilih file dari perangkat'"></span>
-                                </span>
-                                <span class="text-xs text-gray-500"
-                                      x-text="d.fileLama && d.namaFile === d.fileLama ? 'File saat ini. Klik untuk mengganti dengan file lain (maksimal 5 MB).' : 'pdf, jpg, jpeg, png, doc, docx, xls, xlsx, txt, maksimal 5 MB.'"></span>
-                            </label>
-                            <template x-if="d.errorFile">
-                                <p role="alert" class="text-sm text-red-600" x-text="d.errorFile"></p>
-                            </template>
-                        </div>
-
                         <div class="grid grid-cols-1 gap-4.5 md:grid-cols-2">
                             <div class="flex flex-col gap-2">
                                 <label :for="`nama-${d.id}`" class="{{ $labelClass }}">Nama dokumen</label>
@@ -200,17 +180,18 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-2">
+                        <!-- <div class="flex flex-col gap-2">
                             <label :for="`ket-${d.id}`" class="{{ $labelClass }}">Keterangan</label>
                             <textarea :id="`ket-${d.id}`" :name="`dokumen[${i}][keterangan]`" rows="3" x-model="d.keterangan"
                                       placeholder="Keterangan singkat tentang dokumen ini"
                                       class="w-full resize-y rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-[15px] text-gray-900 placeholder:text-gray-400"></textarea>
-                        </div>
+                        </div> -->
 
                         <div class="flex flex-col gap-2">
-                            <label :for="`tautan-${d.id}`" class="{{ $labelClass }}">Tautan dokumen (opsional)</label>
-                            <input :id="`tautan-${d.id}`" :name="`dokumen[${i}][tautan]`" type="url" x-model="d.tautan"
-                                   placeholder="https://" class="{{ $inputClass }}">
+                            <label :for="`tautan-${d.id}`" class="{{ $labelClass }}">Tautan dokumen</label>
+                            <input :id="`tautan-${d.id}`" :name="`dokumen[${i}][tautan]`" type="url" required x-model="d.tautan"
+                                   placeholder="https://drive.google.com/..." class="{{ $inputClass }}">
+                            <p class="text-[13px] text-gray-500">Tempel tautan Google Drive, OneDrive, atau cloud lain. Pastikan akses tautan dibuka untuk yang memiliki tautan.</p>
                         </div>
                     </div>
                 </div>
@@ -227,11 +208,6 @@
 
         {{-- TOMBOL --}}
         <div class="flex flex-wrap items-center justify-end gap-3 pt-4">
-            <template x-if="tersimpan">
-                <p role="status" class="mr-auto rounded-lg border border-green-200 bg-green-50 px-3.5 py-2.5 text-sm text-green-800">
-                    Perubahan tersimpan (simulasi). Data belum masuk database.
-                </p>
-            </template>
             <a href="{{ route('pengajaran.index') }}"
                class="flex h-11 items-center rounded-md bg-red-500 px-6 text-base text-white hover:bg-red-600">Batal</a>
             <button type="submit"
@@ -247,7 +223,7 @@
         Alpine.data('formEditPengajaran', () => ({
             tahunAkademik: @js($daftarTahunAkademik[0]),
             // Nilai awal = data pengajaran yang sedang diedit (data tiruan)
-            prodi: 'D4 Teknologi Rekayasa Komputer', kelas: 'TI-2B', matkul: 'Jaringan Komputer',
+            prodi: 'Teknologi Rekayasa Komputer', kelas: '2B', matkul: 'Jaringan Komputer',
 
             // Semester = kata terakhir dari Tahun akademik ("2025/2026 Ganjil" => "Ganjil")
             get semester() { return this.tahunAkademik.split(' ').pop(); },
@@ -264,34 +240,18 @@
             },
 
             // Dokumen. Dokumen 1 sudah tersimpan (data tiruan), sisanya bisa ditambah / dihapus.
-            // fileLama = nama file yang sudah ada di server. Kalau tidak memilih file baru, file lama tetap dipakai.
             nextId: 2,
             dokumen: [
-                { id: 1, fileLama: 'SK Pengajaran.pdf', namaFile: 'SK Pengajaran.pdf', errorFile: '',
-                  nama: 'Surat Tugas Mengajar', jenis: 'Surat Tugas',
-                  keterangan: 'Ini adalah surat mengajar selama 1 semester', tautan: '' },
+                { id: 1, nama: 'Surat Tugas Mengajar', jenis: 'Surat Tugas',
+                  keterangan: 'Ini adalah surat mengajar selama 1 semester', tautan: 'https://drive.google.com/drive/folders/contoh' },
             ],
             tambahDokumen() {
-                this.dokumen.push({ id: this.nextId++, fileLama: '', namaFile: '', errorFile: '', nama: '', jenis: '', keterangan: '', tautan: '' });
+                this.dokumen.push({ id: this.nextId++, nama: '', jenis: '', keterangan: '', tautan: 'https://drive.google.com/drive/folders/contoh' });
             },
             hapusDokumen(i) { this.dokumen.splice(i, 1); },
-            pilihFile(event, d) {
-                const file = event.target.files[0];
-                d.errorFile = '';
-                if (!file) { d.namaFile = d.fileLama; return; }
-                if (file.size > 5 * 1024 * 1024) {
-                    // terlalu besar: batalkan pilihan file
-                    event.target.value = '';
-                    d.namaFile = d.fileLama;
-                    d.errorFile = 'Ukuran file melebihi 5 MB.';
-                    return;
-                }
-                d.namaFile = file.name;
-            },
-
-            // Simpan (simulasi)
+// Simpan (simulasi)
             tersimpan: false,
-            simpan() { this.tersimpan = true; },
+            simpan() { this.tersimpan = true; this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Perubahan berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' }); },
         }));
     });
 </script>
