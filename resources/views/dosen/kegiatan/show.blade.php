@@ -3,6 +3,7 @@
 @section('title', 'Detail Kegiatan')
 
 @section('content')
+<div dosen-shell>
 
 @php
     // DATA TIRUAN. $id berasal dari alamat (/kegiatan/{id}).

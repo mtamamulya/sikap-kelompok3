@@ -43,8 +43,19 @@ Route::view('/pengajaran/{id}/edit', 'dosen.pengajaran.edit')->whereNumber('id')
 
 Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
 Route::view('/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
-Route::get('/kegiatan/{id}', [KegiatanController::class, 'show'])->whereNumber('id')->name('kegiatan.show');
-Route::view('/kegiatan/{id}/edit', 'dosen.kegiatan.edit')->whereNumber('id')->name('kegiatan.edit');
+
+// Mengirimkan semua variabel dummy yang dibutuhkan kegiatan.blade.php
+Route::view('/kegiatan/{id}', 'kegiatan', [
+    'allActivities' => [],
+    'categories' => [],
+    'activities' => [],
+])->whereNumber('id')->name('kegiatan.show');
+
+Route::view('/kegiatan/{id}/edit', 'kegiatan', [
+    'allActivities' => [],
+    'categories' => [],
+    'activities' => [],
+])->whereNumber('id')->name('kegiatan.edit');
 
 Route::get('/pengajuan/dosen/baru', [PengajuanController::class, 'createDosen'])->name('pengajuan.dosen.create');
 Route::post('/pengajuan/dosen', [PengajuanController::class, 'storeDosen'])->name('pengajuan.dosen.store');

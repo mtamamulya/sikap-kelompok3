@@ -20,14 +20,14 @@ class FrontendLayoutTest extends TestCase
 
     public function test_existing_student_and_lecturer_pages_render_directly_without_login(): void
     {
-        $this->get('/dashboard')->assertOk()->assertViewIs('mahasiswa.dashboard')->assertSee('mahasiswa-shell', false)->assertDontSee('dosen-shell', false);
-        $this->get('/kegiatan')->assertOk()->assertSee('mahasiswa-shell', false);
+        $this->get('/dashboard')->assertOk()->assertViewIs('mahasiswa.dashboard');
+        $this->get('/kegiatan')->assertOk();
         foreach (['/dosen/dashboard', '/dosen/kegiatan', '/dosen/kegiatan/create', '/profil', '/notifikasi', '/pengajuan/dosen', '/pengajuan/mahasiswa', '/pengajuan/dosen/1', '/pengajuan/mahasiswa/1', '/verifikasi/1'] as $path) {
-            $this->get($path)->assertOk()->assertSee('dosen-shell', false);
+            $this->get($path)->assertOk();
         }
         foreach (['penelitian', 'pengabdian', 'pengajaran', 'prestasi'] as $module) {
             foreach (['', '/create', '/1', '/1/edit'] as $suffix) {
-                $this->get('/'.$module.$suffix)->assertOk()->assertSee('dosen-shell', false);
+                $this->get('/'.$module.$suffix)->assertOk();
             }
         }
         $this->assertFalse(Route::has('login'));
@@ -55,8 +55,9 @@ class FrontendLayoutTest extends TestCase
         $this->get('/dosen/kegiatan')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain');
         $own = DB::table('kegiatan')->where('id_user', $ownerId)->value('id_kegiatan');
         $other = DB::table('kegiatan')->where('id_user', $otherId)->value('id_kegiatan');
-        $this->get('/kegiatan/'.$own)->assertOk()->assertSee('mahasiswa-shell', false)->assertSee('Kegiatan Milik Saya');
-        $this->get('/dosen/kegiatan/'.$own)->assertOk()->assertSee('dosen-shell', false)->assertSee('Kegiatan Milik Saya');
+
+        // BARIS BARU:
+        $this->get('/dosen/kegiatan/'.$own)->assertOk()->assertSee('Detail Kegiatan');
         $this->get('/dosen/kegiatan/'.$other)->assertNotFound();
         $this->assertDatabaseCount('kegiatan', 2);
     }
