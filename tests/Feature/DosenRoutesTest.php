@@ -127,7 +127,7 @@ class DosenRoutesTest extends TestCase
 
         $this->get(route('pengajuan.mahasiswa'))
             ->assertOk()
-            ->assertViewIs('dosen.pengajuan.mahasiswa')
+            ->assertViewIs('pengajuan.mahasiswa')
             ->assertSee("Alpine.data('pengajuanMahasiswa'", false);
     }
 }
