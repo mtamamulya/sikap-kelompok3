@@ -15,7 +15,19 @@ class Akreditasi extends Model
         'id_user',
         'keterangan',
         'link',
+        'tahun_terbit',
+        'berlaku_sampai',
+        'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tahun_terbit' => 'integer',
+            'berlaku_sampai' => 'date',
+            'status' => 'boolean',
+        ];
+    }
 
     public function user(): BelongsTo
     {

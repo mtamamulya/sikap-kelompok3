@@ -18,7 +18,15 @@ class Dokumen extends Model
         'nama_file',
         'tipe_dokumen',
         'link_dokumen',
+        'is_lampiran',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_lampiran' => 'boolean',
+        ];
+    }
 
     public function jenisDokumen(): BelongsTo
     {
