@@ -20,6 +20,24 @@
     // Pengaju = akun yang login. Nanti diganti nama user dari backend.
     $pengaju = 'Kuwat Santoso , S.T., M.Kom.';
 
+    // Status & catatan revisi contoh. Urutannya sama dengan daftar di halaman Kegiatan (id 1–10).
+    // Nanti diganti data dari backend. Kalau status "Direvisi", catatan revisi tampil di atas form
+    // dan ada tombol "Simpan & ajukan kembali".
+    $statusContoh = [
+        1  => ['Diajukan',  null],
+        2  => ['Direvisi',  'Lampirkan surat tugas yang sudah ditandatangani dan perjelas jadwal kegiatan.'],
+        3  => ['Disetujui', null],
+        4  => ['Ditolak',   'Lomba tidak termasuk daftar kegiatan yang diakui program studi.'],
+        5  => ['Diajukan',  null],
+        6  => ['Direvisi',  'Daftar anggota belum lengkap. Tambahkan mahasiswa yang ikut.'],
+        7  => ['Disetujui', null],
+        8  => ['Ditolak',   'Jadwal bentrok dengan kegiatan fakultas pada tanggal yang sama.'],
+        9  => ['Diajukan',  null],
+        10 => ['Direvisi',  'Dokumen proposal belum memuat rencana anggaran.'],
+    ];
+    [$status, $catatan] = $statusContoh[max(1, min(10, (int) ($id ?? 1)))];
+    $perluRevisi = $status === 'Direvisi';
+
     $inputClass   = 'h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-[15px] text-gray-900 placeholder:text-gray-400';
     $selectClass  = 'h-11 w-full appearance-none rounded-lg border border-gray-200 bg-white pr-10 pl-3.5 text-[15px] text-gray-900';
     $labelClass   = 'text-[15px] font-medium';
@@ -31,7 +49,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-4xl font-bold tracking-tight">Edit Kegiatan</h1>
+        <h1 class="text-3xl font-bold tracking-tight">Edit Kegiatan</h1>
         <p class="text-2xl text-gray-400">Dashboard / Kegiatan / Edit Kegiatan</p>
     </div>
 
@@ -46,6 +64,22 @@
           class="flex flex-col gap-5 rounded-lg bg-white p-4.5 shadow-sm">
         @csrf
         @method('PUT')
+
+        @if ($perluRevisi)
+            {{-- Catatan revisi dari reviewer. Setelah "Simpan & ajukan kembali" diklik, diganti pesan biru. --}}
+            <div x-show="!diajukan" role="status" class="flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50 p-4 text-[15px] text-orange-900">
+                <svg class="mt-0.5 size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4"/></svg>
+                <div class="flex flex-col gap-1">
+                    <p class="font-semibold">Catatan revisi</p>
+                    <p>{{ $catatan }}</p>
+                    <p class="text-orange-800">Perbaiki data atau dokumen di bawah, lalu klik "Simpan &amp; ajukan kembali".</p>
+                </div>
+            </div>
+            <div x-show="diajukan" x-cloak role="status" class="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-[15px] text-blue-800">
+                <svg class="mt-0.5 size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg>
+                <div><p class="font-semibold">Sudah diajukan kembali</p><p>Kegiatan menunggu verifikasi ulang.</p></div>
+            </div>
+        @endif
 
         {{-- 1. INFORMASI KEGIATAN --}}
         <section class="{{ $sectionClass }}" aria-labelledby="h-info">
@@ -196,7 +230,7 @@
         <section class="{{ $sectionClass }}" aria-labelledby="h-dokumen">
             <div class="flex items-center gap-2.5">
                 <span class="{{ $numClass }}">3</span>
-                <h2 id="h-dokumen" class="text-[15px] font-semibold">Unggah Dokumen</h2>
+                <h2 id="h-dokumen" class="text-[15px] font-semibold">Dokumen Pendukung</h2>
             </div>
 
             <template x-for="(d, i) in dokumen" :key="d.id">
@@ -214,26 +248,6 @@
                     </div>
 
                     <div class="flex flex-col gap-4 p-3.5">
-                        <div class="flex flex-col gap-2">
-                            <span class="{{ $labelClass }}">File</span>
-                            <label class="flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
-                                <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
-                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
-                                       x-on:change="pilihFile($event, d)">
-                                {{-- nama file lama, supaya backend tahu file lama dipertahankan kalau tidak ada file baru --}}
-                                <input type="hidden" :name="`dokumen[${i}][file_lama]`" :value="d.fileLama">
-                                <span class="flex items-center gap-2 text-[13px] font-medium text-brand">
-                                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 7.97M12 20v-8M9 15l3-3 3 3"/></svg>
-                                    <span x-text="d.namaFile || 'Pilih file dari perangkat'"></span>
-                                </span>
-                                <span class="text-xs text-gray-500"
-                                      x-text="d.fileLama && d.namaFile === d.fileLama ? 'File saat ini. Klik untuk mengganti dengan file lain (maksimal 5 MB).' : 'pdf, jpg, jpeg, png, doc, docx, xls, xlsx, txt, maksimal 5 MB.'"></span>
-                            </label>
-                            <template x-if="d.errorFile">
-                                <p role="alert" class="text-sm text-red-600" x-text="d.errorFile"></p>
-                            </template>
-                        </div>
-
                         <div class="grid grid-cols-1 gap-4.5 md:grid-cols-2">
                             <div class="flex flex-col gap-2">
                                 <label :for="`nama-${d.id}`" class="{{ $labelClass }}">Nama dokumen</label>
@@ -257,17 +271,18 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-2">
+                        <!-- <div class="flex flex-col gap-2">
                             <label :for="`ket-${d.id}`" class="{{ $labelClass }}">Keterangan</label>
                             <textarea :id="`ket-${d.id}`" :name="`dokumen[${i}][keterangan]`" rows="3" x-model="d.keterangan"
                                       placeholder="Keterangan singkat tentang dokumen ini"
                                       class="w-full resize-y rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-[15px] text-gray-900 placeholder:text-gray-400"></textarea>
-                        </div>
+                        </div> -->
 
                         <div class="flex flex-col gap-2">
-                            <label :for="`tautan-${d.id}`" class="{{ $labelClass }}">Tautan dokumen (opsional)</label>
-                            <input :id="`tautan-${d.id}`" :name="`dokumen[${i}][tautan]`" type="url" x-model="d.tautan"
-                                   placeholder="https://" class="{{ $inputClass }}">
+                            <label :for="`tautan-${d.id}`" class="{{ $labelClass }}">Tautan dokumen</label>
+                            <input :id="`tautan-${d.id}`" :name="`dokumen[${i}][tautan]`" type="url" required x-model="d.tautan"
+                                   placeholder="https://drive.google.com/..." class="{{ $inputClass }}">
+                            <p class="text-[13px] text-gray-500">Tempel tautan Google Drive, OneDrive, atau cloud lain. Pastikan akses tautan dibuka untuk yang memiliki tautan.</p>
                         </div>
                     </div>
                 </div>
@@ -284,15 +299,18 @@
 
         {{-- TOMBOL --}}
         <div class="flex flex-wrap items-center justify-end gap-3 pt-4">
-            <template x-if="tersimpan">
-                <p role="status" class="mr-auto rounded-lg border border-green-200 bg-green-50 px-3.5 py-2.5 text-sm text-green-800">
-                    Tersimpan (simulasi). Data belum masuk database.
-                </p>
-            </template>
             <a href="{{ route('kegiatan.index') }}"
                class="flex h-11 items-center rounded-md bg-red-500 px-6 text-base text-white hover:bg-red-600">Batal</a>
-            <button type="submit"
-                    class="h-11 cursor-pointer rounded-md bg-brand px-6 text-base text-white hover:bg-blue-700">Simpan</button>
+            @if ($perluRevisi)
+                <button type="submit" :disabled="diajukan"
+                        class="h-11 cursor-pointer rounded-md border border-brand bg-white px-6 text-base text-brand hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50">Simpan</button>
+                <button type="submit" x-on:click="mode = 'ajukan'" :disabled="diajukan"
+                        class="h-11 cursor-pointer rounded-md bg-brand px-6 text-base text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                        x-text="diajukan ? 'Sudah diajukan kembali' : 'Simpan & ajukan kembali'">Simpan &amp; ajukan kembali</button>
+            @else
+                <button type="submit"
+                        class="h-11 cursor-pointer rounded-md bg-brand px-6 text-base text-white hover:bg-blue-700">Simpan</button>
+            @endif
         </div>
     </form>
 
@@ -343,34 +361,29 @@
             hapus(i) { this.anggota.splice(i, 1); },
 
             // Dokumen. Dokumen 1 sudah tersimpan (data tiruan), sisanya bisa ditambah / dihapus.
-            // fileLama = nama file yang sudah ada di server. Kalau tidak memilih file baru, file lama tetap dipakai.
             nextId: 2,
             dokumen: [
-                { id: 1, fileLama: 'Proposal kegiatan.pdf', namaFile: 'Proposal kegiatan.pdf', errorFile: '',
-                  nama: 'Proposal Kegiatan', jenis: 'Proposal',
-                  keterangan: 'Ini adalah proposal kegiatan seminar', tautan: '' },
+                { id: 1, nama: 'Proposal Kegiatan', jenis: 'Proposal',
+                  keterangan: 'Ini adalah proposal kegiatan seminar', tautan: 'https://drive.google.com/drive/folders/contoh' },
             ],
             tambahDokumen() {
-                this.dokumen.push({ id: this.nextId++, fileLama: '', namaFile: '', errorFile: '', nama: '', jenis: '', keterangan: '', tautan: '' });
+                this.dokumen.push({ id: this.nextId++, nama: '', jenis: '', keterangan: '', tautan: 'https://drive.google.com/drive/folders/contoh' });
             },
             hapusDokumen(i) { this.dokumen.splice(i, 1); },
-            pilihFile(event, d) {
-                const file = event.target.files[0];
-                d.errorFile = '';
-                if (!file) { d.namaFile = d.fileLama; return; }
-                if (file.size > 5 * 1024 * 1024) {
-                    // terlalu besar: batalkan pilihan file
-                    event.target.value = '';
-                    d.namaFile = d.fileLama;
-                    d.errorFile = 'Ukuran file melebihi 5 MB.';
-                    return;
-                }
-                d.namaFile = file.name;
-            },
-
-            // Simpan (simulasi)
+// Simpan (simulasi)
             tersimpan: false,
-            simpan() { this.tersimpan = true; },
+            mode: 'simpan',      // 'ajukan' kalau tombol "Simpan & ajukan kembali" yang diklik
+            diajukan: false,
+            simpan() {
+                this.tersimpan = true;
+                if (this.mode === 'ajukan') {
+                    this.diajukan = true;
+                    this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Kegiatan diajukan kembali', pesan: 'Status berubah menjadi Diajukan dan menunggu verifikasi.' });
+                } else {
+                    this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Perubahan berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' });
+                }
+                this.mode = 'simpan';
+            },
         }));
     });
 </script>
