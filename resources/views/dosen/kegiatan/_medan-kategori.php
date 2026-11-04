@@ -19,11 +19,11 @@ return [
         'penyelenggara' => ['label' => 'Penyelenggara lomba', 'placeholder' => 'Nama penyelenggara lomba'],
         'medan' => [
             ['nama' => 'tingkat', 'label' => 'Tingkat', 'tipe' => 'pilihan', 'wajib' => true,
-             'opsi' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional']],
+                'opsi' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional']],
             ['nama' => 'bentuk', 'label' => 'Bentuk keikutsertaan', 'tipe' => 'radio', 'wajib' => true,
-             'opsi' => ['Individu', 'Tim'], 'catatan' => 'Pilih Tim untuk menambahkan anggota kegiatan.'],
+                'opsi' => ['Individu', 'Tim'], 'catatan' => 'Pilih Tim untuk menambahkan anggota kegiatan.'],
             ['nama' => 'capaian', 'label' => 'Capaian', 'tipe' => 'pilihan', 'wajib' => true,
-             'opsi' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan', 'Finalis', 'Peserta']],
+                'opsi' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan', 'Finalis', 'Peserta']],
         ],
     ],
 
@@ -39,11 +39,11 @@ return [
         'penyelenggara' => ['label' => 'Penyelenggara', 'placeholder' => 'Nama institusi'],
         'medan' => [
             ['nama' => 'peran', 'label' => 'Peran', 'tipe' => 'pilihan', 'wajib' => true,
-             'opsi' => ['Peserta', 'Pembicara', 'Panitia']],
+                'opsi' => ['Peserta', 'Pembicara', 'Panitia']],
             ['nama' => 'tingkat', 'label' => 'Tingkat', 'tipe' => 'pilihan', 'wajib' => true,
-             'opsi' => ['Lokal', 'Nasional', 'Internasional']],
+                'opsi' => ['Lokal', 'Nasional', 'Internasional']],
             ['nama' => 'mode', 'label' => 'Mode pelaksanaan', 'tipe' => 'radio', 'wajib' => true,
-             'opsi' => ['Luring', 'Daring']],
+                'opsi' => ['Luring', 'Daring']],
         ],
     ],
 
@@ -52,9 +52,9 @@ return [
         'medan' => [
             ['nama' => 'jumlah_jam', 'label' => 'Jumlah jam pelatihan', 'tipe' => 'angka', 'wajib' => true, 'placeholder' => 'Contoh : 24'],
             ['nama' => 'mode', 'label' => 'Mode pelaksanaan', 'tipe' => 'radio', 'wajib' => true,
-             'opsi' => ['Luring', 'Daring']],
+                'opsi' => ['Luring', 'Daring']],
             ['nama' => 'sertifikat', 'label' => 'Sertifikat', 'tipe' => 'radio', 'wajib' => true,
-             'opsi' => ['Ada', 'Tidak ada']],
+                'opsi' => ['Ada', 'Tidak ada']],
         ],
     ],
 ];
