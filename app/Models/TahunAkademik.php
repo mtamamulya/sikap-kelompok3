@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TahunAkademik extends Model
 {
@@ -20,5 +21,15 @@ class TahunAkademik extends Model
         return [
             'status' => 'boolean',
         ];
+    }
+
+    public function enrollmentTingkatKelas(): HasMany
+    {
+        return $this->hasMany(EnrollmentTingkatKelas::class, 'id_tahun_akademik', 'id_tahun_akademik');
+    }
+
+    public function enrollmentMataKuliah(): HasMany
+    {
+        return $this->hasMany(EnrollmentMataKuliah::class, 'id_tahun_akademik', 'id_tahun_akademik');
     }
 }

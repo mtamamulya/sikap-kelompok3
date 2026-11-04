@@ -13,7 +13,7 @@ class KegiatanController extends Controller
     public function index(Request $request)
     {
         $kegiatan = Kegiatan::untukUser($request->user())
-            ->with(['kategori.jenisKegiatan', 'statusTerkini', 'detail', 'prestasi', 'dokumen'])
+            ->with(['kategori.jenisKegiatan', 'statusTerkini', 'detail.isianKategori', 'prestasi', 'dokumen'])
             ->withCount('anggota')->orderByDesc('tanggal_mulai')->orderByDesc('id_kegiatan')->get();
         $counts = $kegiatan->countBy(fn ($k) => mb_strtolower($k->kategori?->nama_kategori ?? ''));
         $categoryCounts = [
@@ -50,11 +50,11 @@ class KegiatanController extends Controller
                 'raw_date' => $k->tanggal_mulai?->toDateString(),
                 'status' => ucfirst($k->statusTerkini?->status ?? 'Belum diajukan'),
                 'note' => $k->statusTerkini?->catatan_revisi,
-                'capaian' => $k->detail?->posisi_dalam_kegiatan ?? '—',
-                'tingkat' => ucfirst($k->detail?->tingkat_kejuaraan ?? '—'),
-                'jenis' => $k->prestasi?->jenis_prestasi ?? '—',
+                'capaian' => $k->nilaiIsian('posisi_dalam_kegiatan') ?? '—',
+                'tingkat' => ucfirst($k->nilaiIsian('tingkat_kejuaraan') ?? '—'),
+                'jenis' => $k->prestasi->first()?->jenis_prestasi ?? '—',
                 'bentuk' => $k->anggota_count > 1 ? 'Tim' : 'Individu',
-                'penyelenggara' => $k->detail?->penyelenggara ?? '—',
+                'penyelenggara' => $k->nilaiIsian('penyelenggara') ?? '—',
                 'detail_url' => route($request->routeIs('dosen.*') ? 'dosen.kegiatan.show' : 'kegiatan.show', $k->getKey()),
                 'documents' => $k->dokumen->map(fn ($d) => [
                     'name' => $d->nama_file,
@@ -68,7 +68,7 @@ class KegiatanController extends Controller
     public function show(Request $request, int $id)
     {
         $kegiatan = Kegiatan::untukUser($request->user())->with([
-            'kategori.jenisKegiatan', 'detail', 'statusTerkini', 'dokumen.jenisDokumen',
+            'kategori.jenisKegiatan', 'detail.isianKategori', 'statusTerkini', 'dokumen.jenisDokumen',
             'anggota.user.mahasiswa', 'anggota.user.dosen', 'anggota.user.role',
         ])->findOrFail($id);
 
@@ -79,7 +79,7 @@ class KegiatanController extends Controller
                 'nama' => $kegiatan->nama_kegiatan,
                 'kategori' => $kegiatan->kategori?->nama_kategori ?? '—',
                 'jenis' => $kegiatan->kategori?->jenisKegiatan?->nama_jenis_kegiatan ?? '—',
-                'penyelenggara' => $kegiatan->detail?->penyelenggara ?? '—',
+                'penyelenggara' => $kegiatan->nilaiIsian('penyelenggara') ?? '—',
                 'tahun' => $kegiatan->tanggal_mulai?->year ?? '—',
                 'mulai' => $kegiatan->tanggal_mulai?->locale('id')->translatedFormat('j F Y') ?? '—',
                 'selesai' => $kegiatan->tanggal_selesai?->locale('id')->translatedFormat('j F Y') ?? '—',

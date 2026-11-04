@@ -21,4 +21,9 @@ class Prodi extends Model
     {
         return $this->hasMany(Kurikulum::class, 'id_prodi', 'id_prodi');
     }
+
+    public function enrollmentTingkatKelas(): HasMany
+    {
+        return $this->hasMany(EnrollmentTingkatKelas::class, 'id_prodi', 'id_prodi');
+    }
 }
