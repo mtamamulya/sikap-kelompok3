@@ -64,6 +64,7 @@ Route::get('/prestasi-trk', [PrestasiController::class, 'index'])->name('publik.
 // ---------- Login & Pemulihan ----------
 Route::view('/login', 'login')->name('login');
 Route::post('/login', [AdminAuthController::class, 'login'])->name('login.attempt');
+Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth')->name('logout');
 Route::get('/lupa-sandi', [PemulihanController::class, 'show'])->name('password.request');
 Route::post('/lupa-sandi/email', [PemulihanController::class, 'kirimOtp'])->name('password.email');
 Route::post('/lupa-sandi/otp', [PemulihanController::class, 'verifikasi'])->name('password.otp');
