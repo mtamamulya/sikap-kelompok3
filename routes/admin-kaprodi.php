@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\AdminAkreditasiController;
 // ---------- Controller Publik & Landing ----------
-use App\Http\Controllers\AdminAuthController; // Hasil rename dari BeritaController
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminBeritaController;
+use App\Http\Controllers\AdminKegiatanController; // <-- Added AdminKegiatanController
 use App\Http\Controllers\AdminKegiatanDosenDetailShowController;
 use App\Http\Controllers\AdminKegiatanMahasiswaDetailShowController;
 use App\Http\Controllers\AdminKurikulumController;
@@ -12,8 +13,8 @@ use App\Http\Controllers\AdminPengajuanController;
 use App\Http\Controllers\AdminPrestasiController;
 // ---------- Controller Admin ----------
 use App\Http\Controllers\AdminProfilController;
-use App\Http\Controllers\AdminTinjauPengajuanController; // Hasil rename dari DashboardController
-use App\Http\Controllers\AkreditasiController; // Hasil rename dari MahasiswaController
+use App\Http\Controllers\AdminTinjauPengajuanController;
+use App\Http\Controllers\AkreditasiController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\JenisDokumenController;
@@ -51,7 +52,6 @@ use App\Http\Middleware\KaprodiOnly;
 use Illuminate\Support\Facades\Route;
 
 // ---------- Publik ----------
-// Route::view('/trk', 'home')->name('home');
 Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('mata-kuliah');
 Route::get('/mata-kuliah/data', [MataKuliahController::class, 'data'])->name('mata-kuliah.data');
 Route::get('/akreditasi', [AkreditasiController::class, 'index'])->name('akreditasi');
@@ -111,6 +111,8 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     Route::put('/mahasiswa/{id}', [LandingMahasiswaController::class, 'update'])->name('admin.mahasiswa.update');
 
     // Kegiatan
+    Route::get('/kegiatan', [AdminKegiatanController::class, 'index'])->name('admin.kegiatan.index');
+    Route::get('/kegiatan/tambah', [AdminKegiatanController::class, 'create'])->name('admin.kegiatan.create');
     Route::get('/kegiatan/mahasiswa', [KegiatanMahasiswaController::class, 'index'])->name('admin.kegiatan.mahasiswa');
     Route::get('/kegiatan/dosen', [KegiatanDosenController::class, 'index'])->name('admin.kegiatan.dosen');
     Route::get('/kegiatan/dosen/laporan', [KegiatanLaporanController::class, 'dosen'])->name('admin.kegiatan.dosen.laporan');
@@ -162,6 +164,8 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     // Placeholder otomatis dari config/admin.php
     $sudahAda = [
         'admin.dashboard',
+        'admin.kegiatan.index',
+        'admin.kegiatan.create',
         'admin.kurikulum.trk',
         'admin.kurikulum.mata-kuliah',
         'admin.dosen',
