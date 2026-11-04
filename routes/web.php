@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DosenController;
 use App\Http\Controllers\DosenDashboardController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MahasiswaController;

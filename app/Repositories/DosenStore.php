@@ -27,6 +27,18 @@ class DosenStore
 
     private const PATH = 'admin/dosen.json';
 
+    /** Pilihan pangkat untuk dropdown/validasi. Versi database menimpanya dengan isi enum tabel. */
+    public function opsiPangkat(): array
+    {
+        return self::JABATAN;
+    }
+
+    /** Pilihan golongan (format "III/b") untuk dropdown/validasi. Versi database menimpanya dengan isi enum tabel. */
+    public function opsiGolongan(): array
+    {
+        return self::GOLONGAN;
+    }
+
     /** @return array<int, array<string, mixed>> */
     public function all(): array
     {

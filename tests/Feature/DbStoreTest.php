@@ -3,14 +3,18 @@
 namespace Tests\Feature;
 
 use App\Models\Prodi;
+use App\Models\User;
 use App\Repositories\AkreditasiDbStore;
+use App\Repositories\DosenDbStore;
 use App\Repositories\KurikulumDbStore;
 use App\Repositories\MataKuliahDbStore;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use RuntimeException;
 use Tests\TestCase;
 
-/** Menguji versi database dari store (Kurikulum, Mata Kuliah, Akreditasi). Memakai database tes, bukan database bersama. */
+/** Menguji versi database dari store (Kurikulum, Mata Kuliah, Akreditasi, Dosen). Memakai database tes, bukan database bersama. */
 class DbStoreTest extends TestCase
 {
     use RefreshDatabase;
@@ -82,5 +86,107 @@ class DbStoreTest extends TestCase
 
         $store->activate($b['id']);
         $this->assertSame('aktif', $store->find($b['id'])['status']);
+    }
+
+    /** Data dosen valid; $o menimpa sebagian isinya. */
+    private function dataDosen(array $o = []): array
+    {
+        return array_merge([
+            'nama' => 'UJI - Dosen '.uniqid(),
+            'nip' => (string) random_int(1000000000, 9999999999),
+            'status' => 'aktif',
+            'email' => 'uji-'.uniqid().'@example.test',
+            'role' => 'dosen',
+            'password' => 'rahasia123',
+            'pangkat' => 'Lektor',
+            'golongan' => 'III/c',
+            'sk' => '001/UJI/2026',
+            'tanggal' => '2026-01-15',
+        ], $o);
+    }
+
+    public function test_dosen_create_membuat_user_dosen_dan_riwayat_pertama(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $in = $this->dataDosen();
+
+        $row = app(DosenDbStore::class)->create($in);
+
+        $this->assertSame($in['nama'], $row['nama']);
+        $this->assertSame('dosen', $row['role']);
+        $this->assertSame('aktif', $row['status']);
+        $this->assertSame('Lektor', $row['jabatan']);
+        $this->assertSame('III/c', $row['golongan']);
+        $this->assertCount(1, $row['riwayat']);
+        $this->assertDatabaseHas('histori_pangkat_golongan', ['id_dosen' => (int) $row['id'], 'golongan' => '3C']);
+
+        $user = User::where('email', $in['email'])->first();
+        $this->assertTrue(Hash::check($in['password'], $user->password), 'sandi harus ter-hash satu kali saja');
+    }
+
+    public function test_dosen_role_kaprodi_diterima_dan_role_lain_ditolak_tanpa_sisa_data(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $store = app(DosenDbStore::class);
+
+        $this->assertSame('kaprodi', $store->create($this->dataDosen(['role' => 'kaprodi']))['role']);
+
+        $in = $this->dataDosen(['role' => 'admin']);
+        try {
+            $store->create($in);
+            $this->fail('Seharusnya melempar RuntimeException.');
+        } catch (RuntimeException) {
+            $this->assertDatabaseMissing('users', ['email' => $in['email']]);
+            $this->assertDatabaseMissing('dosen', ['nip' => $in['nip']]);
+        }
+    }
+
+    public function test_dosen_update_menambah_riwayat_dan_menjadi_pangkat_saat_ini(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $store = app(DosenDbStore::class);
+        $row = $store->create($this->dataDosen());
+
+        $baru = $store->update($row['id'], [
+            'nama' => $row['nama'], 'nip' => $row['nip'], 'status' => 'nonaktif',
+            'email' => $row['email'], 'role' => 'dosen', 'status_akun' => 'aktif',
+            'password' => 'sandibaru123', 'foto' => 'foto-dosen/uji.jpg',
+        ], ['pangkat' => 'Lektor Kepala', 'golongan' => 'IV/a', 'sk' => '002/UJI/2027', 'tanggal' => '2027-02-01']);
+
+        $this->assertSame('nonaktif', $baru['status']);
+        $this->assertSame('Lektor Kepala', $baru['jabatan']);
+        $this->assertSame('IV/a', $baru['golongan']);
+        $this->assertCount(2, $baru['riwayat']);
+        $this->assertSame('foto-dosen/uji.jpg', $baru['foto']);
+        $this->assertTrue(Hash::check('sandibaru123', User::where('email', $row['email'])->first()->password));
+        $this->assertNull($store->update('999999', []));
+    }
+
+    public function test_dosen_pilihan_dropdown_berasal_dari_enum_dan_semuanya_bisa_disimpan(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $store = app(DosenDbStore::class);
+
+        $this->assertNotEmpty($store->opsiPangkat());
+        $this->assertNotEmpty($store->opsiGolongan());
+
+        foreach ($store->opsiGolongan() as $golongan) {
+            $row = $store->create($this->dataDosen(['golongan' => $golongan, 'pangkat' => $store->opsiPangkat()[0]]));
+            $this->assertSame($golongan, $row['golongan'], "golongan {$golongan} harus bisa disimpan dan dibaca kembali");
+        }
+    }
+
+    public function test_dosen_cek_unik_nip_dan_email(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $store = app(DosenDbStore::class);
+        $row = $store->create($this->dataDosen());
+
+        $this->assertTrue($store->exists('nip', $row['nip']));
+        $this->assertTrue($store->exists('email', $row['email']));
+        $this->assertFalse($store->usedByOther('nip', $row['nip'], $row['id']));
+        $this->assertFalse($store->usedByOther('email', $row['email'], $row['id']));
+        $this->assertFalse($store->exists('nip', '0000000000'));
+        $this->assertNull($store->find('abc'));
     }
 }

@@ -25,7 +25,7 @@ class DosenController extends Controller
             'status' => $r['status'],
         ], $this->store->all());
 
-        return view('admin.dosen', ['dosen' => $dosen, 'jabatan' => DosenStore::JABATAN]);
+        return view('admin.dosen', ['dosen' => $dosen, 'jabatan' => $this->store->opsiPangkat()]);
     }
 
     /** Detail satu dosen: profil, riwayat pangkat, dan aktivitas (4 tab). */
@@ -72,8 +72,8 @@ class DosenController extends Controller
     public function create()
     {
         return view('admin.dosen-tambah', [
-            'jabatan' => DosenStore::JABATAN,
-            'golongan' => DosenStore::GOLONGAN,
+            'jabatan' => $this->store->opsiPangkat(),
+            'golongan' => $this->store->opsiGolongan(),
             'roles' => DosenStore::ROLE,
         ]);
     }
@@ -82,22 +82,33 @@ class DosenController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'nama_lengkap' => ['required', 'string', 'max:150'],
+            'nama_lengkap' => ['required', 'string', 'max:100'],
             'nip' => ['required', 'regex:/^\d{8,20}$/', function ($attr, $value, $fail) {
                 if ($this->store->exists('nip', $value)) {
                     $fail('NIP sudah terdaftar.');
                 }
             }],
             'status_dosen' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'email' => ['required', 'email', 'max:150', function ($attr, $value, $fail) {
-                if ($this->store->exists('email', $value)) {
-                    $fail('Email sudah dipakai akun lain.');
+            'email' => [
+                'required', 
+                'email', 
+                'max:150', 
+                function ($attribute, $value, $fail) {
+                    // Validasi domain wajib @polines.ac.id
+                    if (!str_ends_with(strtolower($value), '@polines.ac.id')) {
+                        $fail('Email akun harus menggunakan domain resmi institusi (@polines.ac.id).');
+                    }
+                },
+                function ($attr, $value, $fail) {
+                    if ($this->store->exists('email', $value)) {
+                        $fail('Email sudah dipakai akun lain.');
+                    }
                 }
-            }],
+            ],
             'role' => ['required', Rule::in(array_keys(DosenStore::ROLE))],
             'password' => ['required', 'string', 'min:8'],
-            'pangkat' => ['required', Rule::in(DosenStore::JABATAN)],
-            'golongan' => ['required', Rule::in(DosenStore::GOLONGAN)],
+            'pangkat' => ['required', Rule::in($this->store->opsiPangkat())],
+            'golongan' => ['required', Rule::in($this->store->opsiGolongan())],
             'nomor_sk' => ['required', 'string', 'max:100'],
             'tanggal_sk' => ['required', 'date'],
         ], [
@@ -153,8 +164,8 @@ class DosenController extends Controller
                 'nomor_sk' => '',
                 'tanggal_sk' => '',
             ],
-            'jabatan' => DosenStore::JABATAN,
-            'golongan' => DosenStore::GOLONGAN,
+            'jabatan' => $this->store->opsiPangkat(),
+            'golongan' => $this->store->opsiGolongan(),
             'roles' => DosenStore::ROLE,
         ]);
     }
@@ -165,25 +176,36 @@ class DosenController extends Controller
         abort_unless($this->store->find($id), 404);
 
         $data = $request->validate([
-            'nama_lengkap' => ['required', 'string', 'max:150'],
+            'nama_lengkap' => ['required', 'string', 'max:100'],
             'nip' => ['required', 'regex:/^\d{8,20}$/', function ($attr, $value, $fail) use ($id) {
                 if ($this->store->usedByOther('nip', $value, $id)) {
                     $fail('NIP sudah dipakai dosen lain.');
                 }
             }],
             'status_dosen' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'email' => ['required', 'email', 'max:150', function ($attr, $value, $fail) use ($id) {
-                if ($this->store->usedByOther('email', $value, $id)) {
-                    $fail('Email sudah dipakai akun lain.');
+            'email' => [
+                'required', 
+                'email', 
+                'max:150', 
+                function ($attribute, $value, $fail) {
+                    // Validasi domain wajib @polines.ac.id
+                    if (!str_ends_with(strtolower($value), '@polines.ac.id')) {
+                        $fail('Email akun harus menggunakan domain resmi institusi (@polines.ac.id).');
+                    }
+                },
+                function ($attr, $value, $fail) use ($id) {
+                    if ($this->store->usedByOther('email', $value, $id)) {
+                        $fail('Email sudah dipakai akun lain.');
+                    }
                 }
-            }],
+            ],
             'role' => ['required', Rule::in(array_keys(DosenStore::ROLE))],
             'status_akun' => ['required', Rule::in(['aktif', 'nonaktif'])],
             'password' => ['nullable', 'string', 'min:8'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             // riwayat pangkat baru: opsional, tetapi kalau diisi harus lengkap
-            'pangkat' => ['nullable', 'required_with:golongan,nomor_sk,tanggal_sk', Rule::in(DosenStore::JABATAN)],
-            'golongan' => ['nullable', 'required_with:pangkat,nomor_sk,tanggal_sk', Rule::in(DosenStore::GOLONGAN)],
+            'pangkat' => ['nullable', 'required_with:golongan,nomor_sk,tanggal_sk', Rule::in($this->store->opsiPangkat())],
+            'golongan' => ['nullable', 'required_with:pangkat,nomor_sk,tanggal_sk', Rule::in($this->store->opsiGolongan())],
             'nomor_sk' => ['nullable', 'required_with:pangkat,golongan,tanggal_sk', 'string', 'max:100'],
             'tanggal_sk' => ['nullable', 'required_with:pangkat,golongan,nomor_sk', 'date'],
         ], [
@@ -232,29 +254,17 @@ class DosenController extends Controller
         return redirect()->route('admin.dosen.show', $id)->with('status', 'Perubahan data dosen berhasil disimpan.');
     }
 
-    /** Aktivitas dosen (4 tab). TODO-DB: ganti dengan query. */
+    /**
+     * Aktivitas dosen (4 tab).
+     * DIPAKSA KOSONG TOTAL UNTUK SEMUA DOSEN DAN SEMUA MODE.
+     */
     private function aktivitas(array $row): array
     {
         return [
-            'penelitian' => ['label' => 'Penelitian', 'items' => [
-                ['title' => 'Deteksi hoaks dengan machine learning', 'year' => '2026', 'type' => 'Penelitian Terapan',      'role' => 'Ketua'],
-                ['title' => 'Analisis sentimen ulasan aplikasi',     'year' => '2025', 'type' => 'Penelitian Dasar',        'role' => 'Anggota'],
-                ['title' => 'Sistem rekomendasi mata kuliah',        'year' => '2025', 'type' => 'Penelitian Pengembangan', 'role' => 'Anggota'],
-            ]],
-            'pengabdian' => ['label' => 'Pengabdian', 'items' => [
-                ['title' => 'Pelatihan sensor sederhana pada sistem terbenam', 'year' => '2025', 'type' => 'Pengabdian kepada Masyarakat', 'role' => 'Ketua'],
-                ['title' => 'Pendampingan digitalisasi UMKM',                  'year' => '2024', 'type' => 'Pengabdian kepada Masyarakat', 'role' => 'Anggota'],
-            ]],
-            'pengajaran' => ['label' => 'Pengajaran', 'items' => [
-                ['title' => 'Pemrograman Web Lanjut', 'year' => '2026', 'type' => 'Semester Ganjil · 3 SKS', 'role' => 'Pengampu'],
-                ['title' => 'Basis Data II',          'year' => '2026', 'type' => 'Semester Ganjil · 3 SKS', 'role' => 'Pengampu'],
-                ['title' => 'Jaringan Komputer',      'year' => '2025', 'type' => 'Semester Genap · 3 SKS',  'role' => 'Koordinator'],
-            ]],
-            'kegiatan' => ['label' => 'Kegiatan', 'items' => [
-                ['title' => 'Seminar Nasional AI', 'year' => '2026', 'type' => 'Seminar',            'role' => 'Pemateri'],
-                ['title' => 'Pelatihan Industri',  'year' => '2025', 'type' => 'Pelatihan',          'role' => 'Peserta'],
-                ['title' => 'Kunjungan Industri',  'year' => '2025', 'type' => 'Kunjungan Industri', 'role' => 'Pendamping'],
-            ]],
+            'penelitian' => ['label' => 'Penelitian', 'items' => []],
+            'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
+            'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
+            'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
         ];
     }
 }

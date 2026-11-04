@@ -66,29 +66,17 @@ class KaprodiDosenController extends Controller
         ]);
     }
 
-    /** Aktivitas dosen (4 tab). TODO-DB: ganti dengan query. */
+    /**
+     * Aktivitas dosen (4 tab).
+     * DIPAKSA KOSONG TOTAL UNTUK SEMUA DOSEN DAN SEMUA MODE.
+     */
     private function aktivitas(array $row): array
     {
         return [
-            'penelitian' => ['label' => 'Penelitian', 'items' => [
-                ['title' => 'Deteksi hoaks dengan machine learning', 'year' => '2026', 'type' => 'Penelitian Terapan',      'role' => 'Ketua'],
-                ['title' => 'Analisis sentimen ulasan aplikasi',     'year' => '2025', 'type' => 'Penelitian Dasar',        'role' => 'Anggota'],
-                ['title' => 'Sistem rekomendasi mata kuliah',        'year' => '2025', 'type' => 'Penelitian Pengembangan', 'role' => 'Anggota'],
-            ]],
-            'pengabdian' => ['label' => 'Pengabdian', 'items' => [
-                ['title' => 'Pelatihan sensor sederhana pada sistem terbenam', 'year' => '2025', 'type' => 'Pengabdian kepada Masyarakat', 'role' => 'Ketua'],
-                ['title' => 'Pendampingan digitalisasi UMKM',                  'year' => '2024', 'type' => 'Pengabdian kepada Masyarakat', 'role' => 'Anggota'],
-            ]],
-            'pengajaran' => ['label' => 'Pengajaran', 'items' => [
-                ['title' => 'Pemrograman Web Lanjut', 'year' => '2026', 'type' => 'Semester Ganjil · 3 SKS', 'role' => 'Pengampu'],
-                ['title' => 'Basis Data II',          'year' => '2026', 'type' => 'Semester Ganjil · 3 SKS', 'role' => 'Pengampu'],
-                ['title' => 'Jaringan Komputer',      'year' => '2025', 'type' => 'Semester Genap · 3 SKS',  'role' => 'Koordinator'],
-            ]],
-            'kegiatan' => ['label' => 'Kegiatan', 'items' => [
-                ['title' => 'Seminar Nasional AI', 'year' => '2026', 'type' => 'Seminar',            'role' => 'Pemateri'],
-                ['title' => 'Pelatihan Industri',  'year' => '2025', 'type' => 'Pelatihan',          'role' => 'Peserta'],
-                ['title' => 'Kunjungan Industri',  'year' => '2025', 'type' => 'Kunjungan Industri', 'role' => 'Pendamping'],
-            ]],
+            'penelitian' => ['label' => 'Penelitian', 'items' => []],
+            'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
+            'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
+            'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
         ];
     }
 }
