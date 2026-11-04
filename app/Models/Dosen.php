@@ -31,4 +31,9 @@ class Dosen extends Model
             'id_dosen'
         );
     }
+
+    public function enrollmentKelasMataKuliah(): HasMany
+    {
+        return $this->hasMany(EnrollmentKelasMataKuliah::class, 'id_dosen', 'id_dosen');
+    }
 }
