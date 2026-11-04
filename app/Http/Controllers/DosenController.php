@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kegiatan;
 use App\Repositories\DosenStore;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; 
 use Illuminate\Validation\Rule;
 
 class DosenController extends Controller
@@ -256,15 +258,61 @@ class DosenController extends Controller
 
     /**
      * Aktivitas dosen (4 tab).
-     * DIPAKSA KOSONG TOTAL UNTUK SEMUA DOSEN DAN SEMUA MODE.
+     * Mengambil data asli dari database melalui tabel anggota_kegiatan.
      */
     private function aktivitas(array $row): array
     {
-        return [
+        $tabs = [
             'penelitian' => ['label' => 'Penelitian', 'items' => []],
             'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
             'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
             'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
         ];
+
+        if (isset($row['aktivitas'])) {
+            return $row['aktivitas'];
+        }
+
+        try {
+            $idUser = $row['id_user'] ?? $row['id'];
+
+            // Gunakan Query Builder untuk melakukan JOIN secara manual sesuai struktur tabel yang dikirim
+            $kegiatans = DB::table('anggota_kegiatan')
+                ->join('kegiatan', 'anggota_kegiatan.id_kegiatan', '=', 'kegiatan.id_kegiatan')
+                ->leftJoin('kategori', 'kegiatan.id_kategori', '=', 'kategori.id_kategori')
+                ->leftJoin('jenis_kegiatan', 'kategori.id_jenis_kegiatan', '=', 'jenis_kegiatan.id_jenis_kegiatan')
+                ->where('anggota_kegiatan.id_user', $idUser)
+                ->orderBy('kegiatan.tanggal_mulai', 'desc')
+                ->select(
+                    'kegiatan.nama_kegiatan',
+                    'kegiatan.tanggal_mulai',
+                    'kategori.nama_kategori',
+                    'jenis_kegiatan.nama_jenis_kegiatan',
+                    'anggota_kegiatan.peran'
+                )
+                ->get();
+
+            foreach ($kegiatans as $keg) {
+                // Tentukan ranah tab berdasarkan nama_kategori (misal 'Penelitian', 'Pengabdian').
+                // Jika tidak spesifik, masukkan ke tab 'kegiatan' umum.
+                $kategoriNama = strtolower(trim($keg->nama_kategori ?? ''));
+                
+                $ranah = 'kegiatan'; // Default
+                if (str_contains($kategoriNama, 'penelitian')) $ranah = 'penelitian';
+                elseif (str_contains($kategoriNama, 'pengabdian')) $ranah = 'pengabdian';
+                elseif (str_contains($kategoriNama, 'pengajaran')) $ranah = 'pengajaran';
+
+                $tabs[$ranah]['items'][] = [
+                    'judul' => $keg->nama_kegiatan,
+                    'tahun' => $keg->tanggal_mulai ? date('Y', strtotime($keg->tanggal_mulai)) : '-',
+                    'jenis' => $keg->nama_kategori ?? '-',
+                    'peran' => $keg->peran ?? 'Anggota',
+                ];
+            }
+        } catch (\Exception $e) {
+            // Cegah error jika tabel-tabel tersebut belum di-migrate sepenuhnya
+        }
+
+        return $tabs;
     }
 }
