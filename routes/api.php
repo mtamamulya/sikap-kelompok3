@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BeritaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -7,40 +8,40 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | API Routes - SIKAP Kelompok 3
 |--------------------------------------------------------------------------
-|
-| Semua route di file ini otomatis mendapat prefix "/api/v1"
-| (lihat bootstrap/app.php -> apiPrefix).
-|
+| Prefix otomatis "/api/v1" (via bootstrap/app.php).
 | Contoh: Route::get('/ping') -> GET /api/v1/ping
-|
-| Route yang dikonsumsi oleh Kelompok 1 (database terpisah) letakkan di
-| dalam group "integrasi" di bawah, supaya jelas mana kontrak publik kita.
-|
 */
 
+// Endpoint Health Check (Sesuai API-CONTRACT.md)
 Route::get('/ping', function () {
     return response()->json([
-        'status' => 'ok',
-        'service' => 'sikap-kelompok3',
-        'time' => now()->toIso8601String(),
-    ]);
+        'success' => true,
+        'message' => 'Service Kelompok 3 Aktif',
+        'data' => [
+            'status' => 'ok',
+            'service' => 'sikap-kelompok3',
+            'time' => now()->toIso8601String(),
+        ],
+    ], 200);
 });
 
 Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-    return $request->user();
+    return response()->json([
+        'success' => true,
+        'message' => 'Data profil user berhasil diambil',
+        'data' => $request->user(),
+    ], 200);
 });
 
 /*
 |--------------------------------------------------------------------------
-| Integrasi dengan Kelompok 1
+| Integrasi dengan Kelompok 1 (Endpoint Kontrak)
 |--------------------------------------------------------------------------
-| Endpoint di bawah ini adalah KONTRAK. Jangan ubah tanpa koordinasi,
-| karena Kelompok 1 memanggilnya dari aplikasi mereka.
-| Dokumentasi kontrak: docs/API-CONTRACT.md
 */
-
 Route::prefix('integrasi')
     ->middleware('auth:sanctum')
     ->group(function () {
-        // TODO: diisi setelah struktur database final.
+        // TODO: Daftarkan endpoint API fitur di sini
     });
+
+Route::get('/berita', [BeritaController::class, 'index']);

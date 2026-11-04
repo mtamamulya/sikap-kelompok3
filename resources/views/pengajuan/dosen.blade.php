@@ -1,19 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'Pengajuan Mahasiswa')
+@section('title', 'Pengajuan Dosen')
 
 @php
     // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
     // status: Diajukan | Direview | Direvisi | Ditolak | Diterima | Selesai
     $daftar = [
-        ['judul' => 'Volunteer Bakti Sosial',      'oleh' => 'Fajar Nugroho',   'nim' => null,       'kategori' => 'Pengabdian', 'tanggal' => '6 Oktober 2026',    'status' => 'Diajukan', 'catatan' => null],
-        ['judul' => 'Lomba KMIPN 2026',            'oleh' => 'Mukhlis Pratama', 'nim' => '43325121', 'kategori' => 'Lomba',      'tanggal' => '1 September 2026',  'status' => 'Direview', 'catatan' => null],
-        ['judul' => 'Kunjungan Industri Bandung',  'oleh' => 'Dimas Pratama',   'nim' => null,       'kategori' => 'Pengabdian', 'tanggal' => '20 Agustus 2026',   'status' => 'Direvisi', 'catatan' => 'Lengkapi surat izin dan jadwal kegiatan.'],
-        ['judul' => 'Lomba Desain Poster',         'oleh' => 'Eka Putri',       'nim' => null,       'kategori' => 'Pengabdian', 'tanggal' => '5 Agustus 2026',    'status' => 'Ditolak',  'catatan' => 'Lomba tidak termasuk daftar kegiatan yang diakui program studi.'],
-        ['judul' => 'Magang Industri',             'oleh' => 'Citra Lestari',   'nim' => null,       'kategori' => 'Pengabdian', 'tanggal' => '15 Januari 2026',   'status' => 'Diterima', 'catatan' => null],
-        ['judul' => 'Magang MSIB',                 'oleh' => 'Gita Maharani',   'nim' => null,       'kategori' => 'Pengabdian', 'tanggal' => '10 Februari 2026',  'status' => 'Selesai',  'catatan' => null],
+        ['judul' => 'Penyuluhan Literasi Digital', 'oleh' => 'Filda Huwani Dewi',  'kategori' => 'Pengabdian', 'tanggal' => '3 Oktober 2026',  'status' => 'Diajukan', 'catatan' => null],
+        ['judul' => 'Seminar Nasional AI',         'oleh' => 'Angga Wahyu Wibowo', 'kategori' => 'Pengabdian', 'tanggal' => '15 Agustus 2026', 'status' => 'Direview', 'catatan' => null],
+        ['judul' => 'Pelatihan Industri',          'oleh' => 'Kuwat Santoso',      'kategori' => 'Pengabdian', 'tanggal' => '12 Agustus 2026', 'status' => 'Direvisi', 'catatan' => 'Lampirkan surat tugas yang sudah ditandatangani.'],
+        ['judul' => 'Woorkshop Penulisan Jurnal',  'oleh' => 'Tahan Prahara',      'kategori' => 'Pengabdian', 'tanggal' => '2 Juli 2026',     'status' => 'Ditolak',  'catatan' => 'Jadwal bentrok dengan kegiatan fakultas pada tanggal yang sama.'],
+        ['judul' => 'Kunjungan Industri',          'oleh' => 'Wiktasari',          'kategori' => 'Pengabdian', 'tanggal' => '26 Juli 2026',    'status' => 'Diterima', 'catatan' => null],
+        ['judul' => 'Kuliah Tamu',                 'oleh' => 'Kuwat Santoso',      'kategori' => 'Pengabdian', 'tanggal' => '10 Juli 2026',    'status' => 'Selesai',  'catatan' => null],
     ];
-    $dosenPembimbing = 'Kuwat Santoso'; // nanti diganti nama dosen yang login
 
     // Status => keadaan 4 langkah (Diajukan, Direview, Keputusan, Selesai).
     // d = sudah lewat (centang biru), a = sedang berjalan, m = belum, h = selesai hijau
@@ -32,17 +31,20 @@
         $k['label3']  = $a['label3'];
         return $k;
     }, $daftar);
+    // id tetap (1, 2, 3, ...) supaya tombol Tinjau tidak berubah saat daftar difilter oleh tab atau pencarian.
+    foreach ($daftar as $n => &$d) { $d['id'] = $n + 1; }
+    unset($d);
 @endphp
 
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-4xl font-bold tracking-tight">Pengajuan Mahasiswa</h1>
-        <p class="text-2xl text-gray-400">Dashboard / Pengajuan / Mahasiswa</p>
+        <h1 class="text-3xl font-bold tracking-tight">Pengajuan Dosen</h1>
+        <p class="text-2xl text-gray-400">Dashboard / Pengajuan / Dosen</p>
     </div>
 
     <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
-             x-data="pengajuanMahasiswa(@js($daftar), @js($dosenPembimbing))">
+             x-data="pengajuanDosen(@js($daftar))">
 
         {{-- Tab status. Angka biru hanya tampil di tab yang aktif. --}}
         <div role="tablist" aria-label="Status pengajuan" class="flex gap-x-2 overflow-x-auto border-b border-gray-200 pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -74,24 +76,23 @@
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex min-w-0 flex-col gap-2 text-[15px]">
                             <h2 class="text-lg font-semibold" x-text="k.judul"></h2>
-                            <p>Diajukan oleh <span class="font-semibold" x-text="k.oleh"></span><template x-if="k.nim"><span> &middot; NIM <span x-text="k.nim"></span></span></template></p>
+                            <p>Diajukan oleh <span class="font-semibold" x-text="k.oleh"></span></p>
                             <p><span x-text="k.kategori"></span> &middot; Diajukan <span x-text="k.tanggal"></span></p>
-                            <p>Dosen pembimbing: <span x-text="dosen"></span></p>
                         </div>
 
                         <div class="flex shrink-0 items-center gap-3">
                             <span :class="warnaBadge[k.status]" class="rounded-md px-2 py-0.5 text-xs" x-text="k.status"></span>
-                            {{-- Tombol Tinjau: alamat halaman tinjau diisi nanti --}}
-                            <a href="#" :aria-label="`Tinjau ${k.judul}`"
+                            {{-- Tombol Tinjau: membuka halaman Detail Pengajuan --}}
+                            <a :href="`{{ url('/pengajuan/dosen') }}/${k.id}`" :aria-label="`Tinjau ${k.judul}`"
                                class="flex h-9 items-center rounded-md bg-brand px-4 text-base text-white hover:bg-blue-700">Tinjau</a>
                         </div>
                     </div>
 
                     {{-- Alur 4 langkah --}}
-                    <ol class="grid grid-cols-4" aria-label="Tahapan pengajuan">
+                    <ol class="flex" aria-label="Tahapan pengajuan">
                         <template x-for="(s, n) in k.langkah" :key="n">
-                            <li class="flex flex-col gap-2" :class="n === 3 ? 'items-end' : 'items-start'">
-                                <div class="flex w-full items-center" :class="n === 3 ? 'justify-end' : ''">
+                            <li class="flex flex-col items-start gap-2" :class="n === 3 ? 'shrink-0' : 'flex-1'">
+                                <div class="flex w-full items-center">
                                     <span :class="lingkaran(k, n)"
                                           class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-medium">
                                         <template x-if="s === 'd' || s === 'h'">
@@ -129,8 +130,8 @@
 @push('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('pengajuanMahasiswa', (daftar, dosen) => ({
-            daftar, dosen,
+        Alpine.data('pengajuanDosen', (daftar) => ({
+            daftar,
             tab: ['Semua', 'Diajukan', 'Direview', 'Direvisi', 'Ditolak', 'Diterima', 'Selesai'],
             aktif: 'Semua',
             cari: '',
@@ -152,7 +153,7 @@
                 const q = this.cari.trim().toLowerCase();
                 return this.daftar.filter(k =>
                     (this.aktif === 'Semua' || k.status === this.aktif) &&
-                    (q === '' || k.judul.toLowerCase().includes(q) || k.oleh.toLowerCase().includes(q) || this.dosen.toLowerCase().includes(q))
+                    (q === '' || k.judul.toLowerCase().includes(q) || k.oleh.toLowerCase().includes(q))
                 );
             },
 

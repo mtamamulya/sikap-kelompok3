@@ -1,5 +1,5 @@
 @php
-    $mhsActive = request()->is('mahasiswa*', 'profil');
+    $mhsActive = request()->is('mahasiswa*', 'profil*');
 
     $menuMhs = [
         ['label' => 'Mata kuliah',        'url' => url('/mahasiswa/mata-kuliah'), 'match' => 'mahasiswa/mata-kuliah*'],
@@ -22,9 +22,9 @@
 
     <!-- Menu Navigasi Utama -->
     <nav class="flex flex-col gap-1.5 text-[15px] text-white">
-        
+
         <!-- Dashboard -->
-        <a href="{{ url('/') }}" 
+        <a href="{{ url('/') }}"
            class="{{ $navItem }} {{ request()->is('/') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
             <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h6v6h-6z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6h-6z"/><path d="M14 14h6v6h-6z"/>
@@ -33,7 +33,7 @@
         </a>
 
         <!-- Pengajuan -->
-        <a href="#" 
+        <a href="{{ route(auth()->user()?->dosen ? 'pengajuan.dosen' : 'pengajuan.mahasiswa') }}"
            class="{{ $navItem }} {{ request()->is('pengajuan*') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
             <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/>
@@ -45,8 +45,8 @@
         <div x-data="{ openMhs: {{ $mhsActive ? 'true' : 'false' }} }" class="flex flex-col gap-1.5">
             <div class="flex items-center rounded-lg transition-colors
                         {{ $subAktif ? 'bg-white/15 text-white' : ($mhsActive ? 'bg-white font-semibold text-[#1f66e5] shadow-sm' : 'hover:bg-white/10') }}">
-                
-                <a href="#" class="flex flex-1 items-center gap-3 rounded-l-lg px-3 py-2.5">
+
+                <a href="{{ route('mahasiswa.dashboard') }}" class="flex flex-1 items-center gap-3 rounded-l-lg px-3 py-2.5">
                     <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M8 21v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/><path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M17 10h2a2 2 0 0 1 2 2v1"/><path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0-4 0"/><path d="M3 13v-1a2 2 0 0 1 2-2h2"/>
                     </svg>
@@ -75,7 +75,7 @@
         {{-- ===== Akhir Grup Mahasiswa ===== --}}
 
         <!-- Kegiatan -->
-        <a href="{{ url('/kegiatan') }}" 
+        <a href="{{ url('/kegiatan') }}"
            class="{{ $navItem }} {{ request()->is('kegiatan*') ? 'bg-white font-semibold text-[#1f66e5] shadow-sm hover:bg-white' : '' }}">
             <svg class="{{ $navIcon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3-5a9 9 0 0 0 6-8a3 3 0 0 0-3-3a9 9 0 0 0-8 6a6 6 0 0 0-5 3"/><path d="M7 14a6 6 0 0 0-3 6a6 6 0 0 0 6-3"/><path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/>

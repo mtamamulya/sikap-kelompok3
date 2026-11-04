@@ -8,17 +8,17 @@
     // DATA TIRUAN. $id berasal dari alamat (/pengabdian/{id}).
     // Nanti diganti data pengabdian dari controller / database oleh tim backend.
     $p = [
-        'judul'          => 'Seminar Nasional AI',
+        'judul'          => 'Deteksi hoaks dengan ML',
         'afiliasi'       => 'Jurusan Teknik Elektro',
-        'skim'           => 'Pengabdian Masyarakat',
-        'ranah'          => 'Pengabdian Masyarakat',
+        'skim'           => 'Pengabdian dasar',
+        'ranah'          => 'Pengabdian dasar',
         'bidang'         => 'Energi',
         'sebelumnya'     => 'Tidak ada, Pengabdian baru',
         'tahun_anggaran' => 2026,
         'tahun_ke'       => 1,
         'lama'           => 1,
         'lokasi'         => 'Kabupaten Kendal',
-        'nomor_sk'       => '39/SK-REK/SP/1/2022',
+        'nomor_sk'       => '4389/UN/KP/2026',
         'tanggal_sk'     => '04/06/2026',
         'dana_dikti'     => 'Rp 1.000.000',
         'dana_pt'        => 'Rp 1.000.000',
@@ -33,15 +33,13 @@
         ['nama' => 'Mukhlis Pratama Mulya', 'peran' => 'Anggota', 'status' => 'Mahasiswa'],
     ];
 
-    // Dokumen pendukung. 'url' = alamat file untuk dilihat / diunduh ('#' = belum ada file sungguhan).
+    // Dokumen pendukung. 'tautan' = alamat dokumen di cloud (Google Drive dll.), dibuka di tab baru.
     $dokumen = [
         [
-            'file'       => 'Proposal pengabdian.pdf',
-            'url'        => '#',
             'nama'       => 'Proposal Pengabdian',
             'jenis'      => 'Proposal',
             'keterangan' => 'Ini adalah proposal pengabdian masyarakat',
-            'tautan'     => null,
+            'tautan'     => 'https://drive.google.com/drive/folders/contoh',
         ],
     ];
 
@@ -52,7 +50,7 @@
     {{-- Judul halaman + tombol kembali --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
-            <h1 class="text-4xl font-bold tracking-tight">Detail Pengabdian</h1>
+            <h1 class="text-3xl font-bold tracking-tight">Detail Pengabdian</h1>
             <p class="text-2xl text-gray-400">Dashboard / Pengabdian / Detail Pengabdian</p>
         </div>
         <a href="{{ route('pengabdian.index') }}"
@@ -150,7 +148,7 @@
         </section>
 
         {{-- 5. DOKUMEN PENDUKUNG
-             Di halaman Detail tidak ada kotak unggah. File ditampilkan sebagai baris dengan tombol Lihat dan Unduh.
+             Di halaman Detail tidak ada kotak unggah. Dokumen ditampilkan sebagai tautan yang dibuka di tab baru (tidak ada unggah file).
              Dokumen ditambah / diganti di halaman Edit. --}}
         <section class="{{ $sectionClass }}" aria-labelledby="h-dokumen">
             <div class="flex items-center gap-2.5">
@@ -167,35 +165,31 @@
                     <div class="flex flex-col gap-4 p-3.5">
                         {{-- File: nama file + tombol Lihat dan Unduh --}}
                         <div class="flex flex-col gap-2">
-                            <span class="text-[15px] font-medium">File</span>
-                            <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
-                                <div class="flex min-w-0 items-center gap-3">
-                                    <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-brand">
-                                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8zM14 3v5h5M9 13h6M9 17h6"/></svg>
-                                    </span>
-                                    <span class="truncate text-[15px]" title="{{ $d['file'] }}">{{ $d['file'] }}</span>
-                                </div>
-
-                                <div class="flex items-center gap-2">
-                                    <a href="{{ $d['url'] }}" target="_blank" rel="noopener noreferrer"
-                                       class="flex h-9 items-center gap-1.5 rounded-lg bg-blue-100 px-3.5 text-sm font-medium text-brand hover:bg-blue-200">
-                                        <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                                        Lihat
-                                    </a>
-                                    <a href="{{ $d['url'] }}" download="{{ $d['file'] }}"
-                                       class="flex h-9 items-center gap-1.5 rounded-lg border border-brand bg-white px-3.5 text-sm font-medium text-brand hover:bg-blue-50">
-                                        <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>
-                                        Unduh
+                            <span class="text-[15px] font-medium">Tautan dokumen</span>
+                            @if (! empty($d['tautan']))
+                                <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3">
+                                    <div class="flex min-w-0 items-center gap-3">
+                                        <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-brand">
+                                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>
+                                        </span>
+                                        <span class="truncate text-[15px]" title="{{ $d['tautan'] }}">{{ $d['tautan'] }}</span>
+                                    </div>
+                                    <a href="{{ $d['tautan'] }}" target="_blank" rel="noopener noreferrer"
+                                       class="flex h-9 items-center gap-1.5 rounded-lg bg-brand px-3.5 text-sm font-medium text-white hover:bg-blue-700">
+                                        Buka dokumen
+                                        <svg class="size-[16px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>
+                                        <span class="sr-only">(dibuka di tab baru)</span>
                                     </a>
                                 </div>
-                            </div>
+                            @else
+                                <p class="rounded-lg border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500">Belum ada tautan dokumen.</p>
+                            @endif
                         </div>
 
                         <dl class="grid grid-cols-1 gap-4.5 md:grid-cols-2">
                             <x-detail-field label="Nama dokumen" :value="$d['nama']" />
                             <x-detail-field label="Jenis dokumen" :value="$d['jenis']" icon="chevron" />
-                            <div class="md:col-span-2"><x-detail-field label="Keterangan" :value="$d['keterangan']" multiline /></div>
-                            <div class="md:col-span-2"><x-detail-field label="Tautan dokumen (opsional)" :value="$d['tautan']" :href="$d['tautan']" /></div>
+                            <!-- <div class="md:col-span-2"><x-detail-field label="Keterangan" :value="$d['keterangan']" multiline /></div> -->
                         </dl>
                     </div>
                 </div>

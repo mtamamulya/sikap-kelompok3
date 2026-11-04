@@ -34,7 +34,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-4xl font-bold tracking-tight">Tambah Prestasi</h1>
+        <h1 class="text-3xl font-bold tracking-tight">Tambah Prestasi</h1>
         <p class="text-2xl text-gray-400">Dashboard / Prestasi / Tambah</p>
     </div>
 
@@ -280,7 +280,7 @@
         <section class="{{ $sectionClass }}" aria-labelledby="h-dokumen">
             <div class="flex items-center gap-2.5">
                 <span class="{{ $numClass }}" x-text="bentuk === 'Tim' ? 4 : 3"></span>
-                <h2 id="h-dokumen" class="text-[15px] font-semibold">Unggah Dokumen</h2>
+                <h2 id="h-dokumen" class="text-[15px] font-semibold">Dokumen Pendukung</h2>
             </div>
 
             <template x-for="(d, i) in dokumen" :key="d.id">
@@ -299,23 +299,6 @@
 
                     <div class="flex flex-col gap-4 p-3.5">
                         <div class="flex flex-col gap-2">
-                            <span class="{{ $labelClass }}">File {!! $wajib !!}</span>
-                            <label class="relative flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-brand bg-white px-4 py-5 text-center hover:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand">
-                                <input type="file" class="sr-only" :name="`dokumen[${i}][file]`"
-                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
-                                       x-on:change="pilihFile($event, d)">
-                                <span class="flex items-center gap-2 text-[13px] font-medium text-brand">
-                                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.5a4 4 0 0 1-.5 7.97M12 20v-8M9 15l3-3 3 3"/></svg>
-                                    <span x-text="d.namaFile || 'Pilih file dari perangkat'"></span>
-                                </span>
-                                <span class="text-xs text-gray-500">pdf, jpg, jpeg, png, doc, docx, xls, xlsx, txt, maksimal 5 MB.</span>
-                            </label>
-                            <template x-if="d.errorFile">
-                                <p role="alert" class="text-sm text-red-600" x-text="d.errorFile"></p>
-                            </template>
-                        </div>
-
-                        <div class="flex flex-col gap-2">
                             <label :for="`jenis-${d.id}`" class="{{ $labelClass }}">Jenis dokumen {!! $wajib !!}</label>
                             <div class="relative">
                                 <select :id="`jenis-${d.id}`" :name="`dokumen[${i}][jenis]`" required x-model="d.jenis" class="{{ $selectClass }}">
@@ -328,6 +311,12 @@
                                 </select>
                                 {!! $chevron !!}
                             </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label :for="`tautan-${d.id}`" class="{{ $labelClass }}">Tautan dokumen {!! $wajib !!}</label>
+                            <input :id="`tautan-${d.id}`" :name="`dokumen[${i}][tautan]`" type="url" required x-model="d.tautan"
+                                   placeholder="https://drive.google.com/..." class="{{ $inputClass }}">
+                            <p class="{{ $hintClass }}">Tempel tautan Google Drive, OneDrive, atau cloud lain. Pastikan akses tautan dibuka untuk yang memiliki tautan.</p>
                         </div>
                     </div>
                 </div>
@@ -400,37 +389,18 @@
             },
             hapus(i) { this.anggota.splice(i, 1); },
 
-            // Dokumen. Dokumen 1 selalu ada, sisanya bisa ditambah / dihapus. File maksimal 5 MB.
+            // Dokumen. Dokumen 1 selalu ada, sisanya bisa ditambah / dihapus.
             nextId: 2,
             dokumen: [
-                { id: 1, namaFile: '', errorFile: '', jenis: '' },
+                { id: 1, jenis: '', tautan: '' },
             ],
             tambahDokumen() {
-                this.dokumen.push({ id: this.nextId++, namaFile: '', errorFile: '', jenis: '' });
+                this.dokumen.push({ id: this.nextId++, jenis: '', tautan: '' });
             },
             hapusDokumen(i) { this.dokumen.splice(i, 1); },
-            pilihFile(event, d) {
-                const file = event.target.files[0];
-                d.errorFile = '';
-                if (!file) { d.namaFile = ''; return; }
-                if (file.size > 5 * 1024 * 1024) {
-                    // terlalu besar: batalkan pilihan file
-                    event.target.value = '';
-                    d.namaFile = '';
-                    d.errorFile = 'Ukuran file melebihi 5 MB.';
-                    return;
-                }
-                d.namaFile = file.name;
-            },
-
-            // Simpan (simulasi). Setiap dokumen wajib punya file.
+// Simpan (simulasi).
             tersimpan: false,
             simpan() {
-                let lengkap = true;
-                this.dokumen.forEach(d => {
-                    if (!d.namaFile) { d.errorFile = 'File wajib dipilih.'; lengkap = false; }
-                });
-                if (!lengkap) return;
                 this.tersimpan = true;
                 this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Data berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' });
             },
