@@ -19,4 +19,9 @@ class JenisDokumen extends Model
     {
         return $this->hasMany(Dokumen::class, 'id_jenis_dokumen', 'id_jenis_dokumen');
     }
+
+    public function buktiPrestasi(): HasMany
+    {
+        return $this->hasMany(BuktiPrestasi::class, 'id_jenis_dokumen', 'id_jenis_dokumen');
+    }
 }
