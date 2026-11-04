@@ -96,10 +96,6 @@
                             <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
                             Profil Saya
                         </a>
-<<<<<<< HEAD
-                        {{-- Autentikasi dikelola kelompok 1; tidak menambah alur login/logout di sini. --}}
-                        <a href="{{ route('mahasiswa.dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
-=======
                         @auth
                             <form method="POST" action="{{ route('logout') }}" class="-mx-2 mt-1 border-t border-gray-100 pt-1">
                                 @csrf
@@ -111,7 +107,7 @@
                         @else
                             <a href="{{ route('login') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Masuk</a>
                         @endauth
->>>>>>> origin/develop
+                        <a href="{{ route('mahasiswa.dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
                     </div>
                 </div>
             </div>
