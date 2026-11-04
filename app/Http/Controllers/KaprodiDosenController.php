@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Repositories\DosenStore;
 use Carbon\Carbon;
+    use Illuminate\Support\Facades\DB; // Pastikan import DB di bagian atas file
+
 
 /** Data dosen untuk kaprodi: HANYA BACA (tanpa tambah / ubah / hapus). Data sama dengan admin. */
 class KaprodiDosenController extends Controller
@@ -66,29 +68,64 @@ class KaprodiDosenController extends Controller
         ]);
     }
 
-    /** Aktivitas dosen (4 tab). TODO-DB: ganti dengan query. */
+
+    /**
+     * Aktivitas dosen (4 tab).
+     * Mengambil data asli dari database melalui tabel anggota_kegiatan.
+     */
     private function aktivitas(array $row): array
     {
-        return [
-            'penelitian' => ['label' => 'Penelitian', 'items' => [
-                ['title' => 'Deteksi hoaks dengan machine learning', 'year' => '2026', 'type' => 'Penelitian Terapan',      'role' => 'Ketua'],
-                ['title' => 'Analisis sentimen ulasan aplikasi',     'year' => '2025', 'type' => 'Penelitian Dasar',        'role' => 'Anggota'],
-                ['title' => 'Sistem rekomendasi mata kuliah',        'year' => '2025', 'type' => 'Penelitian Pengembangan', 'role' => 'Anggota'],
-            ]],
-            'pengabdian' => ['label' => 'Pengabdian', 'items' => [
-                ['title' => 'Pelatihan sensor sederhana pada sistem terbenam', 'year' => '2025', 'type' => 'Pengabdian kepada Masyarakat', 'role' => 'Ketua'],
-                ['title' => 'Pendampingan digitalisasi UMKM',                  'year' => '2024', 'type' => 'Pengabdian kepada Masyarakat', 'role' => 'Anggota'],
-            ]],
-            'pengajaran' => ['label' => 'Pengajaran', 'items' => [
-                ['title' => 'Pemrograman Web Lanjut', 'year' => '2026', 'type' => 'Semester Ganjil · 3 SKS', 'role' => 'Pengampu'],
-                ['title' => 'Basis Data II',          'year' => '2026', 'type' => 'Semester Ganjil · 3 SKS', 'role' => 'Pengampu'],
-                ['title' => 'Jaringan Komputer',      'year' => '2025', 'type' => 'Semester Genap · 3 SKS',  'role' => 'Koordinator'],
-            ]],
-            'kegiatan' => ['label' => 'Kegiatan', 'items' => [
-                ['title' => 'Seminar Nasional AI', 'year' => '2026', 'type' => 'Seminar',            'role' => 'Pemateri'],
-                ['title' => 'Pelatihan Industri',  'year' => '2025', 'type' => 'Pelatihan',          'role' => 'Peserta'],
-                ['title' => 'Kunjungan Industri',  'year' => '2025', 'type' => 'Kunjungan Industri', 'role' => 'Pendamping'],
-            ]],
+        $tabs = [
+            'penelitian' => ['label' => 'Penelitian', 'items' => []],
+            'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
+            'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
+            'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
         ];
+
+        if (isset($row['aktivitas'])) {
+            return $row['aktivitas'];
+        }
+
+        try {
+            $idUser = $row['id_user'] ?? $row['id'];
+
+            // Gunakan Query Builder untuk melakukan JOIN secara manual sesuai struktur tabel yang dikirim
+            $kegiatans = DB::table('anggota_kegiatan')
+                ->join('kegiatan', 'anggota_kegiatan.id_kegiatan', '=', 'kegiatan.id_kegiatan')
+                ->leftJoin('kategori', 'kegiatan.id_kategori', '=', 'kategori.id_kategori')
+                ->leftJoin('jenis_kegiatan', 'kategori.id_jenis_kegiatan', '=', 'jenis_kegiatan.id_jenis_kegiatan')
+                ->where('anggota_kegiatan.id_user', $idUser)
+                ->orderBy('kegiatan.tanggal_mulai', 'desc')
+                ->select(
+                    'kegiatan.nama_kegiatan',
+                    'kegiatan.tanggal_mulai',
+                    'kategori.nama_kategori',
+                    'jenis_kegiatan.nama_jenis_kegiatan',
+                    'anggota_kegiatan.peran'
+                )
+                ->get();
+
+            foreach ($kegiatans as $keg) {
+                // Tentukan ranah tab berdasarkan nama_kategori (misal 'Penelitian', 'Pengabdian').
+                // Jika tidak spesifik, masukkan ke tab 'kegiatan' umum.
+                $kategoriNama = strtolower(trim($keg->nama_kategori ?? ''));
+                
+                $ranah = 'kegiatan'; // Default
+                if (str_contains($kategoriNama, 'penelitian')) $ranah = 'penelitian';
+                elseif (str_contains($kategoriNama, 'pengabdian')) $ranah = 'pengabdian';
+                elseif (str_contains($kategoriNama, 'pengajaran')) $ranah = 'pengajaran';
+
+                $tabs[$ranah]['items'][] = [
+                    'judul' => $keg->nama_kegiatan,
+                    'tahun' => $keg->tanggal_mulai ? date('Y', strtotime($keg->tanggal_mulai)) : '-',
+                    'jenis' => $keg->nama_kategori ?? '-',
+                    'peran' => $keg->peran ?? 'Anggota',
+                ];
+            }
+        } catch (\Exception $e) {
+            // Cegah error jika tabel-tabel tersebut belum di-migrate sepenuhnya
+        }
+
+        return $tabs;
     }
 }

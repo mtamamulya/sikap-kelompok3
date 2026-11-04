@@ -10,6 +10,7 @@
 use App\Http\Controllers\Api\AkreditasiController as ApiAkreditasi;
 use App\Http\Controllers\Api\KurikulumController as ApiKurikulum;
 use App\Http\Controllers\Api\MataKuliahController as ApiMataKuliah;
+use App\Http\Controllers\Api\DosenController as ApiDosenController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('kurikulum', [ApiKurikulum::class, 'index'])->name('api.kurikulum.index');
@@ -22,3 +23,6 @@ Route::get('mata-kuliah/{id}', [ApiMataKuliah::class, 'show'])->whereNumber('id'
 Route::get('akreditasi', [ApiAkreditasi::class, 'index'])->name('api.akreditasi.index');
 Route::get('akreditasi/aktif', [ApiAkreditasi::class, 'aktif'])->name('api.akreditasi.aktif');
 Route::get('akreditasi/{id}', [ApiAkreditasi::class, 'show'])->whereNumber('id')->name('api.akreditasi.show');
+
+Route::get('/dosen', [ApiDosenController::class, 'index']);
+Route::get('/dosen/{id}', [ApiDosenController::class, 'show'])->whereNumber('id');

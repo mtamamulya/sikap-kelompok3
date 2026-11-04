@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Repositories\AkreditasiDbStore;
 use App\Repositories\AkreditasiStore;
+use App\Repositories\DosenDbStore;
+use App\Repositories\DosenStore;
 use App\Repositories\EloquentKurikulumRepository;
 use App\Repositories\EloquentMataKuliahRepository;
 use App\Repositories\KurikulumDbStore;
@@ -30,6 +32,7 @@ class DataSourceServiceProvider extends ServiceProvider
         $this->app->bind(KurikulumStore::class, KurikulumDbStore::class);
         $this->app->bind(MataKuliahStore::class, MataKuliahDbStore::class);
         $this->app->bind(AkreditasiStore::class, AkreditasiDbStore::class);
+        $this->app->bind(DosenStore::class, DosenDbStore::class);
         $this->app->bind(KurikulumRepository::class, EloquentKurikulumRepository::class);
         $this->app->bind(MataKuliahRepository::class, EloquentMataKuliahRepository::class);
     }
