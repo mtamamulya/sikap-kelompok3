@@ -4,8 +4,12 @@
 
 @php
     // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
-    $daftarKategori = ['Lomba', 'Magang', 'Kunjungan Industri', 'Seminar', 'Pelatihan'];
+    $daftarKategori = ['Lomba', 'Kunjungan Industri', 'Seminar', 'Pelatihan'];
     $daftarJenis    = ['Kegiatan dosen', 'Kegiatan Prodi', 'Prodi dan mahasiswa', 'Kegiatan mahasiswa'];
+
+    // Isian tambahan per kategori (edit daftarnya di _medan-kategori.php) dan nilai awal form
+    $medanKategori = require resource_path('views/dosen/kegiatan/_medan-kategori.php');
+    $awal = ['kategori' => '', 'nilai' => []];
 
     // Calon anggota yang bisa dicari: nama => status
     $kandidat = [
@@ -30,7 +34,7 @@
 @section('content')
 
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-3xl font-bold tracking-tight">Ajukan Kegiatan</h1>
+        <h1 class="text-4xl font-bold tracking-tight">Ajukan Kegiatan</h1>
         <p class="text-2xl text-gray-400">Dashboard / Kegiatan / Ajukan</p>
     </div>
 
@@ -40,7 +44,7 @@
         enctype="multipart/form-data" wajib supaya file bisa dikirim ke backend.
         Atribut name="..." sudah disiapkan supaya backend nanti tinggal membaca datanya.
     --}}
-    <form x-data="formKegiatan(@js($kandidat), @js($pengaju))" x-on:submit.prevent="simpan()"
+    <form x-data="formKegiatan(@js($kandidat), @js($pengaju), @js($medanKategori), @js($awal))" x-on:submit.prevent="simpan()"
           method="POST" action="#" enctype="multipart/form-data"
           class="flex flex-col gap-5 rounded-lg bg-white p-4.5 shadow-sm">
         @csrf
@@ -56,7 +60,7 @@
                 <div class="flex flex-col gap-2">
                     <label for="kategori" class="{{ $labelClass }}">Kategori</label>
                     <div class="relative">
-                        <select id="kategori" name="kategori" required class="{{ $selectClass }}">
+                        <select id="kategori" name="kategori" required x-model="kategori" class="{{ $selectClass }}">
                             <option value="">Pilih kategori</option>
                             @foreach ($daftarKategori as $k)
                                 <option>{{ $k }}</option>
@@ -85,9 +89,9 @@
                 </div>
 
                 <div class="flex flex-col gap-2">
-                    <label for="penyelenggara" class="{{ $labelClass }}">Penyelenggara</label>
+                    <label for="penyelenggara" class="{{ $labelClass }}" x-text="labelPenyelenggara">Penyelenggara</label>
                     <input id="penyelenggara" name="penyelenggara" type="text" required
-                           placeholder="Nama institusi" class="{{ $inputClass }}">
+                           :placeholder="placeholderPenyelenggara" placeholder="Nama institusi" class="{{ $inputClass }}">
                 </div>
                 <div class="flex flex-col gap-2">
                     <label for="tahun" class="{{ $labelClass }}">Tahun penyelenggaraan</label>
@@ -110,10 +114,15 @@
                     {{-- tidak boleh sebelum tanggal mulai --}}
                     <input id="selesai" name="tanggal_selesai" type="date" required x-model="selesai" :min="mulai" class="{{ $inputClass }}">
                 </div>
+
+                {{-- Isian tambahan yang berubah menurut kategori --}}
+                @include('dosen.kegiatan._detail-kategori')
             </div>
         </section>
 
         {{-- 2. ANGGOTA KEGIATAN --}}
+        {{-- Untuk kategori Lomba, kartu ini hanya ada kalau bentuk keikutsertaan = Tim (lihat perluAnggota). --}}
+        <template x-if="perluAnggota">
         <section class="{{ $sectionClass }}" aria-labelledby="h-anggota">
             <div class="flex items-center gap-2.5">
                 <span class="{{ $numClass }}">2</span>
@@ -189,11 +198,12 @@
                 </table>
             </div>
         </section>
+        </template>
 
         {{-- 3. UNGGAH DOKUMEN --}}
         <section class="{{ $sectionClass }}" aria-labelledby="h-dokumen">
             <div class="flex items-center gap-2.5">
-                <span class="{{ $numClass }}">3</span>
+                <span class="{{ $numClass }}" x-text="perluAnggota ? 3 : 2">3</span>
                 <h2 id="h-dokumen" class="text-[15px] font-semibold">Dokumen Pendukung</h2>
             </div>
 
@@ -275,8 +285,18 @@
 @push('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('formKegiatan', (kandidat, pengaju) => ({
+        Alpine.data('formKegiatan', (kandidat, pengaju, medanKategori, awal) => ({
             mulai: '', selesai: '',
+
+            // Isian tambahan menurut kategori (daftar isian ada di _medan-kategori.php)
+            medanKategori,
+            kategori: awal.kategori,
+            nilai: { ...awal.nilai },
+            // Kartu Anggota: selalu ada, kecuali kategori Lomba yang bentuknya belum / bukan Tim
+            get perluAnggota() { return this.kategori !== 'Lomba' || this.nilai.bentuk === 'Tim'; },
+            get medan() { return (this.medanKategori[this.kategori] || {}).medan || []; },
+            get labelPenyelenggara() { return ((this.medanKategori[this.kategori] || {}).penyelenggara || {}).label || 'Penyelenggara'; },
+            get placeholderPenyelenggara() { return ((this.medanKategori[this.kategori] || {}).penyelenggara || {}).placeholder || 'Nama institusi'; },
 
             // Anggota: akun yang login (pengaju) selalu ada dan terkunci. Anggota lain kosong di awal.
             anggota: [
@@ -288,6 +308,8 @@
 
             // Kalau nama yang diketik ada di daftar, status otomatis terisi (masih bisa diubah)
             init() {
+                // Ganti kategori = isian tambahan kategori lain dikosongkan
+                this.$watch('kategori', () => { this.nilai = {}; });
                 this.$watch('cari', v => {
                     const nama = Object.keys(kandidat).find(n => n.toLowerCase() === v.trim().toLowerCase());
                     if (nama) this.status = kandidat[nama];
