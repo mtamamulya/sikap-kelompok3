@@ -17,4 +17,9 @@ class AnggotaKegiatan extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
+
+    public function kegiatan(): BelongsTo
+    {
+        return $this->belongsTo(Kegiatan::class, 'id_kegiatan', 'id_kegiatan');
+    }
 }

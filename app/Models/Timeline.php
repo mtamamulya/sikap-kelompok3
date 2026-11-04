@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Timeline extends Model
 {
@@ -23,5 +24,10 @@ class Timeline extends Model
     public function kegiatan(): BelongsTo
     {
         return $this->belongsTo(Kegiatan::class, 'id_kegiatan', 'id_kegiatan');
+    }
+
+    public function buktiHistory(): HasMany
+    {
+        return $this->hasMany(BuktiHistory::class, 'id_timeline', 'id_timeline');
     }
 }

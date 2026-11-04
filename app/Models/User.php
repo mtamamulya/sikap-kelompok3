@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -54,5 +55,20 @@ class User extends Authenticatable
     public function mahasiswa(): HasOne
     {
         return $this->hasOne(Mahasiswa::class, 'id_user', 'id_user');
+    }
+
+    public function kegiatan(): HasMany
+    {
+        return $this->hasMany(Kegiatan::class, 'id_user', 'id_user');
+    }
+
+    public function anggotaKegiatan(): HasMany
+    {
+        return $this->hasMany(AnggotaKegiatan::class, 'id_user', 'id_user');
+    }
+
+    public function akreditasi(): HasMany
+    {
+        return $this->hasMany(Akreditasi::class, 'id_user', 'id_user');
     }
 }
