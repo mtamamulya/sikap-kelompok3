@@ -4,29 +4,54 @@
 
 @section('content')
 @php
-    // Tab "riwayat" yang lama sudah dihapus. Tab "semua" sekarang tampil sebagai "Riwayat mata kuliah".
     $subjudul = [
         'semua'    => 'Telusuri catatan mata kuliah Anda dari semester sebelumnya.',
         'berjalan' => 'Pantau mata kuliah dan beban studi Anda pada semester aktif.',
+        'katalog'  => 'Lihat seluruh mata kuliah dari Tingkat 1 sampai Tingkat 4.',
     ][$tab];
 
     $judulKartu = [
-        'semua'    => 'Riwayat mata kuliah',
-        'berjalan' => 'Paket mata kuliah semester berjalan',
+        'semua'    => 'Riwayat Mata Kuliah',
+        'berjalan' => 'Paket Mata Kuliah',
+        'katalog'  => 'Semua Mata Kuliah',
     ][$tab];
 
     $ketKartu = [
         'semua'    => 'Temukan mata kuliah berdasarkan tingkat, periode, atau nama dosen.',
         'berjalan' => 'Daftar mata kuliah yang ditetapkan untuk semester aktif Anda.',
+        'katalog'  => 'Temukan mata kuliah berdasarkan tingkat, semester, tahun akademik, atau nama mata kuliah.',
     ][$tab];
 
-    // Urutan tombol tab: Semester berjalan di depan, Riwayat mata kuliah di belakang.
     $tabs = [
-        ['berjalan', 'Semester berjalan',   'mahasiswa.mata-kuliah.berjalan'],
-        ['semua',    'Riwayat mata kuliah', 'mahasiswa.mata-kuliah'],
+        ['berjalan', 'Semester Berjalan',   'mahasiswa.mata-kuliah.berjalan'],
+        ['katalog',  'Semua Mata Kuliah',   'mahasiswa.mata-kuliah.katalog'],
+        ['semua',    'Riwayat Mata Kuliah', 'mahasiswa.mata-kuliah.riwayat'],
     ];
 
-    $n        = $rows->count();
+    $n = $rows->count();
+    $pakaiSks = $tab === 'berjalan';
+    $kolomAkhir = $pakaiSks ? 'SKS' : 'Tahun Akademik';
+    $tingkatOpsi = [1 => 'Tingkat 1', 2 => 'Tingkat 2', 3 => 'Tingkat 3', 4 => 'Tingkat 4'];
+    $tahunOptions = array_combine($tahunList, $tahunList) ?: [];
+    $selects = [
+        ['semester', 'Semua Semester', ['Ganjil' => 'Ganjil', 'Genap' => 'Genap']],
+        ['tingkat', 'Semua Tingkat', $tingkatOpsi],
+        ['tahun', 'Tahun Akademik', $tahunOptions],
+    ];
+
+    $perPage = 5;
+    $totalHal = max(1, (int) ceil($n / $perPage));
+    $halaman = max(1, min((int) request()->query('page', 1), $totalHal));
+    $barisTampil = $rows->forPage($halaman, $perPage)->values();
+    $dari = $n ? ($halaman - 1) * $perPage + 1 : 0;
+    $sampai = min($halaman * $perPage, $n);
+    $urlHal = fn (int $p) => request()->fullUrlWithQuery(['page' => $p]).'#daftar-mata-kuliah';
+    $nomor = $totalHal <= 7
+        ? range(1, $totalHal)
+        : collect([1, $halaman - 1, $halaman, $halaman + 1, $totalHal])
+            ->filter(fn ($p) => $p >= 1 && $p <= $totalHal)
+            ->unique()->sort()->values()->all();
+
     $cardCls  = 'rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)] sm:p-6';
     $badgeCls = 'shrink-0 rounded-full border border-[#B8D0FA] bg-[#E8F0FE] px-3 py-1 text-xs font-medium text-[#0162DD]';
     $selCls   = 'h-10 w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white pl-3.5 pr-9 text-sm text-[#0A0A0A] outline-none transition-colors hover:border-[#C7D2E5] focus:border-[#27F]';
@@ -36,7 +61,7 @@
 <div class="flex flex-col gap-6">
     {{-- Judul halaman --}}
     <div class="flex flex-col gap-1.5">
-        <h1 class="text-2xl font-bold leading-tight tracking-[-0.2px] sm:text-[32px] sm:leading-[38px]">Mata Kuliah</h1>
+        <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px]">Mata Kuliah</h1>
         <p class="text-base text-[#6B7280]">{{ $subjudul }}</p>
     </div>
 
@@ -63,39 +88,33 @@
                 <span class="{{ $badgeCls }}">Paket semester</span>
             </div>
 
-            <div class="flex gap-3 rounded-xl bg-[#EEF4FF] px-4 py-3.5 text-[#003385]">
-                {!! $infoIcon !!}
-                <div class="flex flex-col gap-0.5">
-                    <div class="text-sm font-semibold">Paket semester berjalan sudah ditetapkan</div>
-                    <p class="text-sm leading-5">Daftar berikut bersumber dari penetapan akademik, bukan pilihan mandiri atau daftar referensi periode.</p>
-                </div>
-            </div>
+        
 
             <dl class="grid grid-cols-1 divide-y divide-[#E5E7EB] overflow-hidden rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
                 <div class="px-5 py-4">
-                    <dt class="text-xs text-[#6B7280]">Jumlah mata kuliah</dt>
+                    <dt class="text-xs text-[#6B7280]">Jumlah Mata Kuliah</dt>
                     <dd class="mt-1 text-lg font-semibold">{{ $ringkasan['jumlah_berjalan'] }}</dd>
                 </div>
                 <div class="px-5 py-4">
-                    <dt class="text-xs text-[#6B7280]">Total beban studi</dt>
+                    <dt class="text-xs text-[#6B7280]">Total Beban Studi</dt>
                     <dd class="mt-1 text-lg font-semibold">{{ $ringkasan['sks_diambil'] }} SKS</dd>
                 </div>
                 <div class="px-5 py-4">
-                    <dt class="text-xs text-[#6B7280]">Status paket</dt>
+                    <dt class="text-xs text-[#6B7280]">Status Paket</dt>
                     <dd class="mt-1 text-lg font-semibold text-[#4C7D08]">Sudah ditetapkan</dd>
                 </div>
             </dl>
         </section>
     @endif
 
-    {{-- Kartu daftar mata kuliah --}}
+    {{-- Kartu daftar mata kuliah: tinggi mengikuti isi tabel --}}
     <section id="daftar-mata-kuliah" class="{{ $cardCls }} flex scroll-mt-24 flex-col gap-5">
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div class="flex flex-col gap-1">
                 <h2 class="text-xl font-semibold">{{ $judulKartu }}</h2>
                 <p class="text-sm text-[#6B7280]">{{ $ketKartu }}</p>
             </div>
-            <span class="{{ $badgeCls }}">{{ $n }} {{ $tab === 'berjalan' ? 'mata kuliah' : 'catatan' }}</span>
+            <span class="{{ $badgeCls }}">{{ $n }} mata kuliah</span>
         </div>
 
         @if ($tab !== 'berjalan')
@@ -108,11 +127,7 @@
                            class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#A8A8A8]">
                 </div>
 
-                @foreach ([
-                    ['semester', 'Semua Semester', ['Ganjil' => 'Ganjil', 'Genap' => 'Genap']],
-                    ['tingkat',  'Semua Tingkat',  [1 => 'Tingkat 1', 2 => 'Tingkat 2', 3 => 'Tingkat 3']],
-                    ['tahun',    'Tahun Akademik', array_combine($tahunList, $tahunList)],
-                ] as [$field, $placeholder, $options])
+                @foreach ($selects as [$field, $placeholder, $options])
                     <div class="relative">
                         <select name="{{ $field }}" class="{{ $selCls }}" onchange="this.form.submit()" aria-label="{{ $placeholder }}">
                             <option value="">{{ $placeholder }}</option>
@@ -131,19 +146,25 @@
                 <button type="submit" class="sr-only">Terapkan</button>
             </form>
 
+            <div class="flex gap-3 rounded-xl bg-[#EEF4FF]">
+                
+            </div>
+        @elseif ($tab === 'katalog')
             <div class="flex gap-3 rounded-xl bg-[#EEF4FF] px-4 py-3.5 text-[#003385]">
                 {!! $infoIcon !!}
                 <div class="flex flex-col gap-0.5">
-                    <div class="text-sm font-semibold">Informasi mata kuliah belum lengkap</div>
-                    <p class="text-sm leading-5">
-                        {{ $n }} catatan sumber ditampilkan apa adanya, termasuk nama mata kuliah yang berulang. Tingkat dan periode Ganjil/Genap bukan nomor semester. Nilai, SKS, dan status tiap mata kuliah belum tersedia.
-                    </p>
+                    <div class="text-sm font-semibold">Katalog mata kuliah</div>
+                    <p class="text-sm leading-5">Katalog menampilkan referensi mata kuliah Tingkat 1 sampai Tingkat 4. Data ini bukan daftar paket semester yang sedang ditempuh.</p>
                 </div>
+            </div>
+        @else
+            <div class="flex gap-3 rounded-xl bg-[#EEF4FF]">
+             
             </div>
         @endif
 
-        {{-- Tabel: gaya sama dengan dashboard mahasiswa. Lebar kolom dikunci, tinggi minimum setara 10 baris --}}
-        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block {{ $tab === 'berjalan' ? '' : 'md:min-h-[452px]' }}">
+        {{-- Tabel desktop --}}
+        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block">
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
                     <col class="w-[30%]">
@@ -158,17 +179,17 @@
                         <th scope="col" class="px-4 py-2.5 font-semibold">Dosen Pengampu</th>
                         <th scope="col" class="px-4 py-2.5 font-semibold">Tingkat</th>
                         <th scope="col" class="px-4 py-2.5 font-semibold">Semester</th>
-                        <th scope="col" class="px-4 py-2.5 font-semibold">{{ $tab === 'berjalan' ? 'SKS' : 'Tahun Akademik' }}</th>
+                        <th scope="col" class="px-4 py-2.5 font-semibold">{{ $kolomAkhir }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E7EB]">
-                    @forelse ($rows as $r)
+                    @forelse ($barisTampil as $r)
                         <tr class="hover:bg-[#F9FAFB]">
                             <td class="truncate px-4 py-2.5" title="{{ $r['mk'] }}">{{ $r['mk'] }}</td>
                             <td class="truncate px-4 py-2.5" title="{{ $r['dosen'] }}">{{ $r['dosen'] }}</td>
                             <td class="px-4 py-2.5">Tingkat {{ $r['tingkat'] }}</td>
                             <td class="px-4 py-2.5">{{ $r['periode'] }}</td>
-                            <td class="px-4 py-2.5">{{ $tab === 'berjalan' ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</td>
+                            <td class="px-4 py-2.5">{{ $pakaiSks ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -180,7 +201,7 @@
         </div>
 
         <div class="flex flex-col gap-3 md:hidden">
-            @forelse ($rows as $r)
+            @forelse ($barisTampil as $r)
                 <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3.5">
                     <div class="min-w-0">
                         <h3 class="break-words text-sm font-semibold text-[#111827]">{{ $r['mk'] }}</h3>
@@ -196,8 +217,8 @@
                             <dd class="mt-0.5 font-medium text-[#111827]">{{ $r['periode'] }}</dd>
                         </div>
                         <div class="col-span-2">
-                            <dt class="text-[#6B7280]">{{ $tab === 'berjalan' ? 'SKS' : 'Tahun Akademik' }}</dt>
-                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $tab === 'berjalan' ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</dd>
+                            <dt class="text-[#6B7280]">{{ $kolomAkhir }}</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $pakaiSks ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</dd>
                         </div>
                     </dl>
                 </article>
@@ -206,12 +227,47 @@
             @endforelse
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B7280]">
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6B7280]">
             <span>
-                @if ($tab === 'berjalan') {{ $n }} mata kuliah dipaketkan untuk semester aktif
-                @else {{ $n }} catatan sumber ditampilkan • Nama mata kuliah berulang dipertahankan @endif
+                @if ($n)
+                    {{ $dari }}–{{ $sampai }} dari {{ $n }} mata kuliah
+                    @if ($tab === 'katalog') • Tingkat 1 – Tingkat 4 @endif
+                @else
+                    0 mata kuliah ditampilkan
+                @endif
             </span>
-            <span>Halaman 1 dari 1</span>
+            <nav aria-label="Navigasi halaman" class="flex flex-wrap items-center gap-1.5">
+                @php
+                    $pgBase = 'inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2.5 text-xs font-semibold transition';
+                    $pgOn = $pgBase.' border-[#27F] bg-[#27F] text-white';
+                    $pgLink = $pgBase.' border-[#E5E7EB] bg-white text-[#0162DD] hover:bg-[#EFF6FF]';
+                    $pgOff = $pgBase.' cursor-not-allowed border-[#E5E7EB] bg-[#F9FAFB] text-[#A8A8A8]';
+                @endphp
+                @if ($halaman > 1)
+                    <a href="{{ $urlHal($halaman - 1) }}" rel="prev" class="{{ $pgLink }}">Sebelumnya</a>
+                @else
+                    <span class="{{ $pgOff }}" aria-disabled="true">Sebelumnya</span>
+                @endif
+
+                @php $sebelum = null; @endphp
+                @foreach ($nomor as $p)
+                    @if ($sebelum !== null && $p - $sebelum > 1)
+                        <span class="px-1 text-[#A8A8A8]">…</span>
+                    @endif
+                    @if ($p === $halaman)
+                        <span class="{{ $pgOn }}" aria-current="page">{{ $p }}</span>
+                    @else
+                        <a href="{{ $urlHal($p) }}" aria-label="Halaman {{ $p }}" class="{{ $pgLink }}">{{ $p }}</a>
+                    @endif
+                    @php $sebelum = $p; @endphp
+                @endforeach
+
+                @if ($halaman < $totalHal)
+                    <a href="{{ $urlHal($halaman + 1) }}" rel="next" class="{{ $pgLink }}">Berikutnya</a>
+                @else
+                    <span class="{{ $pgOff }}" aria-disabled="true">Berikutnya</span>
+                @endif
+            </nav>
         </div>
     </section>
 </div>

@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Dashboard - Teknologi Rekayasa Komputer')
 
@@ -26,12 +26,12 @@
                         <span class="rounded-full bg-[#EFF6FF] px-3 py-1 text-xs font-semibold text-[#2563EB] border border-[#BFDBFE] transition-all duration-500 group-hover:bg-white/20 group-hover:text-white group-hover:border-white/30">{{ $role }}</span>
                     </div>
                     <p class="text-xs font-medium text-[#6B7280] transition-colors duration-500 group-hover:text-blue-100">
-                        {{ $user?->mahasiswa ? 'NIM' : 'NIP' }}: <span class="font-semibold text-[#374151] group-hover:text-white">{{ $user?->mahasiswa?->nim ?? $user?->dosen?->nip ?? '—' }}</span> @if($user?->mahasiswa) • Angkatan {{ $user->mahasiswa->tahun_masuk }} @endif
+                        {{ $labelIdentitas }}: <span class="font-semibold text-[#374151] group-hover:text-white">{{ $nomorIdentitas }}</span> • Angkatan {{ $angkatan }}
                     </p>
                     <div class="flex flex-wrap items-center gap-4 pt-1 text-xs text-[#6B7280] transition-colors duration-500 group-hover:text-blue-100">
                         <span class="flex items-center gap-1.5">
                             <span class="size-2 rounded-full bg-[#10B981] group-hover:bg-[#34D399]"></span>
-                            Status Akun: <strong class="text-[#047857] group-hover:text-white">{{ $user ? ($user->status ? 'Aktif' : 'Nonaktif') : '—' }}</strong>
+                            Status Akun: <strong class="text-[#047857] group-hover:text-white">{{ $statusAkun }}</strong>
                         </span>
                         <span>•</span>
                         <span>Terakhir login: <strong class="text-[#374151] group-hover:text-white">Belum tersedia</strong></span>
@@ -41,13 +41,9 @@
 
             <!-- Akses Cepat Kanan -->
             <div class="flex items-center gap-3 border-t border-[#E5E7EB] pt-4 md:border-t-0 md:pt-0 transition-colors duration-500 group-hover:border-white/20">
-                <a href="{{ route('profil') }}" class="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-xs font-semibold text-[#374151] shadow-xs transition-all duration-300 hover:bg-gray-50 group-hover:border-white/30 group-hover:bg-white/10 group-hover:text-white group-hover:hover:bg-white/20">
+                <a href="{{ route('mahasiswa.profil') }}" class="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-xs font-semibold text-[#374151] shadow-xs transition-all duration-300 hover:bg-gray-50 group-hover:border-white/30 group-hover:bg-white/10 group-hover:text-white group-hover:hover:bg-white/20">
                     <svg class="size-4 text-[#6B7280] transition-colors duration-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     <span>Edit Profil</span>
-                </a>
-                <a href="{{ route('kegiatan.create') }}" class="flex items-center gap-2 rounded-xl bg-[#2277FF] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-blue-600 group-hover:bg-white group-hover:text-[#2277FF]">
-                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Tambah Kegiatan</span>
                 </a>
             </div>
         </div>
@@ -90,7 +86,7 @@
     <section class="flex flex-col gap-6 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
         <div class="flex flex-col gap-1">
             <h2 class="text-lg font-bold text-[#111827]">Panduan singkat proses pengajuan</h2>
-            <p class="text-xs text-[#6B7280]">Ikuti langkah-langkah berikut agar pengajuan dokumen Anda dapat diproses dengan cepat dan tepat.</p>
+            <p class="text-xs text-[#6B7280]">Pilih kategori kegiatan, isi detail kegiatan, lalu kirim pengajuan untuk ditinjau.</p>
         </div>
 
         <!-- Progress Steps Line -->
@@ -99,22 +95,17 @@
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">1</span>
-                <span class="text-xs font-semibold text-[#111827]">Pilih jenis dokumen</span>
+                <span class="text-xs font-semibold text-[#111827]">Pilih jenis pengajuan</span>
             </div>
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">2</span>
-                <span class="text-xs font-semibold text-[#111827]">Lengkapi data diri</span>
+                <span class="text-xs font-semibold text-[#111827]">Isi formulir sesuai informasi kegiatan</span>
             </div>
 
             <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">3</span>
-                <span class="text-xs font-semibold text-[#111827]">Unggah lampiran</span>
-            </div>
-
-            <div class="relative z-10 flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2">
-                <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#EFF6FF] text-xs font-bold text-[#2277FF]">4</span>
-                <span class="text-xs font-semibold text-[#111827]">Periksa dan kirim</span>
+                <span class="text-xs font-semibold text-[#111827]">Periksa kembali, lalu kirim untuk ditinjau</span>
             </div>
         </div>
 
@@ -122,7 +113,7 @@
         <div class="flex flex-col gap-4 rounded-2xl bg-[#2277FF] p-6 text-white sm:flex-row sm:items-center sm:justify-between">
             <div class="flex flex-col gap-1">
                 <h3 class="text-xl font-bold">Buat pengajuan dokumen baru</h3>
-                <p class="text-xs text-blue-100">Pilih jenis dokumen, lengkapi data, dan unggah lampiran yang diperlukan untuk memulai proses pengajuan.</p>
+                <p class="text-xs text-blue-100">Pilih jenis pengajuan, isi formulir yang tersedia, lalu periksa kembali sebelum mengirim.</p>
             </div>
             <a href="{{ route($pengajuanRoute) }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 text-xs font-bold text-[#2277FF] hover:bg-blue-50 transition shadow-sm">
                 Buat Pengajuan

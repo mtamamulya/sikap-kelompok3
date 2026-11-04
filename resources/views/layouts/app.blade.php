@@ -87,7 +87,7 @@
                             Profil Saya
                         </a>
                         {{-- Autentikasi dikelola kelompok 1; tidak menambah alur login/logout di sini. --}}
-                        <a href="{{ route('dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
+                        <a href="{{ route('mahasiswa.dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
                     </div>
                 </div>
             </div>
