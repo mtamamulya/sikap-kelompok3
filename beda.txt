@@ -1,0 +1,114 @@
+﻿=== resources\views\home.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== resources\views\berita-index.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== resources\views\berita-show.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== resources\views\prestasi-index.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== resources\views\fasilitas.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>         <x-navbar-publik />
+<= @extends('layouts.app')
+<=         <x-navbar />
+=== resources\views\kurikulum.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== resources\views\akreditasi.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== resources\views\mata-kuliah.blade.php : 4 baris beda   (<= landing-trk, => repo baru)
+=> @extends('layouts.publik')
+=>     <x-navbar-publik />
+<= @extends('layouts.app')
+<=     <x-navbar />
+=== config\berita.php : 42 baris beda   (<= landing-trk, => repo baru)
+=>     'slug' => $slug,
+=>     'judul' => $judul,
+=>     'penulis' => 'Humas TRK',
+=>     'kategori' => $kategori,
+=>     'tanggal_pendek' => '09/10/2026',
+=>     'jam' => '10:00',
+=>     'dilihat' => 0,
+=>     'waktu_baca' => '2 menit',
+=>     'gambar' => $img,
+=>     'paragraf' => $paragraf,
+=>         $A.'eea1dae43f4c4adec94cdca526899e7374b5d9b4?width=1760',
+=>         $A.'c03aeabc41a38010ff1ed3bb6aa5185ef5db5a31?width=974',
+=>         $A.'fa2d7ab93ba4ebffe1bef04b7fdc1fd74963cae8?width=1024',
+=>         $A.'be0a1bcac500d7ee3265969f939ef4dcbf5f4065?width=820',
+=>         $A.'3b6a6f87a3cafeffaa2d1a16bea075664fcb7385?width=974',
+=>         $A.'3b6a6f87a3cafeffaa2d1a16bea075664fcb7385?width=974', // ganti dengan gambar sendiri
+=>     'fifa-asean-cup-2026' => $buat(
+=>         $A.'4968f5c7b9f309e7174bca9d6daa415427643463?width=990',
+=>         $A.'4e286dc44fd27faa65f73e3636c93d05414ebc75?width=610',
+=>         $A.'2ebd3fa8924f63ca443fd5416ad9abf263016bf5?width=610',
+=>         $A.'3a7735c15bfc00b23797027d54c3b8e33e939ec5?width=670',
+<=     'slug'            => $slug,
+<=     'judul'           => $judul,
+<=     'penulis'         => 'Humas TRK',
+<=     'kategori'        => $kategori,
+<=     'tanggal_pendek'  => '09/10/2026',
+<=     'jam'             => '10:00',
+<=     'dilihat'         => 0,
+<=     'waktu_baca'      => '2 menit',
+<=     'gambar'          => $img,
+=== config\prestasi.php : 44 baris beda   (<= landing-trk, => repo baru)
+=>     'slug' => 'juara-3-cybersecurity-olivia-2026',
+=>     'juara' => 3,
+=>     'judul' => 'Juara 3 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026',
+=>     'sub' => 'Prestasi TRK',
+=>     'gambar' => $A.'3a7735c15bfc00b23797027d54c3b8e33e939ec5?width=670',
+=>             'slug' => 'fifa-asean-cup-2026',
+=>             'juara' => 1,
+=>             'judul' => 'The Winner of FIFA ASEAN CUP 2026',
+=>             'sub' => 'Timnas Indonesia',
+=>             'gambar' => $A.'4968f5c7b9f309e7174bca9d6daa415427643463?width=990',
+=>             'besar' => true,
+=>             'slug' => 'juara-1-cybersecurity-olivia-2026',
+=>             'juara' => 1,
+=>             'judul' => 'Juara 1 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026',
+=>             'sub' => 'Prestasi TRK',
+=>             'gambar' => $A.'4e286dc44fd27faa65f73e3636c93d05414ebc75?width=610',
+=>             'slug' => 'juara-2-elektro-expo-2026',
+=>             'juara' => 2,
+=>             'judul' => 'Juara 2 Elektro Expo 2026 IoT-Desain Produk Inovasi',
+=>             'sub' => 'Prestasi TRK',
+=>             'gambar' => $A.'2ebd3fa8924f63ca443fd5416ad9abf263016bf5?width=610',
+=>             'besar' => true,
+<=     'slug'   => 'juara-3-cybersecurity-olivia-2026',
+<=     'juara'  => 3,
+<=     'judul'  => 'Juara 3 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026',
+<=     'sub'    => 'Prestasi TRK',
+<=     'gambar' => $A . '3a7735c15bfc00b23797027d54c3b8e33e939ec5?width=670',
+<=             'slug'   => 'fifa-asean-cup-2026',
+<=             'juara'  => 1,
+<=             'judul'  => 'The Winner of FIFA ASEAN CUP 2026',
+=== config\fasilitas.php : 10 baris beda   (<= landing-trk, => repo baru)
+=>             'foto' => $A.'d85de1fefd9f5de7f85646e5eae18e98f4154ff2?width=1200',
+=>             'foto' => $A.'d4d26540f985d832c65d0719054314a08b288e4a?width=1200',
+=>             'foto' => $A.'ef269c73505424833dd0b3a65b588799a0a7b9bd?width=1200',
+=>             'foto' => $A.'b85fffdbc922839aff2a4e96209ccefe9ac73fd6?width=1200',
+=>             'foto' => $A.'9cb23edb5c694e6944be6e883ae4547b5a1f42a7?width=1200',
+<=             'foto' => $A . 'd85de1fefd9f5de7f85646e5eae18e98f4154ff2?width=1200',
+<=             'foto' => $A . 'd4d26540f985d832c65d0719054314a08b288e4a?width=1200',
+<=             'foto' => $A . 'ef269c73505424833dd0b3a65b588799a0a7b9bd?width=1200',
+<=             'foto' => $A . 'b85fffdbc922839aff2a4e96209ccefe9ac73fd6?width=1200',
+<=             'foto' => $A . '9cb23edb5c694e6944be6e883ae4547b5a1f42a7?width=1200',
+=== config\matkul.php : 0 baris beda   (<= landing-trk, => repo baru)
