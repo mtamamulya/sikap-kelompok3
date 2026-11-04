@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# Penjaga sebelum commit - SIKAP Kelompok 3
+#
+# Pasang sekali di tiap laptop:
+#   git config core.hooksPath .githooks
+#
+# Kalau terpaksa melewati pemeriksaan ini (jarang sekali perlu):
+#   git commit --no-verify
+
+berkas=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$berkas" ] && exit 0
+
+gagal=0
+
+# ---------------------------------------------------------------
+# 1. Tolak sisa penanda konflik Git
+# ---------------------------------------------------------------
+rusak=""
+for f in $berkas; do
+    if git show ":$f" 2>/dev/null | grep -qE '^<<<<<<< |^>>>>>>> '; then
+        rusak="$rusak $f"
+    fi
+done
+
+if [ -n "$rusak" ]; then
+    echo ""
+    echo "  COMMIT DIBATALKAN - masih ada sisa penanda konflik Git."
+    echo ""
+    for f in $rusak; do echo "    $f"; done
+    echo ""
+    echo "  Buka file di atas, cari baris yang diawali tujuh tanda"
+    echo "  kurang-dari atau lebih-dari, lalu pilih salah satu isi"
+    echo "  dan hapus penandanya."
+    echo ""
+    echo "  Jangan pakai tombol 'Accept Both Changes' untuk file"
+    echo "  seperti composer.lock - isinya jadi rusak."
+    echo ""
+    gagal=1
+fi
+
+# ---------------------------------------------------------------
+# 2. Jalankan Pint pada file PHP yang di-stage
+# ---------------------------------------------------------------
+php_files=$(echo "$berkas" | grep '\.php$')
+
+if [ -n "$php_files" ]; then
+    if [ -f vendor/bin/pint ]; then
+        # shellcheck disable=SC2086
+        if ! ./vendor/bin/pint --test $php_files > /tmp/pint-hook.log 2>&1; then
+            echo ""
+            echo "  COMMIT DIBATALKAN - format kode belum sesuai Pint."
+            echo ""
+            sed -n '1,40p' /tmp/pint-hook.log | sed 's/^/    /'
+            echo ""
+            echo "  Perbaiki otomatis dengan:"
+            echo ""
+            echo "    vendor/bin/pint"
+            echo ""
+            echo "  lalu 'git add' ulang file yang berubah dan commit lagi."
+            echo ""
+            gagal=1
+        fi
+    else
+        echo "  Peringatan: vendor/bin/pint tidak ada, pemeriksaan format dilewati."
+        echo "  Jalankan 'composer install' dulu."
+    fi
+fi
+
+exit $gagal
