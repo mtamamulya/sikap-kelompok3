@@ -9,6 +9,7 @@ use App\Models\Kegiatan;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
@@ -132,36 +133,77 @@ class DynamicActivityErdTest extends TestCase
 
     public function test_upgrade_transfers_legacy_values_and_rollback_restores_original_tables(): void
     {
-        $migration = require database_path('migrations/2026_11_04_000001_apply_dynamic_activity_erd.php');
-        $migration->down();
-        $activity = $this->activity();
-        $activity->update(['lokasi' => 'Semarang', 'tanggal_mulai' => '2026-11-04']);
-        $skim = DB::table('skim')->insertGetId(['nama_skim' => 'Penelitian Terapan', 'ranah' => 'penelitian'], 'id_skim');
-        $bidang = DB::table('kelompok_bidang')->insertGetId(['nama_kelompok_bidang' => 'Teknologi Informasi'], 'id_kelompok_bidang');
-        DB::table('kegiatan_dosen')->insert([
-            'id_kegiatan' => $activity->getKey(), 'id_skim' => $skim, 'id_kelompok_bidang' => $bidang,
-            'afiliasi' => 'Polines', 'tahun_anggaran' => 2026, 'tahun_pelaksanaan_ke' => 1, 'lama_kegiatan_tahun' => 2,
-            'dana_dikti' => 0, 'dana_pt' => 1234567.89, 'dana_institusi_lain' => 0, 'mitra' => 'Desa A',
-        ]);
-        DB::table('detail_kegiatan')->insert(['id_kegiatan' => $activity->getKey(), 'penyelenggara' => 'LPPM', 'tingkat_kejuaraan' => 'nasional']);
-        $old = (array) DB::table('kegiatan_dosen')->first();
-        $migration->up();
+        $this->withIsolatedMigrationDatabase(function () {
+            $migration = require database_path('migrations/2026_11_04_000001_apply_dynamic_activity_erd.php');
+            $migration->down();
+            $activity = $this->activity();
+            $activity->update(['lokasi' => 'Semarang', 'tanggal_mulai' => '2026-11-04']);
+            $skim = DB::table('skim')->insertGetId(['nama_skim' => 'Penelitian Terapan', 'ranah' => 'penelitian'], 'id_skim');
+            $bidang = DB::table('kelompok_bidang')->insertGetId(['nama_kelompok_bidang' => 'Teknologi Informasi'], 'id_kelompok_bidang');
+            DB::table('kegiatan_dosen')->insert([
+                'id_kegiatan' => $activity->getKey(), 'id_skim' => $skim, 'id_kelompok_bidang' => $bidang,
+                'afiliasi' => 'Polines', 'tahun_anggaran' => 2026, 'tahun_pelaksanaan_ke' => 1, 'lama_kegiatan_tahun' => 2,
+                'dana_dikti' => 0, 'dana_pt' => 1234567.89, 'dana_institusi_lain' => 0, 'mitra' => 'Desa A',
+            ]);
+            DB::table('detail_kegiatan')->insert(['id_kegiatan' => $activity->getKey(), 'penyelenggara' => 'LPPM', 'tingkat_kejuaraan' => 'nasional']);
+            $old = (array) DB::table('kegiatan_dosen')->first();
+            $migration->up();
 
-        $activity = $activity->fresh();
-        $this->assertSame('Penelitian Terapan', $activity->nilaiIsian('skim'));
-        $this->assertSame('Teknologi Informasi', $activity->nilaiIsian('kelompok_bidang'));
-        $this->assertSame('1234567.89', $activity->nilaiIsian('dana_pt'));
-        $this->assertSame('0', $activity->nilaiIsian('dana_dikti'));
-        $this->assertSame('LPPM', $activity->nilaiIsian('penyelenggara'));
-        $this->assertSame('Semarang', $activity->nilaiIsian('lokasi'));
-        $this->assertSame('2026-11-04', $activity->nilaiIsian('tanggal_mulai'));
-        $this->assertEquals($old, (array) DB::table('legacy_kegiatan_dosen')->first());
-        $this->assertDatabaseCount('legacy_detail_kegiatan', 1);
+            $activity = $activity->fresh();
+            $this->assertSame('Penelitian Terapan', $activity->nilaiIsian('skim'));
+            $this->assertSame('Teknologi Informasi', $activity->nilaiIsian('kelompok_bidang'));
+            $this->assertSame('1234567.89', $activity->nilaiIsian('dana_pt'));
+            $this->assertSame((string) $old['dana_dikti'], $activity->nilaiIsian('dana_dikti'));
+            $this->assertSame('LPPM', $activity->nilaiIsian('penyelenggara'));
+            $this->assertSame('Semarang', $activity->nilaiIsian('lokasi'));
+            $this->assertSame('2026-11-04', $activity->nilaiIsian('tanggal_mulai'));
+            $this->assertEquals($old, (array) DB::table('legacy_kegiatan_dosen')->first());
+            $this->assertDatabaseCount('legacy_detail_kegiatan', 1);
 
-        $migration->down();
-        $this->assertEquals($old, (array) DB::table('kegiatan_dosen')->first());
-        $this->assertDatabaseHas('detail_kegiatan', ['id_kegiatan' => $activity->getKey(), 'penyelenggara' => 'LPPM']);
-        $this->assertDatabaseHas('skim', ['id_skim' => $skim]);
-        $this->assertDatabaseHas('kelompok_bidang', ['id_kelompok_bidang' => $bidang]);
+            $migration->down();
+            $this->assertEquals($old, (array) DB::table('kegiatan_dosen')->first());
+            $this->assertDatabaseHas('detail_kegiatan', ['id_kegiatan' => $activity->getKey(), 'penyelenggara' => 'LPPM']);
+            $this->assertDatabaseHas('skim', ['id_skim' => $skim]);
+            $this->assertDatabaseHas('kelompok_bidang', ['id_kelompok_bidang' => $bidang]);
+        });
+
+        $this->assertTrue(Schema::hasColumn('detail_kegiatan', 'id_detail_kegiatan'));
+        $this->assertTrue(DB::connection()->getPdo()->inTransaction());
+    }
+
+    private function withIsolatedMigrationDatabase(callable $assertions): void
+    {
+        $original = DB::getDefaultConnection();
+        $source = DB::connection();
+        $config = $source->getConfig();
+        unset($config['name']);
+        $database = null;
+        $admin = null;
+        if ($config['driver'] === 'sqlite') {
+            $config['database'] = ':memory:';
+        } else {
+            $this->assertContains($config['driver'], ['mysql', 'mariadb']);
+            $database = 'sikap_erd_test_'.bin2hex(random_bytes(8));
+            // CREATE/DROP DATABASE implicitly commit MySQL transactions. Use a
+            // separate admin connection, never the RefreshDatabase transaction.
+            $admin = DB::build($config);
+            $admin->statement('CREATE DATABASE `'.$database.'` CHARACTER SET utf8mb4');
+            $config['database'] = $database;
+        }
+        config(['database.connections.erd_migration_test' => $config]);
+        DB::setDefaultConnection('erd_migration_test');
+
+        try {
+            $this->assertSame(0, Artisan::call('migrate', ['--database' => 'erd_migration_test', '--force' => true]));
+            $assertions();
+        } finally {
+            DB::setDefaultConnection($original);
+            DB::purge('erd_migration_test');
+            if ($database !== null) {
+                // Only drop the uniquely named database created by this test.
+                $admin->statement('DROP DATABASE `'.$database.'`');
+                $admin->disconnect();
+            }
+        }
     }
 }
