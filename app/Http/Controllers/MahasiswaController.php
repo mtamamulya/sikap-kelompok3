@@ -68,9 +68,9 @@ class MahasiswaController extends Controller
         ]);
     }
 
-    public function mataKuliah(Request $request, string $tab = 'semua')
+    public function mataKuliah(Request $request, string $tab = 'berjalan')
     {
-        abort_unless(in_array($tab, ['semua', 'berjalan', 'riwayat'], true), 404);
+        abort_unless(in_array($tab, ['semua', 'berjalan', 'katalog', 'riwayat'], true), 404);
 
         // DATA DUMMY: ganti dengan query Eloquent / API Kelompok 1
         // Format: [mata kuliah, dosen, tingkat, periode, tahun akademik]
@@ -97,6 +97,33 @@ class MahasiswaController extends Controller
             ['Internet of Things', 'Tahan Prahara',      2, 'Ganjil', 4],
         ])->map(fn ($r) => ['mk' => $r[0], 'dosen' => $r[1], 'tingkat' => $r[2], 'periode' => $r[3], 'tahun' => '2026/2027', 'sks' => $r[4]]);
 
+        // DATA DUMMY: katalog seluruh mata kuliah Tingkat 1 - Tingkat 4
+        // Format: [mata kuliah, dosen, tingkat, periode, SKS, tahun akademik]
+        $katalog = collect([
+            // Tingkat 1
+            ['Algoritma dan Pemrograman', 'Arif Setyawan',      1, 'Ganjil', 4, '2024/2025'],
+            ['Matematika Dasar',          'Prayitno',           1, 'Ganjil', 3, '2024/2025'],
+            ['Dasar Elektronika',         'Kuwat Santoso',      1, 'Ganjil', 3, '2024/2025'],
+            ['Internet of Things',        'Tahan Prahara',      1, 'Genap',  4, '2024/2025'],
+            ['Sistem Operasi',            'Arif Setyawan',      1, 'Genap',  4, '2024/2025'],
+            // Tingkat 2
+            ['Kecerdasan Buatan',         'Angga Wahyu Wibowo', 2, 'Ganjil', 2, '2026/2027'],
+            ['Jaringan Komputer',         'Kuwat Santoso',      2, 'Ganjil', 4, '2025/2026'],
+            ['Computer Vision',           'Prayitno',           2, 'Ganjil', 3, '2026/2027'],
+            ['Pemrograman Web',           'Wiktasari',          2, 'Genap',  4, '2025/2026'],
+            ['Mikrokontroler',            'Tahan Prahara',      2, 'Genap',  3, '2025/2026'],
+            // Tingkat 3
+            ['Sistem Basis Data',         'Wiktasari',          3, 'Ganjil', 4, '2025/2026'],
+            ['Keamanan Jaringan',         'Kuwat Santoso',      3, 'Ganjil', 3, '2026/2027'],
+            ['Machine Learning',          'Angga Wahyu Wibowo', 3, 'Genap',  3, '2026/2027'],
+            ['Rekayasa Perangkat Lunak',  'Prayitno',           3, 'Genap',  3, '2025/2026'],
+            // Tingkat 4
+            ['Proyek Akhir',              'Arif Setyawan',      4, 'Ganjil', 6, '2026/2027'],
+            ['Manajemen Proyek TI',       'Wiktasari',          4, 'Ganjil', 2, '2026/2027'],
+            ['Magang Industri',           'Tahan Prahara',      4, 'Genap',  6, '2026/2027'],
+            ['Tugas Akhir',               'Angga Wahyu Wibowo', 4, 'Genap',  6, '2026/2027'],
+        ])->map(fn ($r) => ['mk' => $r[0], 'dosen' => $r[1], 'tingkat' => $r[2], 'periode' => $r[3], 'sks' => $r[4], 'tahun' => $r[5]]);
+
         $filter = [
             'q' => trim((string) $request->query('q')),
             'semester' => (string) $request->query('semester'),
@@ -104,15 +131,27 @@ class MahasiswaController extends Controller
             'tahun' => (string) $request->query('tahun'),
         ];
 
-        // Tab "berjalan" = paket semester, tanpa filter. Tab lain memakai keempat filter.
-        $rows = $tab === 'berjalan'
-            ? $berjalan
-            : $arsip->filter(function ($r) use ($filter) {
-                return ($filter['q'] === '' || mb_stripos($r['mk'].' '.$r['dosen'], $filter['q']) !== false)
-                    && ($filter['semester'] === '' || $r['periode'] === $filter['semester'])
-                    && ($filter['tingkat'] === '' || (string) $r['tingkat'] === $filter['tingkat'])
-                    && ($filter['tahun'] === '' || $r['tahun'] === $filter['tahun']);
-            })->values();
+        // Filter dipakai bersama oleh tab "semua" (Riwayat) dan "katalog" (Semua mata kuliah),
+        // keduanya sekarang punya filter Tahun Akademik.
+        $cocok = fn ($r) => ($filter['q'] === '' || mb_stripos($r['mk'].' '.$r['dosen'], $filter['q']) !== false)
+            && ($filter['semester'] === '' || $r['periode'] === $filter['semester'])
+            && ($filter['tingkat'] === '' || (string) $r['tingkat'] === $filter['tingkat'])
+            && ($filter['tahun'] === '' || $r['tahun'] === $filter['tahun']);
+
+        // Tab "berjalan" = paket semester, tanpa filter. Tab lain memakai filter.
+        $rows = match ($tab) {
+            'berjalan' => $berjalan,
+            'katalog'  => $katalog->filter($cocok)->sortBy([['tingkat', 'asc'], ['mk', 'asc']])->values(),
+            default    => $arsip->filter($cocok)->values(),
+        };
+
+        // Pilihan dropdown Tahun Akademik: gabungan tahun dari arsip dan katalog, terbaru di atas.
+        $tahunList = $arsip->pluck('tahun')
+            ->merge($katalog->pluck('tahun'))
+            ->unique()
+            ->sortDesc()
+            ->values()
+            ->all();
 
         return view('mahasiswa.mata-kuliah', [
             'nama' => 'Arya Bima',
@@ -120,7 +159,7 @@ class MahasiswaController extends Controller
             'tab' => $tab,
             'rows' => $rows,
             'filter' => $filter,
-            'tahunList' => $arsip->pluck('tahun')->unique()->sortDesc()->values()->all(),
+            'tahunList' => $tahunList,
             'ringkasan' => [
                 'tahun_akademik' => '2026/2027 Ganjil',
                 'semester_ke' => 7,
@@ -193,7 +232,7 @@ class MahasiswaController extends Controller
             'tingkatList' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'],
             'capaianList' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'],
             'jenisList' => ['Akademik', 'Nonakademik'],
-            'jenisDokList' => ['Sertifikat', 'Piagam penghargaan', 'Surat tugas', 'Surat keterangan penyelenggara', 'Foto kegiatan', 'Lainnya'],
+            'jenisDokList' => ['Sertifikat', 'Dokumentasi kegiatan'],
             // DATA DUMMY: ganti dengan daftar mahasiswa dari database (untuk pencarian anggota tim)
             'daftarMahasiswa' => ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', 'Arya Bima', 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'],
             'peranList' => ['Ketua', 'Anggota'],
@@ -210,10 +249,10 @@ class MahasiswaController extends Controller
     {
         $data = $this->validasiPrestasi($request);
 
-        // TODO: simpan ke database. Untuk file bukti beserta jenisnya:
-        // foreach ($request->file('dokumen', []) as $i => $f) {
-        //     $path  = $f->store('prestasi', 'public');
-        //     $jenis = $request->input("jenis_dokumen.$i");
+        // TODO: simpan ke database. Bukti prestasi berupa tautan (bukan file):
+        // foreach ($request->input('link_dokumen', []) as $i => $link) {
+        //     $jenis = $request->input("jenis_dokumen.$i"); // 'Sertifikat' atau 'Dokumentasi kegiatan'
+        //     // simpan $link dan $jenis
         // }
         // Anggota tim (jika bentuk = Tim): $request->input('anggota', []) berisi [['nama' => ..., 'peran' => ...], ...]
 
@@ -249,9 +288,10 @@ class MahasiswaController extends Controller
                 ['nama' => 'Ivan Sigit Santoso',    'peran' => 'Anggota'],
                 ['nama' => 'Anisa Aulia Nurusyifa', 'peran' => 'Anggota'],
             ],
+            // Dokumen berupa tautan. 'url' dipakai view sebagai link yang dapat dibuka.
             'dokumen' => [
-                ['id' => 11, 'jenis' => 'Sertifikat',    'nama' => 'sertifikat-iot.pdf', 'ukuran' => '1,2 MB', 'url' => null],
-                ['id' => 12, 'jenis' => 'Foto kegiatan', 'nama' => 'foto-iot.jpg',       'ukuran' => '2,4 MB', 'url' => null],
+                ['id' => 11, 'jenis' => 'Sertifikat',            'nama' => 'Sertifikat IoT',   'url' => 'https://drive.google.com/file/d/contoh-sertifikat'],
+                ['id' => 12, 'jenis' => 'Dokumentasi kegiatan',  'nama' => 'Foto kegiatan IoT', 'url' => 'https://drive.google.com/file/d/contoh-dokumentasi'],
             ],
         ];
 
@@ -269,7 +309,7 @@ class MahasiswaController extends Controller
 
         // TODO: perbarui data di database.
         // Dokumen lama yang dihapus pengguna: $request->input('dokumen_hapus', []) berisi id dokumen.
-        // Dokumen baru: $request->file('dokumen', []) dan $request->input('jenis_dokumen', []).
+        // Dokumen baru (tautan): $request->input('link_dokumen', []) dan $request->input('jenis_dokumen', []).
 
         return redirect()->route('mahasiswa.prestasi')->with('status', 'Prestasi berhasil diperbarui.');
     }
@@ -294,7 +334,7 @@ class MahasiswaController extends Controller
     {
         $tingkat = ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'];
         $capaian = ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'];
-        $jenisDok = ['Sertifikat', 'Piagam penghargaan', 'Surat tugas', 'Surat keterangan penyelenggara', 'Foto kegiatan', 'Lainnya'];
+        $jenisDok = ['Sertifikat', 'Dokumentasi kegiatan'];
 
         return $request->validate([
             'sumber' => ['required', Rule::in(['sebelumnya', 'mandiri'])],
@@ -314,10 +354,11 @@ class MahasiswaController extends Controller
             'anggota.*.nama' => ['required', 'string', 'max:150'],
             'anggota.*.peran' => ['required', 'string', 'max:100'],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
-            'dokumen' => ['nullable', 'array', 'max:5'],
-            'dokumen.*' => ['file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,txt', 'max:5120'],
+            // Bukti prestasi berupa tautan, bukan unggah file.
+            'link_dokumen' => ['nullable', 'array', 'max:5'],
+            'link_dokumen.*' => ['required', 'url', 'max:500'],
             'jenis_dokumen' => ['nullable', 'array', 'max:5'],
-            'jenis_dokumen.*' => ['nullable', Rule::in($jenisDok)],
+            'jenis_dokumen.*' => ['required', Rule::in($jenisDok)],
             'dokumen_hapus' => ['nullable', 'array'],
             'dokumen_hapus.*' => ['integer'],
         ], [
@@ -325,7 +366,7 @@ class MahasiswaController extends Controller
             'required_if' => ':attribute wajib diisi.',
             'in' => ':attribute tidak valid.',
             'max' => ':attribute terlalu panjang atau terlalu besar.',
-            'mimes' => 'Format :attribute tidak didukung.',
+            'url' => ':attribute tidak valid. Gunakan alamat lengkap yang diawali https://',
             'after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
             'anggota.required' => 'Tambahkan minimal satu anggota tim.',
             'anggota.min' => 'Tambahkan minimal satu anggota tim.',
@@ -335,7 +376,8 @@ class MahasiswaController extends Controller
             'tanggal_mulai' => 'Tanggal mulai', 'tanggal_selesai' => 'Tanggal selesai',
             'bentuk' => 'Bentuk partisipasi', 'kegiatan' => 'Kegiatan sebelumnya',
             'anggota.*.nama' => 'Nama anggota', 'anggota.*.peran' => 'Peran anggota',
-            'dokumen.*' => 'File', 'jenis_dokumen.*' => 'Jenis dokumen',
+            'link_dokumen' => 'Link dokumen', 'link_dokumen.*' => 'Link dokumen',
+            'jenis_dokumen' => 'Jenis dokumen', 'jenis_dokumen.*' => 'Jenis dokumen',
         ]);
     }
 }
