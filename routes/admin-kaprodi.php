@@ -2,9 +2,10 @@
 
 use App\Http\Controllers\AdminAkreditasiController;
 // ---------- Controller Publik & Landing ----------
-use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminAuthControlller;
 use App\Http\Controllers\AdminBeritaController;
-use App\Http\Controllers\AdminKegiatanController; // <-- Added AdminKegiatanController
+use App\Http\Controllers\AdminKegiatanController; 
+use App\Http\Controllers\AdminKegiatanTambahController; // <-- Controller Tambah Kegiatan
 use App\Http\Controllers\AdminKegiatanDosenDetailShowController;
 use App\Http\Controllers\AdminKegiatanMahasiswaDetailShowController;
 use App\Http\Controllers\AdminKurikulumController;
@@ -110,9 +111,11 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     Route::get('/mahasiswa/{id}/edit', [LandingMahasiswaController::class, 'edit'])->name('admin.mahasiswa.edit');
     Route::put('/mahasiswa/{id}', [LandingMahasiswaController::class, 'update'])->name('admin.mahasiswa.update');
 
-    // Kegiatan
+    // Kegiatan (Menggunakan AdminKegiatanTambahController untuk Create & Store)
     Route::get('/kegiatan', [AdminKegiatanController::class, 'index'])->name('admin.kegiatan.index');
-    Route::get('/kegiatan/tambah', [AdminKegiatanController::class, 'create'])->name('admin.kegiatan.create');
+    Route::get('/kegiatan/tambah', [AdminKegiatanTambahController::class, 'create'])->name('admin.kegiatan.create');
+    Route::post('/kegiatan', [AdminKegiatanTambahController::class, 'store'])->name('admin.kegiatan.store');
+    
     Route::get('/kegiatan/mahasiswa', [KegiatanMahasiswaController::class, 'index'])->name('admin.kegiatan.mahasiswa');
     Route::get('/kegiatan/dosen', [KegiatanDosenController::class, 'index'])->name('admin.kegiatan.dosen');
     Route::get('/kegiatan/dosen/laporan', [KegiatanLaporanController::class, 'dosen'])->name('admin.kegiatan.dosen.laporan');
