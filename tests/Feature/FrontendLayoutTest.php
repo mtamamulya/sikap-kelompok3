@@ -19,8 +19,26 @@ class FrontendLayoutTest extends TestCase
 
     public function test_existing_student_and_lecturer_pages_render_directly_without_login(): void
     {
-        $this->get('/dashboard')->assertOk()->assertViewIs('mahasiswa.dashboard')->assertSee('mahasiswa-shell', false)->assertDontSee('dosen-shell', false);
-        $this->get('/kegiatan')->assertOk()->assertSee('mahasiswa-shell', false)->assertDontSee('dosen-shell', false);
+        $this->get('/mahasiswa/dashboard')
+            ->assertOk()
+            ->assertViewIs('mahasiswa.dashboard.dashboard')
+            ->assertSee('href="'.route('mahasiswa.dashboard').'"', false)
+            ->assertDontSee('href="'.route('mahasiswa.index').'" aria-current="page"', false)
+            ->assertSee('aria-current="page"', false)
+            ->assertDontSee('dosen-shell', false);
+        $this->get('/mahasiswa/kegiatan')
+            ->assertOk()
+            ->assertViewIs('mahasiswa.kegiatan.index')
+            ->assertSee('FKBSE 2025')
+            ->assertSee('href="'.route('kegiatan.index').'"', false)
+            ->assertSee('aria-current="page"', false)
+            ->assertDontSee('dosen-shell', false);
+        $this->get('/dashboard')->assertRedirect('/mahasiswa/dashboard');
+        $this->get('/kegiatan')->assertRedirect('/mahasiswa/kegiatan');
+        $this->get('/pengajuan')->assertRedirect('/mahasiswa/pengajuan');
+        $this->get('/mahasiswa')->assertRedirect('/mahasiswa/mahasiswa/dashboard');
+        $this->get('/mahasiswa/mahasiswa/dashboard')->assertOk()->assertSee('Mahasiswa');
+        $this->get('/mahasiswa/akademik')->assertRedirect('/mahasiswa/mahasiswa/dashboard');
         foreach (['/dosen/dashboard', '/dosen/kegiatan', '/dosen/kegiatan/create', '/profil', '/notifikasi', '/pengajuan/dosen', '/pengajuan/mahasiswa', '/pengajuan/dosen/1', '/pengajuan/mahasiswa/1', '/verifikasi/1'] as $path) {
             $this->get($path)->assertOk()->assertSee('class="frontend-shell dosen-shell', false);
         }
@@ -45,7 +63,7 @@ class FrontendLayoutTest extends TestCase
 
         $this->actingAs(User::findOrFail($ownerId));
 
-        $this->get('/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain');
+        $this->get('/mahasiswa/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain');
         $this->get('/dosen/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain')->assertViewHas('stats', fn ($stats) => $stats[1]['value'] === 1 && $stats[3]['value'] === 1);
         $this->get('/dosen/kegiatan')->assertOk()
             ->assertOk()

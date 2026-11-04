@@ -115,5 +115,5 @@
         @endforeach
     </div>
 
-    <a href="{{ route('dashboard') }}" class="{{ $linkBase }} mt-6 text-white hover:bg-white/10">Tampilan mahasiswa</a>
+    <a href="{{ route('mahasiswa.dashboard') }}" class="{{ $linkBase }} mt-6 text-white hover:bg-white/10">Tampilan mahasiswa</a>
 </nav>

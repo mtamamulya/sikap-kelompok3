@@ -107,6 +107,7 @@
                         @else
                             <a href="{{ route('login') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Masuk</a>
                         @endauth
+                        <a href="{{ route('mahasiswa.dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
                     </div>
                 </div>
             </div>

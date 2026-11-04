@@ -341,14 +341,14 @@ class PengajuanController extends Controller
 
     public function index(Request $request)
     {
-        return $this->renderIndex($request, 'PengajuanMahasiswa.index');
+        return $this->renderIndex($request, 'mahasiswa.pengajuan.index');
     }
 
     public function dashboard()
     {
         $submissions = $this->rows();
 
-        return view('pengajuan.dashboard', [
+        return view('mahasiswa.pengajuan.dashboard', [
             'mahasiswa' => config('mahasiswa'),
             'totalPengajuan' => $submissions->count(),
             'totalKegiatan' => $submissions->count(),
@@ -391,17 +391,31 @@ class PengajuanController extends Controller
 
     public function create()
     {
-        return view('PengajuanMahasiswa.create', ['item' => null]);
+        return view('mahasiswa.pengajuan.create', [
+            'item' => null,
+            'advisors' => $this->advisorOptions(),
+        ]);
     }
 
     public function createDosen()
     {
-        return view('dosen.pengajuan.create', ['item' => null]);
+        return view('dosen.pengajuan.create', [
+            'item' => null,
+            'advisors' => $this->advisorOptions(),
+        ]);
     }
 
     public function edit(int $id)
     {
-        return view('PengajuanMahasiswa.create', ['item' => $this->findEditable($id)]);
+        return view('mahasiswa.pengajuan.create', [
+            'item' => $this->findEditable($id),
+            'advisors' => $this->advisorOptions(),
+        ]);
+    }
+
+    private function advisorOptions(): Collection
+    {
+        return collect(config('mahasiswa.dosen_mata_kuliah', []));
     }
 
     public function show(int $id)
@@ -445,7 +459,7 @@ class PengajuanController extends Controller
             'url' => $f['url'] ?? (isset($f['path']) ? asset('storage/'.$f['path']) : null),
         ])->all();
 
-        return view('PengajuanMahasiswa.show', compact('row', 'steps', 'student', 'files', 'item'));
+        return view('mahasiswa.pengajuan.show', compact('row', 'steps', 'student', 'files', 'item'));
     }
 
     public function destroy(int $id)
@@ -499,7 +513,8 @@ class PengajuanController extends Controller
                 'level' => ['required', Rule::in(['Kabupaten', 'Provinsi', 'Nasional', 'Internasional'])],
                 'organizer' => ['required', 'string', 'max:255'],
                 'info_url' => ['nullable', 'url'],
-                'advisor' => ['nullable', 'string', 'max:255'],
+                'advisors' => ['nullable', 'array'],
+                'advisors.*' => ['required', 'string', Rule::in($this->advisorOptions()->pluck('nama')->all())],
             ],
             'Volunteer' => [
                 'title' => ['required', 'string', 'max:255'],
@@ -524,6 +539,11 @@ class PengajuanController extends Controller
 
         if ($data['category'] === 'Magang') {
             $data['title'] = 'Magang '.$data['role'].' di '.$data['organizer'];
+        }
+
+        if ($data['category'] === 'Lomba') {
+            $data['advisors'] = array_values(array_unique($data['advisors'] ?? []));
+            $data['advisor'] = $data['advisors'][0] ?? null;
         }
 
         if (isset($data['members'])) {
