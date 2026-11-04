@@ -96,12 +96,6 @@
                             <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
                             Profil Saya
                         </a>
-                        <a href="{{ route('home') }}" role="menuitem"
-                           class="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] text-gray-800 hover:bg-gray-100">
-                            <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8"/></svg>
-                            Halaman utama
-                        </a>
-                        <a href="{{ route('dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
                         @auth
                             <form method="POST" action="{{ route('logout') }}" class="-mx-2 mt-1 border-t border-gray-100 pt-1">
                                 @csrf

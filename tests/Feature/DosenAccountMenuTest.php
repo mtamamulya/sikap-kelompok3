@@ -27,8 +27,8 @@ class DosenAccountMenuTest extends TestCase
 
         $response = $this->actingAs($user)->get('/dosen/kegiatan/create');
         $response->assertOk()->assertSee('Yanto')->assertDontSee('Pratinjau dosen')
-            ->assertSee('Halaman utama')->assertSee('Keluar')
-            ->assertSee('href="'.route('home').'"', false)
+            ->assertDontSee('Halaman utama')->assertSee('Keluar')
+            ->assertSee('Profil Saya')
             ->assertSee('action="'.route('logout').'"', false);
         $this->assertSame(2, substr_count($response->getContent(), '>Yanto<'));
     }
@@ -54,7 +54,7 @@ class DosenAccountMenuTest extends TestCase
     {
         $this->withoutVite();
         $this->get('/dosen/kegiatan/create')->assertOk()->assertSee('Pratinjau dosen')
-            ->assertSee('Halaman utama')->assertDontSee('action="'.route('logout').'"', false);
+            ->assertDontSee('Halaman utama')->assertDontSee('action="'.route('logout').'"', false);
         $this->post(route('logout'))->assertRedirect(route('login'));
     }
 }
