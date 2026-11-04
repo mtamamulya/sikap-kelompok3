@@ -35,14 +35,15 @@ return [
         ['label' => 'Data Mahasiswa', 'route' => 'admin.mahasiswa', 'url' => 'mahasiswa',
             'icon' => '<path d="M5 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />'],
 
-        ['label' => 'Kegiatan',
+        [
+            'label' => 'Kegiatan',
             'icon' => '<path d="M4 13a8 8 0 0 1 7 7a6 6 0 0 0 3 -5a9 9 0 0 0 6 -8a3 3 0 0 0 -3 -3a9 9 0 0 0 -8 6a6 6 0 0 0 -5 3" /><path d="M7 14a6 6 0 0 0 -3 6a6 6 0 0 0 6 -3" /><path d="M15 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />',
             'children' => [
-                ['label' => 'Kegiatan Mahasiswa', 'route' => 'admin.kegiatan.mahasiswa', 'url' => 'kegiatan/mahasiswa'],
-                ['label' => 'Kegiatan Dosen', 'route' => 'admin.kegiatan.dosen', 'url' => 'kegiatan/dosen'],
+                ['label' => 'Data Kegiatan', 'route' => 'admin.kegiatan.index', 'url' => 'kegiatan'],
                 ['label' => 'Jenis Dokumen', 'route' => 'admin.kegiatan.jenis-dokumen', 'url' => 'kegiatan/jenis-dokumen'],
                 ['label' => 'Kategori Kegiatan', 'route' => 'admin.kegiatan.kategori-kegiatan', 'url' => 'kegiatan/kategori-kegiatan'],
-            ]],
+            ]
+        ],
 
         ['label' => 'Pengajuan', 'route' => 'admin.pengajuan', 'url' => 'pengajuan',
             'icon' => '<path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/><path d="M4 13h3l3 3h4l3 -3h3"/>'],
