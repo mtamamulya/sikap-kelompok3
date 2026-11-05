@@ -14,7 +14,20 @@
 
     {{-- Alpine.js dimuat melalui resources/js/app.js. --}}
 </head>
-@php $namaDosen = request()->user()?->dosen?->nama ?? 'Pratinjau dosen'; @endphp
+@php
+    $pengguna = request()->user();
+    $namaDosen = $pengguna?->dosen?->nama
+        ?? $pengguna?->mahasiswa?->nama
+        ?? $pengguna?->email
+        ?? 'Pratinjau dosen';
+    $inisialDosen = mb_strtoupper(mb_substr($namaDosen, 0, 1));
+    $fotoDosen = $pengguna?->foto_profil;
+    $fotoDosenUrl = $fotoDosen
+        ? (\Illuminate\Support\Str::startsWith($fotoDosen, ['http://', 'https://'])
+            ? $fotoDosen
+            : \Illuminate\Support\Facades\Storage::disk('public')->url($fotoDosen))
+        : null;
+@endphp
 <body class="frontend-shell dosen-shell h-dvh overflow-hidden bg-page font-sans text-gray-900 antialiased">
 {{-- menu = status menu samping di layar kecil (HP / tablet). Di layar lebar menu selalu tampil. --}}
 <div class="flex h-full" data-frontend-shell data-menu-state="menu" x-data="{ menu: false }" x-on:keydown.escape.window="menu = false">
@@ -56,14 +69,12 @@
                 <button type="button" x-on:click="akun = !akun" aria-haspopup="menu" aria-controls="menu-akun" :aria-expanded="akun"
                         class="-m-1 flex cursor-pointer items-center gap-2.5 rounded-lg p-1 hover:bg-gray-100"
                         :class="akun ? 'bg-gray-100' : ''">
-                    {{-- Kalau file public/images/kuwat.jpeg ada, fotonya dipakai. Kalau tidak, tampil inisial. --}}
-                    @if (file_exists(public_path('images/kuwat.jpeg')))
-                        <img src="{{ asset('images/kuwat.jpeg') }}" alt="" class="size-[34px] rounded-full object-cover">
+                    @if ($fotoDosenUrl)
+                        <img src="{{ $fotoDosenUrl }}" alt="" class="size-[34px] rounded-full object-cover">
                     @else
-                        <span class="flex size-[34px] items-center justify-center rounded-full bg-red-600 text-[13px] font-semibold text-white">KS</span>
+                        <span class="flex size-[34px] items-center justify-center rounded-full bg-red-600 text-[13px] font-semibold text-white">{{ $inisialDosen }}</span>
                     @endif
                     <span class="hidden max-w-40 flex-col text-left leading-tight sm:flex">
-                        {{-- nanti diganti data user yang login --}}
                         <span class="truncate text-sm font-semibold">{{ $namaDosen }}</span>
                         <span class="text-xs text-gray-600">Dosen</span>
                     </span>
@@ -75,7 +86,6 @@
                      x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                      class="absolute top-full right-0 z-40 mt-3 w-64 rounded-xl border border-gray-100 bg-white p-4 shadow-lg">
                     <div class="flex flex-col gap-0.5 pb-3">
-                        {{-- nanti diganti data user yang login --}}
                         <p class="truncate text-[15px] font-bold" title="{{ $namaDosen }}">{{ $namaDosen }}</p>
                         <p class="text-sm text-gray-500">Dosen</p>
                     </div>
@@ -86,8 +96,18 @@
                             <svg class="size-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
                             Profil Saya
                         </a>
-                        {{-- Autentikasi dikelola kelompok 1; tidak menambah alur login/logout di sini. --}}
-                        <a href="{{ route('dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
+                        @auth
+                            <form method="POST" action="{{ route('logout') }}" class="-mx-2 mt-1 border-t border-gray-100 pt-1">
+                                @csrf
+                                <button type="submit" role="menuitem" class="flex w-full cursor-pointer items-center gap-3 rounded-lg px-2 py-2.5 text-left text-[15px] text-red-600 hover:bg-red-50">
+                                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17v3H4V4h6v3M8 12h13m-4-4 4 4-4 4"/></svg>
+                                    Keluar
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Masuk</a>
+                        @endauth
+                        <a href="{{ route('mahasiswa.dashboard') }}" role="menuitem" class="block rounded-lg px-2 py-2.5 text-sm text-brand hover:bg-blue-50">Tampilan mahasiswa</a>
                     </div>
                 </div>
             </div>

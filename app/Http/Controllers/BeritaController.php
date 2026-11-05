@@ -53,7 +53,7 @@ class BeritaController extends Controller
             )))
             ->values();
 
-        return view('PengajuanMahasiswa.berita.index', [
+        return view('mahasiswa.pengajuan.berita.index', [
             'items' => $items,
             'status' => $status,
             'query' => $query,
@@ -63,7 +63,7 @@ class BeritaController extends Controller
 
     public function create()
     {
-        return view('PengajuanMahasiswa.berita.form', $this->formData());
+        return view('mahasiswa.pengajuan.berita.form', $this->formData());
     }
 
     public function store(Request $request)
@@ -73,7 +73,7 @@ class BeritaController extends Controller
 
     public function show(int $id)
     {
-        return view('PengajuanMahasiswa.berita.show', ['item' => $this->find($id)]);
+        return view('mahasiswa.pengajuan.berita.show', ['item' => $this->find($id)]);
     }
 
     public function edit(int $id)
@@ -81,7 +81,7 @@ class BeritaController extends Controller
         $item = $this->find($id);
         abort_unless(in_array($item['status'], ['Draft', 'Direvisi'], true), 403);
 
-        return view('PengajuanMahasiswa.berita.form', $this->formData($item));
+        return view('mahasiswa.pengajuan.berita.form', $this->formData($item));
     }
 
     public function update(Request $request, int $id)
