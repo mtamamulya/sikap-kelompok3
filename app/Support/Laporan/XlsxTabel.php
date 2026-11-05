@@ -91,7 +91,7 @@ class XlsxTabel
             .'</Relationships>';
     }
 
-    /** Gaya sel: 0 biasa, 1 judul, 2 header tabel, 3 isi (kiri), 4 isi (tengah), 5 catatan kecil. */
+    /** Gaya sel: 0 biasa, 1 judul, 2 header tabel, 3 isi (kiri), 4 isi (tengah), 5 catatan kecil, 6 judul (tengah), 7 info (tengah). */
     private function styles(): string
     {
         $border = '<border><left style="thin"><color rgb="FFC7C7CC"/></left><right style="thin"><color rgb="FFC7C7CC"/></right>'
@@ -110,13 +110,15 @@ class XlsxTabel
             .'<fill><patternFill patternType="solid"><fgColor rgb="FF2277FF"/><bgColor indexed="64"/></patternFill></fill></fills>'
             .'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'.$border.'</borders>'
             .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-            .'<cellXfs count="6">'
+            .'<cellXfs count="8">'
             .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
             .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
             .'<xf numFmtId="0" fontId="2" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="top" wrapText="1"/></xf>'
             .'<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
+            .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>'
             .'</cellXfs>'
             .'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
             .'</styleSheet>';
@@ -129,10 +131,14 @@ class XlsxTabel
         $baris = [];
         $r = 1;
 
-        $baris[] = '<row r="'.$r.'" ht="22" customHeight="1">'.$this->sel('A', $r, $this->judul, 1).'</row>';
+        // Judul & info: digabung selebar tabel dan rata tengah (sama dengan PDF).
+        $gabung = [];
+        $baris[] = '<row r="'.$r.'" ht="22" customHeight="1">'.$this->sel('A', $r, $this->judul, 6).'</row>';
+        $gabung[] = 'A'.$r.':'.$akhir.$r;
         $r++;
         foreach ($this->info as $teks) {
-            $baris[] = '<row r="'.$r.'">'.$this->sel('A', $r, $teks, 0).'</row>';
+            $baris[] = '<row r="'.$r.'">'.$this->sel('A', $r, $teks, 7).'</row>';
+            $gabung[] = 'A'.$r.':'.$akhir.$r;
             $r++;
         }
         $r++;   // baris kosong
@@ -178,6 +184,7 @@ class XlsxTabel
             .'<cols>'.$cols.'</cols>'
             .'<sheetData>'.implode('', $baris).'</sheetData>'
             .'<autoFilter ref="A'.$barisHeader.':'.$akhir.$barisAkhir.'"/>'
+            .'<mergeCells count="'.count($gabung).'">'.implode('', array_map(fn ($g) => '<mergeCell ref="'.$g.'"/>', $gabung)).'</mergeCells>'
             .'<pageMargins left="0.5" right="0.5" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>'
             .'<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>'
             .'</worksheet>';

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\KegiatanProdiData;
 use Illuminate\Http\Request;
 
 /**
  * Halaman "Kegiatan" (admin) gabungan: tab Dosen | Mahasiswa | Prodi.
  * Data Dosen & Mahasiswa memakai sumber yang sama dengan halaman lamanya
  * (KegiatanDosenController::index() & KegiatanMahasiswaController::index()).
- * Data Prodi masih contoh. TODO-DB: ganti dengan query kegiatan prodi.
+ * Data Prodi masih contoh (KegiatanProdiData). TODO-DB: ganti dengan query kegiatan prodi.
  */
 class AdminKegiatanController extends Controller
 {
@@ -45,34 +46,18 @@ class AdminKegiatanController extends Controller
         }, $isi['rows'] ?? []));
     }
 
-    /** Kegiatan tingkat program studi (data contoh). */
+    /** Kegiatan tingkat program studi (data contoh, sumber sama dengan laporan PDF/Excel). */
     private function prodi(): array
     {
-        $daftar = [
-            ['Workshop Penyusunan Kurikulum OBE', 'Pelatihan', 'Kaprodi TRK'],
-            ['Rapat Kerja Program Studi', 'Seminar', 'Kaprodi TRK'],
-            ['Studi Banding Prodi ke Politeknik Mitra', 'Kunjungan Industri', 'Sekretaris Prodi'],
-            ['Pelatihan Penjaminan Mutu Internal', 'Pelatihan', 'Gugus Penjaminan Mutu'],
-            ['Kunjungan Industri Mitra Prodi', 'Kunjungan Industri', 'Koordinator Kerja Sama'],
-            ['Seminar Pemetaan Kompetensi Lulusan', 'Seminar', 'Kaprodi TRK'],
-        ];
-        $status = ['Diajukan', 'Direvisi', 'Disetujui', 'Ditolak'];
-        $bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus'];
-
-        $rows = [];
-        foreach ($daftar as $i => $d) {
-            $rows[] = [
-                'id' => (string) ($i + 1),
-                'nama' => $d[0],
-                'kategori' => $d[1],
-                'pengaju' => $d[2],
-                'tanggal' => (($i * 4) % 27 + 1).' '.$bulan[$i % 8].' 2026',
-                'status' => $status[$i % 4],
-                'semester' => $i % 2 === 0 ? 'Ganjil' : 'Genap',
-                'kelas' => '',
-            ];
-        }
-
-        return $rows;
+        return array_map(fn ($r) => [
+            'id' => $r['id'],
+            'nama' => $r['nama'],
+            'kategori' => $r['kategori'],
+            'pengaju' => $r['penanggung_jawab'],   // kolom tabel "Penanggung Jawab"
+            'tanggal' => $r['tanggal'],
+            'status' => $r['status'],
+            'semester' => $r['semester'],
+            'kelas' => '',
+        ], KegiatanProdiData::semua());
     }
 }

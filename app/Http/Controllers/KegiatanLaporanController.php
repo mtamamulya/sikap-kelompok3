@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\KegiatanData;
+use App\Repositories\KegiatanProdiData;
 use App\Support\Laporan\LaporanKegiatan;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Unduh laporan data kegiatan dosen / mahasiswa (PDF atau Excel) per kurun waktu tahun.
- * Dipakai admin (/admin/kegiatan/{dosen|mahasiswa}/laporan) DAN kaprodi (/kaprodi/...).
+ * Unduh laporan data kegiatan dosen / mahasiswa / prodi (PDF atau Excel) per kurun waktu tahun.
+ * Dipakai admin (/admin/kegiatan/{dosen|mahasiswa|prodi}/laporan) DAN kaprodi (/kaprodi/...).
  *   - kaprodi : selalu hanya kegiatan yang sudah disetujui.
  *   - admin   : boleh memilih status (bawaan: Disetujui).
  *
@@ -29,13 +30,22 @@ class KegiatanLaporanController extends Controller
         return $this->unduh($request, 'mahasiswa');
     }
 
+    public function prodi(Request $request): Response
+    {
+        return $this->unduh($request, 'prodi');
+    }
+
     private function unduh(Request $request, string $jenis): Response
     {
         $kaprodi = $request->routeIs('kaprodi.*');
-        $rows = $jenis === 'dosen' ? $this->data->dosen() : $this->data->mahasiswa();
+        $rows = match ($jenis) {
+            'dosen' => $this->data->dosen(),
+            'mahasiswa' => $this->data->mahasiswa(),
+            default => KegiatanProdiData::semua(),
+        };
 
         // Tahun: bila kosong/tidak valid pakai tahun terbaru; bila terbalik ditukar.
-        $tahunList = $this->data->tahun($rows);
+        $tahunList = $jenis === 'prodi' ? KegiatanProdiData::tahun($rows) : $this->data->tahun($rows);
         $terbaru = end($tahunList) ?: (int) date('Y');
         $dari = (int) $request->query('dari', $terbaru);
         $sampai = (int) $request->query('sampai', $terbaru);

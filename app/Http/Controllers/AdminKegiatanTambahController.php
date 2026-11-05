@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 /**
- * Halaman "Tambah Kegiatan" (admin): informasi kegiatan, anggota (dosen/mahasiswa), unggah dokumen.
+ * Halaman "Tambah Kegiatan" (admin DAN kaprodi, dibedakan dari nama route): informasi kegiatan, anggota (dosen/mahasiswa), unggah dokumen.
  * TODO-DB: daftar kategori / jenis dokumen di bawah diganti ambil dari KategoriKegiatanStore & JenisDokumen,
  *          dan store() menyimpan kegiatan + anggota + dokumen ke database.
  */
 class AdminKegiatanTambahController extends Controller
 {
     private const KATEGORI = ['Lomba', 'Seminar', 'Pelatihan', 'Magang', 'Kunjungan Industri'];
-    private const JENIS_KEGIATAN = ['Kegiatan Dosen', 'Kegiatan Mahasiswa'];
+    private const JENIS_KEGIATAN = ['Kegiatan Dosen', 'Kegiatan Mahasiswa', 'Kegiatan Prodi'];
     private const JENIS_DOKUMEN = ['Surat tugas', 'Sertifikat', 'Proposal', 'Laporan', 'Lainnya'];
 
     public function __construct(private DosenStore $dosen, private MahasiswaStore $mahasiswa) {}
@@ -82,8 +82,14 @@ class AdminKegiatanTambahController extends Controller
         // TODO-DB: simpan kegiatan + anggota ($data['anggota'] = ["Dosen:1", "Mahasiswa:5", ...])
         //          + dokumen (file: $request->file('dokumen.N.file')->store('kegiatan', 'public')) dalam satu transaksi.
 
-        $tujuan = $data['jenis_kegiatan'] === 'Kegiatan Dosen' ? 'admin.kegiatan.dosen' : 'admin.kegiatan.mahasiswa';
+        // Admin & kaprodi sama-sama langsung berstatus "Disetujui". Kembali ke tab jenis yang dipilih.
+        $tab = match ($data['jenis_kegiatan']) {
+            'Kegiatan Dosen' => 'dosen',
+            'Kegiatan Mahasiswa' => 'mahasiswa',
+            default => 'prodi',
+        };
+        $prefix = $request->routeIs('kaprodi.*') ? 'kaprodi' : 'admin';
 
-        return redirect()->route($tujuan)->with('success', 'Kegiatan baru berhasil disimpan.');
+        return redirect()->route($prefix.'.kegiatan.index', ['tab' => $tab])->with('success', 'Kegiatan baru berhasil disimpan.');
     }
 }

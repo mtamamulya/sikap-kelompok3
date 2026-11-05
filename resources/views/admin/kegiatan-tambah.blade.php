@@ -3,7 +3,7 @@
     Form "Tambah Kegiatan": 1 Informasi kegiatan, 2 Anggota kegiatan, 3 Unggah dokumen.
     Anggota & dokumen dinamis (JavaScript biasa). Simpan = SIMULASI (lihat controller, TODO-DB).
 --}}
-@extends('layouts.admin')
+@extends(request()->routeIs('kaprodi.*') ? 'layouts.kaprodi' : 'layouts.admin')
 
 @section('title', 'Tambah Kegiatan')
 
@@ -23,7 +23,7 @@
         <p class="text-xl font-medium leading-[30px] tracking-[-0.15px] text-[#A8A8A8] sm:text-2xl">Dashboard / Kegiatan / Tambah</p>
     </div>
 
-    <form method="POST" action="{{ route('admin.kegiatan.store') }}" enctype="multipart/form-data" class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm sm:p-6" novalidate>
+    <form method="POST" action="{{ route(request()->routeIs('kaprodi.*') ? 'kaprodi.kegiatan.store' : 'admin.kegiatan.store') }}" enctype="multipart/form-data" class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm sm:p-6" novalidate>
         @csrf
 
         {{-- ============ 1. Informasi Kegiatan ============ --}}
@@ -159,7 +159,7 @@
 
         {{-- Aksi --}}
         <div class="flex items-center justify-end gap-3">
-            <a href="{{ route('admin.kegiatan.mahasiswa') }}" class="inline-flex h-10 items-center rounded-lg bg-[#FF3F3F] px-5 text-base font-medium text-white hover:bg-[#E63535]">Batal</a>
+            <a href="{{ route(request()->routeIs('kaprodi.*') ? 'kaprodi.kegiatan.index' : 'admin.kegiatan.index') }}" class="inline-flex h-10 items-center rounded-lg bg-[#FF3F3F] px-5 text-base font-medium text-white hover:bg-[#E63535]">Batal</a>
             <button type="submit" class="inline-flex h-10 items-center rounded-lg bg-[#2277FF] px-5 text-base font-medium text-white hover:bg-[#1A63D8]">Simpan</button>
         </div>
     </form>
