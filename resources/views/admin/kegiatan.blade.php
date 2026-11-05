@@ -288,7 +288,7 @@
     var URL_LAPORAN = {
         dosen:     @json(route('admin.kegiatan.dosen.laporan')),
         mahasiswa: @json(route('admin.kegiatan.mahasiswa.laporan')),
-        prodi:     null
+        prodi:     @json(route('admin.kegiatan.prodi.laporan'))
     };
     
     var CSRF = @json(csrf_token());

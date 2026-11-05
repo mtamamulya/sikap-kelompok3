@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AdminAkreditasiController;
 // ---------- Controller Publik & Landing ----------
-use App\Http\Controllers\AdminAuthControlller;
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminBeritaController;
 use App\Http\Controllers\AdminKegiatanController; 
 use App\Http\Controllers\AdminKegiatanTambahController; // <-- Controller Tambah Kegiatan
@@ -121,6 +121,7 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     Route::get('/kegiatan/dosen', [KegiatanDosenController::class, 'index'])->name('admin.kegiatan.dosen');
     Route::get('/kegiatan/dosen/laporan', [KegiatanLaporanController::class, 'dosen'])->name('admin.kegiatan.dosen.laporan');
     Route::get('/kegiatan/mahasiswa/laporan', [KegiatanLaporanController::class, 'mahasiswa'])->name('admin.kegiatan.mahasiswa.laporan');
+    Route::get('/kegiatan/prodi/laporan', [KegiatanLaporanController::class, 'prodi'])->name('admin.kegiatan.prodi.laporan');
     Route::get('/kegiatan/mahasiswa/{id}', [AdminKegiatanMahasiswaDetailShowController::class, 'show'])->name('admin.kegiatan.mahasiswa.detail.show');
     Route::get('/kegiatan/dosen/{id}', [AdminKegiatanDosenDetailShowController::class, 'show'])->name('admin.kegiatan.dosen.detail.show');
     Route::delete('/kegiatan/dosen/{id}', [KegiatanHapusController::class, 'dosen'])->name('admin.kegiatan.dosen.destroy');
