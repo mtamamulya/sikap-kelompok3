@@ -1,9 +1,9 @@
 {{--
     resources/views/admin/mahasiswa.blade.php
     Daftar mahasiswa: cari, filter tingkat & status, paginasi (sudah berfungsi).
-    Aksi: lihat (ke halaman detail) dan hapus (modal konfirmasi -> DELETE lewat form + CSRF; aktif bila route admin.mahasiswa.destroy dibuat).
+    Aksi: lihat (ke halaman detail) dan hapus (modal konfirmasi -> DELETE lewat form + CSRF).
     Tombol Tambah Mahasiswa menjadi link bila route admin.mahasiswa.create dibuat.
-    Tabel memakai DataTables 2.x (sorting & paginasi ditangani library). Tidak lagi memakai public/js/tabel-urut.js.
+    Tabel memakai DataTables 2.x (sorting & paginasi ditangani library).
 --}}
 @extends('layouts.admin')
 
@@ -18,14 +18,13 @@
     #tabel-wrap .dt-layout-row.dt-layout-table {
         border: 1px solid rgb(0 0 47 / .15);
         border-radius: 6px;
-        overflow: hidden;                    /* latar header ikut terpotong sudut bulat */
+        overflow: hidden;
         background: #fff;
     }
     #tabel-wrap .dt-layout-table .dt-layout-cell { width: 100%; padding: 0; overflow-x: auto; }
 
     #tabel { width: 100%; min-width: 880px; table-layout: fixed; border-collapse: collapse; margin: 0 !important; font-size: 14px; color: #1C2024; }
 
-    /* Lebar kolom (total harus 100%): NIM 18, Nama 24, Tingkat 14, Kelas 18, Status 14, Aksi 12 */
     #tabel.dataTable > thead > tr > th:nth-child(1) { width: 18%; }
     #tabel.dataTable > thead > tr > th:nth-child(2) { width: 24%; }
     #tabel.dataTable > thead > tr > th:nth-child(3) { width: 14%; }
@@ -33,7 +32,6 @@
     #tabel.dataTable > thead > tr > th:nth-child(5) { width: 14%; }
     #tabel.dataTable > thead > tr > th:nth-child(6) { width: 12%; }
 
-    /* Header: latar abu penuh, semua kolom rata kiri */
     #tabel.dataTable > thead > tr > th {
         padding: 8px; font-weight: 510; text-align: left;
         background: #F9F9FC;
@@ -53,11 +51,10 @@
     #tabel.dataTable > tbody > tr > td.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #tabel.dataTable > tbody > tr > td.dt-empty { padding: 24px; text-align: center; color: #A8A8A8; }
 
-    /* Kolom pertama: beri jarak dari tepi kiri kotak (header & isi sejajar) */
     #tabel.dataTable > thead > tr > th:first-child,
     #tabel.dataTable > tbody > tr > td:first-child:not(.dt-empty) { padding-left: 20px; }
 
-    /* ---------- Paginasi: di tengah bawah, tombol kotak 32px ---------- */
+    /* ---------- Paginasi ---------- */
     #tabel-wrap .dt-layout-row:not(.dt-layout-table) { padding: 24px 0 0; justify-content: center; }
     #tabel-wrap .dt-layout-row:not(.dt-layout-table) .dt-layout-cell { width: 100%; padding: 0; display: flex; justify-content: center; }
     #tabel-wrap .dt-paging nav { display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -71,13 +68,12 @@
     }
     #tabel-wrap .dt-paging .dt-paging-button.disabled { cursor: not-allowed; opacity: .6; }
 
-    /* Tombol angka */
     #tabel-wrap .dt-paging .dt-paging-button:not(.previous):not(.next):not(.ellipsis),
     #tabel-wrap .dt-paging .dt-paging-button:not(.previous):not(.next):not(.ellipsis):hover {
         background: #fff !important; color: #0A0A0A !important; border-color: #DFE3E8 !important;
     }
     #tabel-wrap .dt-paging .dt-paging-button:not(.previous):not(.next):not(.ellipsis):hover { border-color: #2277FF !important; }
-    /* Halaman aktif: border + angka biru */
+    
     #tabel-wrap .dt-paging .dt-paging-button.current:not(.previous):not(.next):not(.ellipsis),
     #tabel-wrap .dt-paging .dt-paging-button.current:not(.previous):not(.next):not(.ellipsis):hover,
     #tabel-wrap .dt-paging .dt-paging-button[aria-current="page"]:not(.previous):not(.next):not(.ellipsis),
@@ -86,7 +82,6 @@
     }
     #tabel-wrap .dt-paging .dt-paging-button.ellipsis { border-color: transparent !important; background: none !important; color: #55555C !important; opacity: 1; cursor: default; }
 
-    /* Tombol sebelumnya (biru penuh, panah putih) & berikutnya (biru muda, panah biru) */
     #tabel-wrap .dt-paging .dt-paging-button.previous,
     #tabel-wrap .dt-paging .dt-paging-button.next {
         font-size: 0 !important; background-repeat: no-repeat !important; background-position: center !important; background-size: 20px 20px !important;
@@ -105,7 +100,7 @@
     #tabel-wrap .dt-paging .dt-paging-button.next:hover:not(.disabled) { background-color: #BBD2F6 !important; }
 
     /* ---------- Modal konfirmasi hapus ---------- */
-    #modalHapus { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }  /* margin:auto + inset:0 = tepat di tengah (Tailwind reset menimpa margin bawaan dialog) */
+    #modalHapus { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }
     #modalHapus::backdrop { background: rgb(10 10 10 / .45); }
     #modalHapus[open] { animation: modalMasuk .15s ease-out; }
     @keyframes modalMasuk { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -130,14 +125,28 @@
             <h1 class="mt-[6px] text-[32px] font-bold leading-10 tracking-[-0.3px]">Data Mahasiswa</h1>
             <x-admin.breadcrumb :items="[['Dashboard', 'admin.dashboard'], ['Data Mahasiswa']]" />
         </div>
-        <a id="btnAdd" href="{{ \Illuminate\Support\Facades\Route::has('admin.mahasiswa.create') ? route('admin.mahasiswa.create') : '#' }}" class="mt-2 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-[#1F73FF] px-4 text-base font-medium text-white">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
-            Tambah Mahasiswa
-        </a>
+        
+        <div class="flex items-center gap-2">
+            {{-- Tombol Sinkronisasi Kelas Semester Aktif --}}
+            <form action="{{ route('admin.mahasiswa.buat-kelas') }}" method="POST" class="inline-block">
+                @csrf
+                <button type="submit" class="mt-2 rounded-md bg-emerald-600 px-4 py-2 text-[15px] font-medium text-white shadow hover:bg-emerald-700" onclick="return confirm('Sinkronkan penempatan kelas semua mahasiswa aktif untuk semester ini?')">
+                    Sinkronisasi Kelas
+                </button>
+            </form>
+
+            <a id="btnAdd" href="{{ \Illuminate\Support\Facades\Route::has('admin.mahasiswa.create') ? route('admin.mahasiswa.create') : '#' }}" class="mt-2 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-[#1F73FF] px-4 text-[15px] font-medium text-white shadow hover:bg-[#1A66E0]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                Tambah Mahasiswa
+            </a>
+        </div>
     </div>
 
-    @if (session('success'))
-        <div class="mt-4 rounded-md border border-[#D6EDB5] bg-[#E6F3D3] px-4 py-3 text-sm text-[#4C7D08]" role="status">{{ session('success') }}</div>
+    @if (session('status'))
+        <div class="mt-4 rounded-md border border-[#D6EDB5] bg-[#E6F3D3] px-4 py-3 text-sm text-[#4C7D08]" role="status">{{ session('status') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="mt-4 rounded-md border border-[#FFD9D9] bg-[#FFEDED] px-4 py-3 text-sm text-[#E5484D]" role="status">{{ session('error') }}</div>
     @endif
 
     <section class="mt-6 rounded-lg bg-white p-4 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
@@ -161,15 +170,13 @@
                 <select id="fStatus" class="h-10 w-full cursor-pointer appearance-none rounded-md border border-[#E4E4E7] bg-white px-4 pr-9 text-sm outline-none focus:border-[#1F73FF]">
                     <option value="all">Semua Status</option>
                     <option value="Aktif">Aktif</option>
-                    <option value="Cuti">Cuti</option>
-                    <option value="Lulus">Lulus</option>
                     <option value="Non-aktif">Non-aktif</option>
                 </select>
                 <svg class="pointer-events-none absolute right-3 top-[11px]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6" /></svg>
             </div>
         </div>
 
-        {{-- Tabel (isi <tbody> dan paginasi dibuat otomatis oleh DataTables) --}}
+        {{-- Tabel --}}
         <div id="tabel-wrap" class="mt-5">
             <table id="tabel">
                 <thead>
@@ -187,7 +194,7 @@
     </section>
 </main>
 
-{{-- Modal konfirmasi hapus (dibuka lewat JS: tombol Hapus di tabel) --}}
+{{-- Modal konfirmasi hapus --}}
 <dialog id="modalHapus" aria-labelledby="modalHapusJudul" aria-describedby="modalHapusTeks">
     <div class="modal-kartu">
         <div class="modal-ikon">
@@ -205,7 +212,6 @@
 @endsection
 
 @push('scripts')
-{{-- Hapus baris jQuery ini kalau layout admin kamu sudah memuat jQuery 3.x --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <script>
@@ -217,7 +223,6 @@
 
     var $ = function (id) { return document.getElementById(id); };
 
-    // Nilai filter dropdown (dicek dari data asli baris)
     var filter = { level: 'all', status: 'all' };
 
     function esc(s) {
@@ -231,9 +236,8 @@
     var I_EYE   = svg(16, 1.5, '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />');
     var I_TRASH = svg(16, 1.5, '<path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v3" />');
 
-    var TXT = DataTable.render.text(); // otomatis escape HTML
+    var TXT = DataTable.render.text();
 
-    /* ---------- Filter tingkat + status ---------- */
     DataTable.ext.search.push(function (settings, searchData, dataIndex, r) {
         if (settings.nTable.id !== 'tabel') return true;
         return (filter.level === 'all' || r.level === filter.level) &&
@@ -244,9 +248,9 @@
         data: data,
         autoWidth: false,
         pageLength: 10,
-        order: [],                       // tanpa urutan awal = urutan asli dari server
+        order: [],
         columns: [
-            { data: 'nim',       render: TXT, className: 'truncate', orderable: false },                       // NIM tidak bisa diurutkan (sama seperti sebelumnya)
+            { data: 'nim',       render: TXT, className: 'truncate', orderable: false },
             { data: 'name',      render: TXT, className: 'truncate' },
             { data: 'level',     render: TXT, className: 'truncate', searchable: false },
             { data: 'className', render: TXT, className: 'truncate', searchable: false },
@@ -254,9 +258,7 @@
                 data: 'status', searchable: false,
                 render: function (d, type) {
                     if (type !== 'display') return d;
-                    var cls = d === 'Aktif' ? 'bg-[#DDF3D0] text-[#3A8A1E]'
-                            : d === 'Cuti'  ? 'bg-[#FBE5CB] text-[#854700]'
-                            :                 'bg-[#EDEDF0] text-[#55555C]';
+                    var cls = d === 'Aktif' ? 'bg-[#DDF3D0] text-[#3A8A1E]' : 'bg-[#EDEDF0] text-[#55555C]';
                     return '<span class="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium ' + cls + '">' + esc(d) + '</span>';
                 }
             },
@@ -271,7 +273,6 @@
                 }
             }
         ],
-        // Tooltip: arahkan kursor ke teks yang terpotong "..." -> muncul teks lengkapnya
         createdRow: function (tr, r) {
             var td = tr.children;
             td[0].title = r.nim || '';
@@ -279,7 +280,6 @@
             td[2].title = r.level || '';
             td[3].title = r.className || '';
         },
-        // Hanya paginasi (tengah bawah). Kotak cari, "show entries", dan info bawaan dimatikan
         layout: { topStart: null, topEnd: null, bottomStart: null, bottomEnd: null, bottom: 'paging' },
         pagingType: 'simple_numbers',
         language: {
@@ -289,7 +289,6 @@
         }
     });
 
-    // Sembunyikan paginasi kalau hanya ada 1 halaman
     function togglePager() {
         var p = document.querySelector('#tabel-wrap .dt-paging');
         if (p) p.style.display = table.page.info().pages > 1 ? '' : 'none';
@@ -297,13 +296,10 @@
     table.on('draw.dt', togglePager);
     togglePager();
 
-    /* ---------- Event filter ---------- */
-    // Cari di NIM dan nama (kolom lain tidak ikut dicari)
     $('q').addEventListener('input', function (e) { table.search(e.target.value.trim()).draw(); });
     $('fLevel').addEventListener('change', function (e) { filter.level = e.target.value; table.draw(); });
     $('fStatus').addEventListener('change', function (e) { filter.status = e.target.value; table.draw(); });
 
-    /* ---------- Hapus: modal konfirmasi, lalu DELETE lewat form + CSRF (halaman dimuat ulang -> kembali ke halaman 1) ---------- */
     var modal = $('modalHapus'), btnYa = $('modalHapusYa'), pesanError = $('modalHapusError');
     var idHapus = null;
 
@@ -326,27 +322,27 @@
         }
         if (b.dataset.act === 'delete') {
             idHapus = b.dataset.id;
-            if (typeof modal.showModal !== 'function') {            // cadangan untuk browser lama
+            if (typeof modal.showModal !== 'function') {
                 if (URL_DELETE && confirm('Hapus mahasiswa "' + (r ? r.name : '') + '"?')) kirimHapus(idHapus);
                 return;
             }
             $('modalHapusNama').textContent = '"' + (r ? r.name : '') + '"';
             pesanError.hidden = true;
-            modal.showModal();                                      // fokus awal di tombol Batal; Esc menutup modal
+            modal.showModal();
         }
     });
 
     $('modalHapusBatal').addEventListener('click', function () { modal.close(); });
-    modal.addEventListener('click', function (e) { if (e.target === modal) modal.close(); });   // klik area gelap = batal
+    modal.addEventListener('click', function (e) { if (e.target === modal) modal.close(); });
     modal.addEventListener('close', function () { idHapus = null; btnYa.disabled = false; btnYa.textContent = 'Hapus'; });
     btnYa.addEventListener('click', function () {
         if (!idHapus) return;
-        if (!URL_DELETE) {                                          // route hapus belum dibuat di backend
+        if (!URL_DELETE) {
             pesanError.textContent = 'Fitur hapus belum tersedia: route admin.mahasiswa.destroy belum dibuat.';
             pesanError.hidden = false;
             return;
         }
-        btnYa.disabled = true;                                      // cegah klik ganda
+        btnYa.disabled = true;
         btnYa.textContent = 'Menghapus...';
         kirimHapus(idHapus);
     });

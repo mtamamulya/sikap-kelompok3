@@ -150,6 +150,69 @@ class DosenDbStore extends DosenStore
         return $ok ? $this->find($id) : null;
     }
 
+    /**
+     * Aktivitas dosen untuk 4 tab halaman detail. Dosen -> kegiatan lewat kegiatan.id_user (pembuat) atau
+     * anggota_kegiatan.id_user. Penelitian/Pengabdian = kegiatan yang punya kegiatan_dosen dengan skim.ranah
+     * 'penelitian'/'pengabdian'; Kegiatan = sisanya. Peran <- anggota_kegiatan.peran (null bila hanya pembuat).
+     * Pengajaran <- enrollment_kelas_mata_kuliah.id_dosen (mata kuliah, tahun akademik, tingkat, kelas); peran tetap 'Pengampu'.
+     */
+    public function aktivitas(string $id): ?array
+    {
+        $tab = [
+            'penelitian' => ['label' => 'Penelitian', 'items' => []],
+            'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
+            'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
+            'kegiatan' => ['label' => 'Kegiatan', 'items' => []],
+        ];
+
+        $idUser = ctype_digit($id) ? Dosen::query()->whereKey((int) $id)->value('id_user') : null;
+        if (! $idUser) {
+            return $tab;
+        }
+
+        $rows = DB::table('kegiatan as k')
+            ->leftJoin('anggota_kegiatan as a', fn ($j) => $j->on('a.id_kegiatan', '=', 'k.id_kegiatan')->where('a.id_user', '=', $idUser))
+            ->leftJoin('kategori as kt', 'kt.id_kategori', '=', 'k.id_kategori')
+            ->leftJoin('kegiatan_dosen as kd', 'kd.id_kegiatan', '=', 'k.id_kegiatan')
+            ->leftJoin('skim as s', 's.id_skim', '=', 'kd.id_skim')
+            ->where(fn ($q) => $q->where('k.id_user', $idUser)->orWhereNotNull('a.id_anggota_kegiatan'))
+            ->orderByDesc('k.tanggal_mulai')->orderByDesc('k.id_kegiatan')
+            ->get(['k.nama_kegiatan', 'k.tanggal_mulai', 'kt.nama_kategori', 'kd.tahun_anggaran', 's.nama_skim', 's.ranah', 'a.peran']);
+
+        foreach ($rows as $r) {
+            $kunci = in_array($r->ranah, ['penelitian', 'pengabdian'], true) ? $r->ranah : 'kegiatan';
+
+            $tab[$kunci]['items'][] = [
+                'title' => $r->nama_kegiatan,
+                'year' => (string) ($r->tahun_anggaran ?: substr((string) $r->tanggal_mulai, 0, 4)),
+                'type' => ($kunci === 'kegiatan' ? $r->nama_kategori : $r->nama_skim) ?? '-',
+                'role' => $r->peran,
+            ];
+        }
+
+        $pengajaran = DB::table('enrollment_kelas_mata_kuliah as ekm')
+            ->join('enrollment_mata_kuliah as emk', 'emk.id_enrollment_mk', '=', 'ekm.id_enrollment_mk')
+            ->join('mata_kuliah as mk', 'mk.id_mk', '=', 'emk.id_mk')
+            ->join('tahun_akademik as ta', 'ta.id_tahun_akademik', '=', 'emk.id_tahun_akademik')
+            ->join('enrollment_tingkat_kelas as etk', 'etk.id_enrollment_tingkat_kelas', '=', 'ekm.id_enrollment_tingkat_kelas')
+            ->join('kelas as kl', 'kl.id_kelas', '=', 'etk.id_kelas')
+            ->join('tingkat as tg', 'tg.id_tingkat', '=', 'etk.id_tingkat')
+            ->where('ekm.id_dosen', (int) $id)
+            ->orderByDesc('ta.id_tahun_akademik')->orderBy('mk.nama_mk')
+            ->get(['mk.nama_mk', 'mk.sks_teori', 'mk.sks_praktik', 'ta.tahun_akademik', 'tg.tingkat', 'kl.jenis_kelas']);
+
+        foreach ($pengajaran as $r) {
+            $tab['pengajaran']['items'][] = [
+                'title' => $r->nama_mk,
+                'year' => $r->tahun_akademik,
+                'type' => 'Tingkat '.$r->tingkat.' Kelas '.$r->jenis_kelas.' · '.($r->sks_teori + $r->sks_praktik).' SKS',
+                'role' => 'Pengampu',
+            ];
+        }
+
+        return $tab;
+    }
+
     /** Pilihan pangkat = isi enum histori_pangkat_golongan.pangkat (bila tidak terbaca, pakai daftar bawaan). */
     public function opsiPangkat(): array
     {

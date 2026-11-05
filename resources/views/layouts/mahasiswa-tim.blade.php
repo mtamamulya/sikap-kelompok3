@@ -16,7 +16,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
     <style>[x-cloak]{display:none !important}</style>
 </head>
-<body class="bg-[#F9FAFB] font-sans text-[#111827] antialiased">
+<body class="frontend-shell mahasiswa-shell bg-[#F9FAFB] font-sans text-[#111827] antialiased">
 
 <div class="flex min-h-screen bg-[#F7F7F7] text-[#111827]">
     @include('layouts.partials.pengajuan-sidebar')

@@ -9,8 +9,9 @@
     $v = fn ($k, $def = '') => old($k, $d[$k] ?? $def);
     $input = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13px] outline-none placeholder:text-[#9CA3AF] focus:border-[#2277FF]';
     $select = $input.' appearance-none pr-9';
-    $defaultMembers = [['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota'], ['name' => 'Anisa Aulia Nurusyifa', 'role' => 'Anggota']];
-    $members = old('members') ? json_decode(old('members'), true) : ($d['members'] ?? $defaultMembers);
+    $members = old('members') !== null
+        ? (json_decode(old('members'), true) ?: [])
+        : ($d['members'] ?? []);
     $initialDocuments = old('documents', collect($item['documents'] ?? [])->map(fn ($f) => [
         'name' => $f['name'] ?? '',
         'type' => $f['type'] ?? 'Dokumentasi',
@@ -28,6 +29,10 @@
     $cancelUrl = $item
         ? route($isDosen ? 'pengajuan.dosen.show' : 'pengajuan.show', $item['id'])
         : route($indexRoute);
+    $selectedAdvisors = collect(old('advisors', $d['advisors'] ?? (isset($d['advisor']) ? [$d['advisor']] : [])))
+        ->filter(fn ($name) => is_string($name) && $name !== '')
+        ->values()
+        ->all();
 @endphp
 <div class="flex flex-col gap-6 px-4 pb-10 pt-7 sm:px-6 lg:px-12"
      x-data="{
@@ -36,6 +41,10 @@
          level: @js($v('level', '')),
          members: @js($members),
          newMember: '', newRole: '',
+         advisors: @js($advisors),
+         selectedAdvisors: @js($selectedAdvisors),
+         advisor: @js($v('advisor')),
+         advisorQuery: '',
          locLabels: @js($locLabels),
          documents: @js($initialDocuments),
          documentTypes: @js($documentTypes),
@@ -46,6 +55,21 @@
              if (!this.newMember.trim()) return;
              this.members.push({ name: this.newMember.trim(), role: this.newRole || 'Anggota' });
              this.newMember = ''; this.newRole = '';
+         },
+         get advisorMatches() {
+             const query = this.advisorQuery.trim().toLocaleLowerCase();
+             return query
+                 ? this.advisors.filter(dosen => !this.selectedAdvisors.includes(dosen.nama) && dosen.nama.toLocaleLowerCase().includes(query)).slice(0, 8)
+                 : [];
+         },
+         addAdvisor(dosen) {
+             if (dosen && !this.selectedAdvisors.includes(dosen.nama)) {
+                 this.selectedAdvisors.push(dosen.nama);
+             }
+             this.advisorQuery = '';
+         },
+         removeAdvisor(name) {
+             this.selectedAdvisors = this.selectedAdvisors.filter(advisor => advisor !== name);
          },
          addDocument() {
              this.documents.push({ id: Date.now() + Math.random(), name: '', type: '', url: '' });
@@ -111,7 +135,7 @@
                         <input name="title" value="{{ $v('title') }}" class="{{ $input }}" placeholder="Masukkan judul kegiatan...">
                     </x-pengajuan.field>
 
-                    @include('PengajuanMahasiswa.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Lomba'])
+                    @include('pengajuan.partials.team', ['input' => $input, 'select' => $select, 'memberLabel' => 'Anggota Lomba'])
 
                     <div class="flex flex-col gap-5 md:flex-row">
                         <div class="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -137,8 +161,8 @@
                         <input name="info_url" value="{{ $v('info_url') }}" class="{{ $input }}" placeholder="https://...">
                     </x-pengajuan.field>
 
-                    <x-pengajuan.field label="Dosen Pembimbing" optional name="advisor">
-                        <input name="advisor" value="{{ $v('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pembimbing">
+                    <x-pengajuan.field label="Dosen Pembimbing" optional name="advisors">
+                        @include('pengajuan.partials.advisor', ['input' => $input])
                     </x-pengajuan.field>
                 </div>
             </template>
@@ -189,7 +213,7 @@
                     </x-pengajuan.field>
 
                     <x-pengajuan.field label="Dosen Pembimbing / Pendamping" optional name="advisor">
-                        <input name="advisor" value="{{ $v('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pendamping">
+                        <input name="advisor" x-model="advisor" value="{{ $v('advisor') }}" class="{{ $input }}" placeholder="Masukkan nama dosen pendamping">
                     </x-pengajuan.field>
                 </div>
             </template>

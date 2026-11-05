@@ -32,35 +32,46 @@ class KaprodiMahasiswaController extends Controller
         $row = $this->store->find($id);
         abort_unless($row, 404);
 
-        // TODO-DB: riwayat & kegiatan diganti query database berdasarkan $id.
-        $mahasiswa = ['id' => $row['id'], 'nama' => $row['nama'], 'nim' => $row['nim'], 'status' => $row['status']];
+        // 1. Ambil data foto dari tabel users secara langsung menggunakan relasi Eloquent
+        $mhsModel = \App\Models\Mahasiswa::with('user')->find($id);
+        $fotoProfil = $mhsModel && $mhsModel->user ? $mhsModel->user->foto_profil : null;
+
+        // 2. Sisipkan key 'foto' ke dalam array mahasiswa
+        $mahasiswa = [
+            'id' => $row['id'], 
+            'nama' => $row['nama'], 
+            'nim' => $row['nim'], 
+            'status' => $row['status'],
+            'foto' => $fotoProfil
+        ];
 
         $academic = [
             ['Angkatan', $row['angkatan']],
-            ['Program studi', 'Teknik Informatika, D3'],
+            ['Program studi', config('admin.prodi.nama', 'Teknologi Rekayasa Komputer').', '.config('admin.prodi.jenjang', 'D4')],
             ['Tingkat saat ini', $row['level']],
-            ['Kelas saat ini', Str::after($row['kelas'], 'TI-')],
+            ['Kelas saat ini', \Illuminate\Support\Str::after($row['kelas'], 'TI-')],
         ];
 
         $identity = [
             ['Email akun', $row['email']],
-            ['Tanggal lahir', $row['tanggal_lahir'] ? Carbon::parse($row['tanggal_lahir'])->locale('id')->translatedFormat('j F Y') : '-'],
-            ['No. telepon', $row['telepon']],
-            ['Akun login', 'Aktif'],
+            ['Akun login', $row['status'] === 'Non-aktif' ? 'Nonaktif' : 'Aktif'],
         ];
 
-        $history = [
-            ['year' => '2025/2026', 'current' => true, 'sem' => 'Ganjil', 'prodi' => 'Teknik Informatika', 'level' => $row['level'], 'cls' => Str::after($row['kelas'], 'TI-')],
-            ['year' => '2024/2025', 'sem' => 'Genap',  'prodi' => 'Teknik Informatika', 'level' => 'Tingkat 1', 'cls' => '2A'],
-            ['year' => '2024/2025', 'sem' => 'Ganjil', 'prodi' => 'Teknik Informatika', 'level' => 'Tingkat 1', 'cls' => '2A'],
+        // 3. Fallback dummy data ikut dirapikan agar jika database kosong, yang muncul tetap TRK D4 (bukan Teknik Informatika)
+        $history = $this->store->riwayatKelas($id) ?? [
+            ['year' => '2025/2026', 'current' => true, 'sem' => 'Ganjil', 'prodi' => config('admin.prodi.nama', 'Teknologi Rekayasa Komputer'), 'level' => $row['level'], 'cls' => \Illuminate\Support\Str::after($row['kelas'], 'TI-')],
+            ['year' => '2024/2025', 'sem' => 'Genap',  'prodi' => config('admin.prodi.nama', 'Teknologi Rekayasa Komputer'), 'level' => 'Tingkat 1', 'cls' => '1B'],
+            ['year' => '2024/2025', 'sem' => 'Ganjil', 'prodi' => config('admin.prodi.nama', 'Teknologi Rekayasa Komputer'), 'level' => 'Tingkat 1', 'cls' => '1B'],
         ];
 
-        $kegiatan = [
+        $kegiatan = $this->store->kegiatan($id) ?? [
             ['title' => 'Kompetisi Pengembangan Aplikasi Web', 'year' => '2026', 'type' => 'Lomba',    'role' => 'Ketua Tim'],
             ['title' => 'Pelatihan Dasar Jaringan Komputer',   'year' => '2025', 'type' => 'Pelatihan', 'role' => 'Peserta'],
             ['title' => 'Seminar Nasional Teknologi Informasi', 'year' => '2025', 'type' => 'Seminar',  'role' => 'Panitia'],
         ];
 
-        return view('kaprodi.mahasiswa-detail', compact('mahasiswa', 'academic', 'identity', 'history', 'kegiatan'));
+        return view('kaprodi.mahasiswa-detail', compact('mahasiswa', 'academic', 'identity', 'history', 'kegiatan'));    
     }
 }
+
+

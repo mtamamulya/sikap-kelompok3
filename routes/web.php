@@ -1,17 +1,20 @@
 <?php
 
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\DosenDashboardController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
+use App\Http\Controllers\LandingMahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 // Ganti redirect otomatis ini dengan Landing Page TRK
 Route::view('/', 'home')->name('home');
+Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');
 
 Route::get('/dosen/kegiatan', [KegiatanController::class, 'index'])->name('dosen.kegiatan.index');
@@ -43,21 +46,19 @@ Route::view('/pengajaran/create', 'dosen.pengajaran.create')->name('pengajaran.c
 Route::view('/pengajaran/{id}', 'dosen.pengajaran.show')->whereNumber('id')->name('pengajaran.show');
 Route::view('/pengajaran/{id}/edit', 'dosen.pengajaran.edit')->whereNumber('id')->name('pengajaran.edit');
 
-Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
-Route::view('/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
+Route::redirect('/kegiatan', '/mahasiswa/kegiatan');
+Route::redirect('/kegiatan/create', '/mahasiswa/kegiatan/create');
+Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan.index')->name('kegiatan.index');
+Route::view('/mahasiswa/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
 
 // Mengirimkan semua variabel dummy yang dibutuhkan kegiatan.blade.php
-Route::view('/kegiatan/{id}', 'kegiatan', [
-    'allActivities' => [],
-    'categories' => [],
-    'activities' => [],
-])->whereNumber('id')->name('kegiatan.show');
-
-Route::view('/kegiatan/{id}/edit', 'kegiatan', [
+Route::view('/mahasiswa/kegiatan/{id}/edit', 'kegiatan', [
     'allActivities' => [],
     'categories' => [],
     'activities' => [],
 ])->whereNumber('id')->name('kegiatan.edit');
+
+Route::get('/mahasiswa/kegiatan/{id}', [KegiatanController::class, 'show'])->whereNumber('id')->name('kegiatan.show');
 
 Route::get('/pengajuan/dosen/baru', [PengajuanController::class, 'createDosen'])->name('pengajuan.dosen.create');
 Route::post('/pengajuan/dosen', [PengajuanController::class, 'storeDosen'])->name('pengajuan.dosen.store');
@@ -75,21 +76,52 @@ Route::view('/kegiatan-page', 'kegiatan')->name('kegiatan');
 Route::view('/header', 'header')->name('header');
 Route::view('/navbar', 'navbar')->name('navbar');
 
-Route::get('/pengajuan/dashboard', [PengajuanController::class, 'dashboard'])->name('pengajuan.dashboard');
-Route::get('/mahasiswa', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.index');
+Route::get('/mahasiswa/pengajuan/dashboard', [PengajuanController::class, 'dashboard'])->name('pengajuan.dashboard');
+Route::redirect('/mahasiswa', '/mahasiswa/mahasiswa/dashboard');
+Route::redirect('/mahasiswa/akademik', '/mahasiswa/mahasiswa/dashboard');
+Route::get('/mahasiswa/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.index');
 
-Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
-Route::get('/mahasiswa/mata-kuliah', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'semua')->name('mahasiswa.mata-kuliah');
+Route::get('/mahasiswa/dashboard', [DashboardController::class, 'index'])->name('mahasiswa.dashboard');
+Route::get('/mahasiswa/mata-kuliah', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'berjalan')->name('mahasiswa.mata-kuliah');
 Route::get('/mahasiswa/mata-kuliah/semester-berjalan', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'berjalan')->name('mahasiswa.mata-kuliah.berjalan');
-Route::get('/mahasiswa/mata-kuliah/riwayat', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'riwayat')->name('mahasiswa.mata-kuliah.riwayat');
-Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan')->name('mahasiswa.kegiatan');
-Route::view('/mahasiswa/profil', 'mahasiswa.profil')->name('mahasiswa.profil');
-Route::get('/mahasiswa/prestasi', [MahasiswaController::class, 'prestasi'])->name('mahasiswa.prestasi');
-Route::get('/mahasiswa/prestasi/tambah', [MahasiswaController::class, 'prestasiTambah'])->name('mahasiswa.prestasi.tambah');
-Route::post('/mahasiswa/prestasi', [MahasiswaController::class, 'prestasiSimpan'])->name('mahasiswa.prestasi.simpan');
-Route::get('/mahasiswa/prestasi/{prestasi}/edit', [MahasiswaController::class, 'prestasiEdit'])->name('mahasiswa.prestasi.edit');
-Route::delete('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiHapus'])->name('mahasiswa.prestasi.hapus');
-Route::put('/mahasiswa/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiUpdate'])->name('mahasiswa.prestasi.update');
+Route::get('/mahasiswa/mata-kuliah/katalog', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'katalog')->name('mahasiswa.mata-kuliah.katalog');
+Route::get('/mahasiswa/mata-kuliah/riwayat', [MahasiswaController::class, 'mataKuliah'])->defaults('tab', 'semua')->name('mahasiswa.mata-kuliah.riwayat');
+Route::view('/mahasiswa/profil', 'mahasiswa.mahasiswa.profil')->name('mahasiswa.profil');
+Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    Route::get('/prestasi', [MahasiswaController::class, 'prestasi'])
+        ->name('prestasi');
+
+    // Letakkan route statis sebelum route parameter prestasi.
+    Route::get('/prestasi/tambah', [MahasiswaController::class, 'prestasiTambah'])
+        ->name('prestasi.tambah');
+    Route::post('/prestasi', [MahasiswaController::class, 'prestasiSimpan'])
+        ->name('prestasi.simpan');
+
+    Route::get('/prestasi/{prestasi}/edit', [MahasiswaController::class, 'prestasiEdit'])
+        ->name('prestasi.edit');
+    Route::put('/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiUpdate'])
+        ->name('prestasi.update');
+    Route::delete('/prestasi/{prestasi}', [MahasiswaController::class, 'prestasiHapus'])
+        ->name('prestasi.hapus');
+});
 
 require __DIR__.'/pengajuan.php';
+
+Route::redirect('/pengajuan', '/mahasiswa/pengajuan');
+Route::redirect('/pengajuan/baru', '/mahasiswa/pengajuan/baru');
+Route::redirect('/pengajuan/dashboard', '/mahasiswa/pengajuan/dashboard');
+Route::redirect('/pengajuan/berita', '/mahasiswa/pengajuan/berita');
+Route::redirect('/pengajuan/berita/baru', '/mahasiswa/pengajuan/berita/baru');
+Route::get('/pengajuan/berita/{id}/edit', fn ($id) => redirect()->route('pengajuan.berita.edit', $id))->whereNumber('id');
+Route::get('/pengajuan/berita/{id}', fn ($id) => redirect()->route('pengajuan.berita.show', $id))->whereNumber('id');
+Route::get('/pengajuan/{id}/edit', fn ($id) => redirect()->route('pengajuan.edit', $id))->whereNumber('id');
+Route::get('/pengajuan/{id}', fn ($id) => redirect()->route('pengajuan.show', $id))->whereNumber('id');
+Route::get('/kegiatan/{id}/edit', fn ($id) => redirect()->route('kegiatan.edit', $id))->whereNumber('id');
+Route::get('/kegiatan/{id}', fn ($id) => redirect()->route('kegiatan.show', $id))->whereNumber('id');
+
+// Route Sinkronisasi Kelas
+Route::post('/admin/mahasiswa/buat-kelas', [LandingMahasiswaController::class, 'buatKelasSemester'])->name('admin.mahasiswa.buat-kelas');
+// Route Hapus Mahasiswa (Method DELETE)
+Route::delete('/admin/mahasiswa/{id}', [LandingMahasiswaController::class, 'destroy'])->name('admin.mahasiswa.destroy');
+
 require __DIR__.'/admin-kaprodi.php';

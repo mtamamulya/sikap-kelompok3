@@ -4,7 +4,7 @@
         'Prestasi' => ['route' => 'mahasiswa.prestasi', 'match' => 'mahasiswa.prestasi*'],
     ];
     $dashboardActive = request()->routeIs('mahasiswa.dashboard');
-    $mhsActive = request()->routeIs('mahasiswa.index', 'mahasiswa.mata-kuliah*', 'mahasiswa.prestasi*', 'mahasiswa.kegiatan', 'mahasiswa.profil');
+    $mhsActive = request()->routeIs('mahasiswa.index', 'mahasiswa.mata-kuliah*', 'mahasiswa.prestasi*', 'mahasiswa.profil');
     $mhsOpen = $mhsActive;
     $item = 'flex h-10 items-center gap-2 rounded-lg px-3 text-base tracking-[-0.18px] transition';
     $on = 'bg-[#2277FF] text-white';
@@ -54,8 +54,8 @@
             </div>
         </div>
 
-        <a href="{{ route('mahasiswa.kegiatan') }}" @if (request()->routeIs('mahasiswa.kegiatan')) aria-current="page" @endif class="{{ $item }} {{ request()->routeIs('mahasiswa.kegiatan') ? $on : $off }}">
-            <i class="{{ $icon }} ti-rocket {{ request()->routeIs('mahasiswa.kegiatan') ? 'text-white' : 'text-[#2B3F6C]' }}"></i>
+        <a href="{{ route('kegiatan.index') }}" @if (request()->routeIs('kegiatan.*')) aria-current="page" @endif class="{{ $item }} {{ request()->routeIs('kegiatan.*') ? $on : $off }}">
+            <i class="{{ $icon }} ti-rocket {{ request()->routeIs('kegiatan.*') ? 'text-white' : 'text-[#2B3F6C]' }}"></i>
             <span class="flex-1">Kegiatan</span>
         </a>
     </nav>
