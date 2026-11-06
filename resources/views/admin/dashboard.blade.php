@@ -119,15 +119,16 @@
                         </div>
 
                         {{-- Batang --}}
-                        <div class="absolute inset-x-0 bottom-0 top-2 flex items-end justify-around gap-2 overflow-x-auto">
+                        <div class="absolute inset-x-0 bottom-0 top-2 flex items-end justify-around gap-2 overflow-x-auto" id="chart-wrapper">
                             @foreach ($years as $d)
-                                <div class="group relative flex h-full w-12 shrink-0 flex-col items-center justify-end gap-3">
+                                {{-- Tambahkan class 'bar-item', 'cursor-pointer', dan 'transition-opacity' --}}
+                                <div class="bar-item group relative flex h-full w-12 shrink-0 cursor-pointer flex-col items-center justify-end gap-3 transition-opacity duration-300">
                                     <span class="absolute z-10 hidden whitespace-nowrap rounded-[3px] bg-white px-1 py-0.5 text-xs font-normal shadow-md group-hover:block"
                                           style="top: max(0px, calc({{ (1 - $d['ratio']) * 100 }}% - {{ ((1 - $d['ratio']) * 28) + 24 }}px))">
                                         {{ $d['v'] }} Kegiatan
                                     </span>
-                                    <div class="w-12 bg-[#226CFF]" style="height: calc((100% - 28px) * {{ $d['ratio'] }})"></div>
-                                    <span class="leading-4">{{ $d['y'] }}</span>
+                                    <div class="w-12 rounded-t-sm bg-[#226CFF] transition-colors group-hover:bg-[#1A5AE0]" style="height: calc((100% - 28px) * {{ $d['ratio'] }})"></div>
+                                    <span class="leading-4 group-hover:font-semibold">{{ $d['y'] }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -167,6 +168,22 @@
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <script>
 (function () {
+
+        // --- Efek Interaktif Grafik Bar ---
+    const chartBars = document.querySelectorAll('.bar-item');
+    chartBars.forEach(bar => {
+        // Saat kursor masuk, samarkan batang yang lain
+        bar.addEventListener('mouseenter', () => {
+            chartBars.forEach(b => { 
+                if (b !== bar) b.style.opacity = '0.3'; 
+            });
+        });
+        // Saat kursor pergi, kembalikan seperti semula
+        bar.addEventListener('mouseleave', () => {
+            chartBars.forEach(b => b.style.opacity = '1');
+        });
+    });
+
     var data = @json($rows);
     var JUMLAH_TAMPIL = 5;    // tampilkan 5 kegiatan terbaru
 

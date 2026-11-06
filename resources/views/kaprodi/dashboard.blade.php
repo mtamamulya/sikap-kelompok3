@@ -119,15 +119,15 @@
                         </div>
 
                         {{-- Batang --}}
-                        <div class="absolute inset-x-0 bottom-0 top-2 flex items-end justify-between sm:justify-around gap-1 sm:gap-2 overflow-x-auto pb-6 sm:pb-7 scrollbar-hide">
+                        <div class="absolute inset-x-0 bottom-0 top-2 flex items-end justify-between sm:justify-around gap-1 sm:gap-2 overflow-x-auto pb-6 sm:pb-7 scrollbar-hide" id="chart-wrapper">
                             @foreach ($years as $d)
-                                <div class="group relative flex h-full w-8 sm:w-12 shrink-0 flex-col items-center justify-end gap-2">
+                                <div class="bar-item group relative flex h-full w-8 sm:w-12 shrink-0 cursor-pointer flex-col items-center justify-end gap-2 transition-opacity duration-300">
                                     <span class="absolute -top-1 z-10 hidden whitespace-nowrap rounded-[3px] bg-white px-1 py-0.5 text-[10px] sm:text-xs font-normal shadow-md group-hover:block"
                                           style="bottom: calc({{ $d['ratio'] * 100 }}% * 0.92 + 32px); top: auto">
-                                        {{ $d['v'] }}
+                                        {{ $d['v'] }} Kegiatan
                                     </span>
-                                    <div class="w-full bg-[#226CFF] rounded-t-sm" style="height: calc(100% * {{ $d['ratio'] }})"></div>
-                                    <span class="absolute -bottom-6 sm:-bottom-7 leading-4">{{ $d['y'] }}</span>
+                                    <div class="w-full bg-[#226CFF] rounded-t-sm transition-colors group-hover:bg-[#1A5AE0]" style="height: calc(100% * {{ $d['ratio'] }})"></div>
+                                    <span class="absolute -bottom-6 sm:-bottom-7 leading-4 group-hover:font-semibold">{{ $d['y'] }}</span>
                                 </div>
                             @endforeach
                         </div>
@@ -139,7 +139,7 @@
             <div class="flex flex-col gap-4 sm:gap-8 rounded-lg bg-white px-3 pb-4 pt-3 sm:px-4 sm:pb-6 sm:pt-4 {{ $cardShadow }}">
                 <div class="flex items-center gap-3">
                     <h2 class="flex-1 text-lg sm:text-xl font-medium leading-6">Kegiatan Menunggu Validasi</h2>
-                    <a href="{{ route('kaprodi.kegiatan.dosen') }}" class="rounded-md px-2 py-1 text-sm sm:text-base font-medium text-[#226CFF]">Lihat semua</a>
+                    <a href="{{ route('kaprodi.pengajuan') }}" class="rounded-md px-2 py-1 text-sm sm:text-base font-medium text-[#226CFF]">Lihat semua</a>
                 </div>
 
                 {{-- Tabel (isi <tbody> dibuat otomatis oleh DataTables: 5 kegiatan terbaru, tanpa paginasi) --}}
@@ -167,6 +167,20 @@
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <script>
 (function () {
+
+    // --- Efek Interaktif Grafik Bar Kaprodi ---
+    const chartBars = document.querySelectorAll('.bar-item');
+    chartBars.forEach(bar => {
+        bar.addEventListener('mouseenter', () => {
+            chartBars.forEach(b => { 
+                if (b !== bar) b.style.opacity = '0.3'; 
+            });
+        });
+        bar.addEventListener('mouseleave', () => {
+            chartBars.forEach(b => b.style.opacity = '1');
+        });
+    });
+
     var data = @json($rows);
     var JUMLAH_TAMPIL = 5;    // tampilkan 5 kegiatan terbaru
 
