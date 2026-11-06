@@ -99,24 +99,34 @@
     #tabel-wrap .dt-paging .dt-paging-button.previous:hover:not(.disabled) { background-color: #1A66E0 !important; border-color: #1A66E0 !important; }
     #tabel-wrap .dt-paging .dt-paging-button.next:hover:not(.disabled) { background-color: #BBD2F6 !important; }
 
-    /* ---------- Modal konfirmasi hapus ---------- */
-    #modalHapus { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }
-    #modalHapus::backdrop { background: rgb(10 10 10 / .45); }
-    #modalHapus[open] { animation: modalMasuk .15s ease-out; }
+    /* ---------- Modal Konfirmasi (Hapus & Sinkronisasi) ---------- */
+    .dialog-overlay { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }
+    .dialog-overlay::backdrop { background: rgb(10 10 10 / .45); }
+    .dialog-overlay[open] { animation: modalMasuk .15s ease-out; }
     @keyframes modalMasuk { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+    
     .modal-kartu { padding: 24px; border-radius: 12px; background: #fff; text-align: center; box-shadow: 0 20px 50px rgb(0 0 0 / .2); }
-    .modal-ikon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 9999px; background: #FFD9D9; color: #E5484D; }
+    .modal-ikon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 9999px; }
+    .modal-ikon-danger { background: #FFD9D9; color: #E5484D; }
+    .modal-ikon-warning { background: #FDE2CA; color: #DC6803; }
+    
     .modal-judul { font-size: 18px; font-weight: 700; line-height: 24px; color: #0A0A0A; }
     .modal-teks { margin-top: 8px; font-size: 14px; line-height: 20px; color: #55555C; }
     .modal-teks strong { font-weight: 600; color: #0A0A0A; word-break: break-word; }
     .modal-error { margin-top: 12px; font-size: 13px; color: #E5484D; }
+    
     .modal-aksi { display: flex; gap: 12px; margin-top: 24px; }
     .modal-btn { flex: 1; height: 40px; border: 1px solid transparent; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
     .modal-btn-batal { background: #fff; border-color: #E8E8EC; color: #2E2E2E; }
     .modal-btn-batal:hover { background: #F9F9FB; }
+    
     .modal-btn-hapus { background: #E5484D; color: #fff; }
     .modal-btn-hapus:hover { background: #D13A3F; }
     .modal-btn-hapus:disabled { opacity: .7; cursor: not-allowed; }
+    
+    .modal-btn-sinkron { background: #10B981; color: #fff; } /* Emerald 500 */
+    .modal-btn-sinkron:hover { background: #059669; } /* Emerald 600 */
+    .modal-btn-sinkron:disabled { opacity: .7; cursor: not-allowed; }
 </style>
 
 <main class="p-4 pb-10 sm:p-6">
@@ -127,13 +137,10 @@
         </div>
         
         <div class="flex items-center gap-2">
-            {{-- Tombol Sinkronisasi Kelas Semester Aktif --}}
-            <form action="{{ route('admin.mahasiswa.buat-kelas') }}" method="POST" class="inline-block">
-                @csrf
-                <button type="submit" class="mt-2 rounded-md bg-emerald-600 px-4 py-2 text-[15px] font-medium text-white shadow hover:bg-emerald-700" onclick="return confirm('Sinkronkan penempatan kelas semua mahasiswa aktif untuk semester ini?')">
-                    Sinkronisasi Kelas
-                </button>
-            </form>
+            {{-- Tombol Buka Modal Sinkronisasi --}}
+            <button type="button" id="btnSinkron" class="mt-2 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-emerald-600 px-4 text-[15px] font-medium text-white shadow hover:bg-emerald-700">
+                Sinkronisasi Kelas
+            </button>
 
             <a id="btnAdd" href="{{ \Illuminate\Support\Facades\Route::has('admin.mahasiswa.create') ? route('admin.mahasiswa.create') : '#' }}" class="mt-2 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-[#1F73FF] px-4 text-[15px] font-medium text-white shadow hover:bg-[#1A66E0]">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
@@ -194,10 +201,15 @@
     </section>
 </main>
 
+{{-- Form tersembunyi untuk proses sinkronisasi --}}
+<form id="formSinkron" action="{{ route('admin.mahasiswa.buat-kelas') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
 {{-- Modal konfirmasi hapus --}}
-<dialog id="modalHapus" aria-labelledby="modalHapusJudul" aria-describedby="modalHapusTeks">
+<dialog id="modalHapus" class="dialog-overlay" aria-labelledby="modalHapusJudul" aria-describedby="modalHapusTeks">
     <div class="modal-kartu">
-        <div class="modal-ikon">
+        <div class="modal-ikon modal-ikon-danger">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v3" /></svg>
         </div>
         <h2 id="modalHapusJudul" class="modal-judul">Hapus mahasiswa?</h2>
@@ -206,6 +218,21 @@
         <div class="modal-aksi">
             <button type="button" id="modalHapusBatal" class="modal-btn modal-btn-batal">Batal</button>
             <button type="button" id="modalHapusYa" class="modal-btn modal-btn-hapus">Hapus</button>
+        </div>
+    </div>
+</dialog>
+
+{{-- Modal konfirmasi sinkronisasi --}}
+<dialog id="modalSinkron" class="dialog-overlay" aria-labelledby="modalSinkronJudul" aria-describedby="modalSinkronTeks">
+    <div class="modal-kartu">
+        <div class="modal-ikon modal-ikon-warning">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v2m0 4v.01M5.07 19H18.93c1.9 0 2.8-2.27 1.8-3.75L13.8 3.55c-1-1.4-3.1-1.4-4.1 0L2.27 15.25c-1 1.48-.1 3.75 1.8 3.75z" /></svg>
+        </div>
+        <h2 id="modalSinkronJudul" class="modal-judul">Sinkronisasi Kelas?</h2>
+        <p id="modalSinkronTeks" class="modal-teks">Proses ini akan menempatkan seluruh mahasiswa ke tingkat baru sesuai semester aktif saat ini. Lanjutkan?</p>
+        <div class="modal-aksi">
+            <button type="button" id="modalSinkronBatal" class="modal-btn modal-btn-batal">Batal</button>
+            <button type="button" id="modalSinkronYa" class="modal-btn modal-btn-sinkron">Sinkronkan</button>
         </div>
     </div>
 </dialog>
@@ -300,7 +327,8 @@
     $('fLevel').addEventListener('change', function (e) { filter.level = e.target.value; table.draw(); });
     $('fStatus').addEventListener('change', function (e) { filter.status = e.target.value; table.draw(); });
 
-    var modal = $('modalHapus'), btnYa = $('modalHapusYa'), pesanError = $('modalHapusError');
+    // ---------- Logika Modal Hapus ----------
+    var modalHapus = $('modalHapus'), btnYaHapus = $('modalHapusYa'), pesanError = $('modalHapusError');
     var idHapus = null;
 
     function kirimHapus(id) {
@@ -322,30 +350,58 @@
         }
         if (b.dataset.act === 'delete') {
             idHapus = b.dataset.id;
-            if (typeof modal.showModal !== 'function') {
+            if (typeof modalHapus.showModal !== 'function') {
                 if (URL_DELETE && confirm('Hapus mahasiswa "' + (r ? r.name : '') + '"?')) kirimHapus(idHapus);
                 return;
             }
             $('modalHapusNama').textContent = '"' + (r ? r.name : '') + '"';
             pesanError.hidden = true;
-            modal.showModal();
+            modalHapus.showModal();
         }
     });
 
-    $('modalHapusBatal').addEventListener('click', function () { modal.close(); });
-    modal.addEventListener('click', function (e) { if (e.target === modal) modal.close(); });
-    modal.addEventListener('close', function () { idHapus = null; btnYa.disabled = false; btnYa.textContent = 'Hapus'; });
-    btnYa.addEventListener('click', function () {
+    $('modalHapusBatal').addEventListener('click', function () { modalHapus.close(); });
+    modalHapus.addEventListener('click', function (e) { if (e.target === modalHapus) modalHapus.close(); });
+    modalHapus.addEventListener('close', function () { idHapus = null; btnYaHapus.disabled = false; btnYaHapus.textContent = 'Hapus'; });
+    
+    btnYaHapus.addEventListener('click', function () {
         if (!idHapus) return;
         if (!URL_DELETE) {
             pesanError.textContent = 'Fitur hapus belum tersedia: route admin.mahasiswa.destroy belum dibuat.';
             pesanError.hidden = false;
             return;
         }
-        btnYa.disabled = true;
-        btnYa.textContent = 'Menghapus...';
+        btnYaHapus.disabled = true;
+        btnYaHapus.textContent = 'Menghapus...';
         kirimHapus(idHapus);
     });
+
+    // ---------- Logika Modal Sinkronisasi ----------
+    var modalSinkron = $('modalSinkron');
+    var btnSinkron = $('btnSinkron');
+    var btnYaSinkron = $('modalSinkronYa');
+    var formSinkron = $('formSinkron');
+
+    btnSinkron.addEventListener('click', function() {
+        if (typeof modalSinkron.showModal === 'function') {
+            modalSinkron.showModal();
+        } else {
+            // Fallback apabila browser pengguna masih sangat lama
+            if(confirm('Sinkronkan penempatan kelas semua mahasiswa aktif untuk semester ini?')) {
+                formSinkron.submit();
+            }
+        }
+    });
+
+    $('modalSinkronBatal').addEventListener('click', function () { modalSinkron.close(); });
+    modalSinkron.addEventListener('click', function (e) { if (e.target === modalSinkron) modalSinkron.close(); });
+    
+    btnYaSinkron.addEventListener('click', function () {
+        btnYaSinkron.disabled = true;
+        btnYaSinkron.textContent = 'Menyinkronkan...';
+        formSinkron.submit();
+    });
+
 })();
 </script>
 @endpush
