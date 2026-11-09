@@ -29,3 +29,5 @@ input, select, textarea, button {
     main h1.text-4xl { font-size: 1.875rem; line-height: 2.25rem; }
     main p.text-2xl  { font-size: 1.125rem; line-height: 1.75rem; }
 }
+
+html, body { overflow-x: hidden; overscroll-behavior-x: none; }

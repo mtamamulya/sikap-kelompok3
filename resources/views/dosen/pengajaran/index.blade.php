@@ -55,7 +55,7 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full">
                 <label for="kelas" class="sr-only">Filter kelas</label>
                 <select id="kelas" x-model="f.kelas" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Kelas</option>
@@ -66,7 +66,7 @@
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full">
                 <label for="tahun" class="sr-only">Filter tahun akademik</label>
                 <select id="tahun" x-model="f.tahun" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>
@@ -77,7 +77,7 @@
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full">
                 <label for="semester" class="sr-only">Filter semester</label>
                 <select id="semester" x-model="f.semester" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Semester</option>
