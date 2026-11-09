@@ -53,7 +53,7 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full">
                 <label for="tahun" class="sr-only">Filter tahun</label>
                 <select id="tahun" x-model="f.tahun" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>
