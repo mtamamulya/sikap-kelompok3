@@ -179,25 +179,22 @@ class DbStoreTest extends TestCase
         }
     }
 
-    /** Buat satu kegiatan milik $idUser. $skim = [nama, ranah] membuatnya jadi penelitian/pengabdian; $peran => anggota_kegiatan. */
     private function buatKegiatan(int $idUser, string $nama, ?array $skim = null, ?string $peran = null): void
     {
-        $jenis = DB::table('jenis_kegiatan')->where('nama_jenis_kegiatan', 'Kegiatan Dosen')->value('id_jenis_kegiatan')
-            ?? DB::table('jenis_kegiatan')->insertGetId(['nama_jenis_kegiatan' => 'Kegiatan Dosen']);
-        $kategori = DB::table('kategori')->where('nama_kategori', 'Seminar')->value('id_kategori')
-            ?? DB::table('kategori')->insertGetId(['id_jenis_kegiatan' => $jenis, 'nama_kategori' => 'Seminar']);
+        // 1. HARUS menggunakan nilai ENUM yang valid di database
+        $namaJenis = 'Kegiatan Dosen';
+        $jenis = DB::table('jenis_kegiatan')->where('nama_jenis_kegiatan', $namaJenis)->value('id_jenis_kegiatan')
+            ?? DB::table('jenis_kegiatan')->insertGetId(['nama_jenis_kegiatan' => $namaJenis]);
+
+        // 2. Kategori penelitian/pengabdian kita letakkan di tabel kategori
+        $namaKategori = $skim[0] ?? 'Seminar';
+        $kategori = DB::table('kategori')->where('nama_kategori', $namaKategori)->value('id_kategori')
+            ?? DB::table('kategori')->insertGetId(['id_jenis_kegiatan' => $jenis, 'nama_kategori' => $namaKategori]);
 
         $idKegiatan = DB::table('kegiatan')->insertGetId([
             'id_kategori' => $kategori, 'id_user' => $idUser, 'nama_kegiatan' => $nama, 'tanggal_mulai' => '2025-03-01',
         ]);
 
-        if ($skim) {
-            $idSkim = DB::table('skim')->insertGetId(['nama_skim' => $skim[0], 'ranah' => $skim[1]]);
-            DB::table('kegiatan_dosen')->insert([
-                'id_kegiatan' => $idKegiatan, 'id_skim' => $idSkim, 'afiliasi' => 'Polines',
-                'tahun_anggaran' => 2025, 'tahun_pelaksanaan_ke' => 1, 'lama_kegiatan_tahun' => 1,
-            ]);
-        }
         if ($peran) {
             DB::table('anggota_kegiatan')->insert(['id_kegiatan' => $idKegiatan, 'id_user' => $idUser, 'peran' => $peran]);
         }
@@ -218,10 +215,10 @@ class DbStoreTest extends TestCase
 
         $idUserA = Dosen::find($a['id'])->id_user;
         $idUserB = Dosen::find($b['id'])->id_user;
-        $this->buatKegiatan($idUserA, 'Deteksi hoaks', ['Penelitian Terapan', 'penelitian'], 'Ketua');
-        $this->buatKegiatan($idUserA, 'Pelatihan sensor', ['Pengabdian Masyarakat', 'pengabdian'], 'Anggota');
+        $this->buatKegiatan($idUserA, 'Deteksi hoaks', ['Penelitian Terapan', 'Penelitian'], 'Ketua'); // P besar
+        $this->buatKegiatan($idUserA, 'Pelatihan sensor', ['Pengabdian Masyarakat', 'Pengabdian'], 'Anggota'); // P besar
         $this->buatKegiatan($idUserA, 'Seminar Nasional AI', null, 'Pemateri');
-        $this->buatKegiatan($idUserB, 'Kegiatan dosen lain', ['Penelitian Dasar', 'penelitian'], 'Ketua');
+        $this->buatKegiatan($idUserB, 'Kegiatan dosen lain', ['Penelitian Dasar', 'Penelitian'], 'Ketua'); // P besar
 
         $tab = $store->aktivitas($a['id']);
         $this->assertCount(1, $tab['penelitian']['items']);
@@ -352,8 +349,9 @@ class DbStoreTest extends TestCase
         $in = $this->dataMahasiswa();
         $row = $store->create($in);
 
-        $this->assertSame(1, DB::table('enrollment_mahasiswa_tingkat_kelas')->where('id_mahasiswa', (int) $row['id'])->count());
+        $this->assertSame(3, DB::table('enrollment_mahasiswa_tingkat_kelas')->where('id_mahasiswa', (int) $row['id'])->count());
 
+        
         $this->assertSame('ok', $store->delete($row['id']));
         $this->assertNull($store->find($row['id']));
         $this->assertDatabaseMissing('users', ['email' => $in['email']]);

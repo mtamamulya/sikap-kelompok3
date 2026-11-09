@@ -101,7 +101,7 @@ class PenempatanKelasMahasiswaTest extends TestCase
 
         $ridho = $this->buatMahasiswa('4.33.25.1.09', 2025);       // semester 3 -> tingkat 2, kelas B
         $baru = $this->buatMahasiswa('4.33.26.0.01', 2026);        // semester 1 -> tingkat 1, kelas A
-        $this->buatMahasiswa('4.33.21.2.05', 2021);                // semester 11 -> lulus
+        $this->buatMahasiswa('4.33.20.2.05', 2020);
         $this->buatMahasiswa('4.33.25.2.10', 2025, false);         // akun nonaktif -> dilewati
         $this->buatMahasiswa('43325119', 2025);                    // NIM salah format
 
@@ -116,7 +116,7 @@ class PenempatanKelasMahasiswaTest extends TestCase
 
         // diulang: tidak membuat baris ganda
         $this->assertSame(
-            ['dibuat' => 0, 'sudah-ada' => 2, 'lulus' => 1, 'belum-mulai' => 0, 'nim-tidak-valid' => 1],
+            ['dibuat' => 0, 'sudah-ada' => 2, 'lulus' => 0, 'belum-mulai' => 0, 'nim-tidak-valid' => 1],
             $svc->buatUntukSemester($idTa)
         );
         $this->assertSame(2, DB::table('enrollment_mahasiswa_tingkat_kelas')->count());

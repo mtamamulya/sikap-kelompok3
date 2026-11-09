@@ -150,12 +150,7 @@ class DosenDbStore extends DosenStore
         return $ok ? $this->find($id) : null;
     }
 
-    /**
-     * Aktivitas dosen untuk 4 tab halaman detail. Dosen -> kegiatan lewat kegiatan.id_user (pembuat) atau
-     * anggota_kegiatan.id_user. Penelitian/Pengabdian = kegiatan yang punya kegiatan_dosen dengan skim.ranah
-     * 'penelitian'/'pengabdian'; Kegiatan = sisanya. Peran <- anggota_kegiatan.peran (null bila hanya pembuat).
-     * Pengajaran <- enrollment_kelas_mata_kuliah.id_dosen (mata kuliah, tahun akademik, tingkat, kelas); peran tetap 'Pengampu'.
-     */
+    
     public function aktivitas(string $id): ?array
     {
         $tab = [
@@ -170,22 +165,26 @@ class DosenDbStore extends DosenStore
             return $tab;
         }
 
+        // QUERY BARU: Menghapus JOIN ke kegiatan_dosen dan skim yang sudah dibuang Kel. 3
         $rows = DB::table('kegiatan as k')
             ->leftJoin('anggota_kegiatan as a', fn ($j) => $j->on('a.id_kegiatan', '=', 'k.id_kegiatan')->where('a.id_user', '=', $idUser))
             ->leftJoin('kategori as kt', 'kt.id_kategori', '=', 'k.id_kategori')
-            ->leftJoin('kegiatan_dosen as kd', 'kd.id_kegiatan', '=', 'k.id_kegiatan')
-            ->leftJoin('skim as s', 's.id_skim', '=', 'kd.id_skim')
+            ->leftJoin('jenis_kegiatan as jk', 'kt.id_jenis_kegiatan', '=', 'jk.id_jenis_kegiatan')
             ->where(fn ($q) => $q->where('k.id_user', $idUser)->orWhereNotNull('a.id_anggota_kegiatan'))
             ->orderByDesc('k.tanggal_mulai')->orderByDesc('k.id_kegiatan')
-            ->get(['k.nama_kegiatan', 'k.tanggal_mulai', 'kt.nama_kategori', 'kd.tahun_anggaran', 's.nama_skim', 's.ranah', 'a.peran']);
+            ->get(['k.nama_kegiatan', 'k.tanggal_mulai', 'kt.nama_kategori', 'jk.nama_jenis_kegiatan as ranah', 'a.peran']);
 
         foreach ($rows as $r) {
-            $kunci = in_array($r->ranah, ['penelitian', 'pengabdian'], true) ? $r->ranah : 'kegiatan';
+            // Kita deteksi tab tujuan dari nama_kategori (karena jenis_kegiatan sekarang mutlak 'Kegiatan Dosen')
+            $namaKategori = strtolower((string) $r->nama_kategori);
+            
+            $kunci = (str_contains($namaKategori, 'penelitian')) ? 'penelitian' : 
+                     ((str_contains($namaKategori, 'pengabdian')) ? 'pengabdian' : 'kegiatan');
 
             $tab[$kunci]['items'][] = [
                 'title' => $r->nama_kegiatan,
-                'year' => (string) ($r->tahun_anggaran ?: substr((string) $r->tanggal_mulai, 0, 4)),
-                'type' => ($kunci === 'kegiatan' ? $r->nama_kategori : $r->nama_skim) ?? '-',
+                'year' => substr((string) $r->tanggal_mulai, 0, 4),
+                'type' => $r->nama_kategori ?? '-',
                 'role' => $r->peran,
             ];
         }

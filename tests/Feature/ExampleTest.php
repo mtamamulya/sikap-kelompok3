@@ -2,15 +2,16 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase; // Tambahkan ini
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    use RefreshDatabase; // Tambahkan baris ini di dalam class
+
     public function test_the_application_returns_a_successful_response(): void
     {
         $response = $this->get('/');
-
         $response->assertOk();
     }
 }
