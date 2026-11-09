@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Unduh laporan data kegiatan dosen / mahasiswa / prodi (PDF atau Excel) per kurun waktu tahun.
+ * Unduh laporan data kegiatan semua / dosen / mahasiswa / prodi (PDF atau Excel) per kurun waktu tahun.
  * Dipakai admin (/admin/kegiatan/{dosen|mahasiswa|prodi}/laporan) DAN kaprodi (/kaprodi/...).
  *   - kaprodi : selalu hanya kegiatan yang sudah disetujui.
  *   - admin   : boleh memilih status (bawaan: Disetujui).
@@ -35,17 +35,45 @@ class KegiatanLaporanController extends Controller
         return $this->unduh($request, 'prodi');
     }
 
+    public function semua(Request $request): Response
+    {
+        return $this->unduh($request, 'semua');
+    }
+
+    /** Gabungan dosen + mahasiswa + prodi dengan kolom seragam (jenis, pelaku). */
+    private function gabungan(): array
+    {
+        $ambil = fn (array $rows, string $jenis, string $pelaku) => array_map(fn ($r) => [
+            'nama' => $r['nama'],
+            'kategori' => $r['kategori'],
+            'jenis' => $jenis,
+            'pelaku' => $r[$pelaku] ?? '-',
+            'tanggal' => $r['tanggal'],
+            'tanggal_iso' => $r['tanggal_iso'],
+            'tahun' => $r['tahun'],
+            'semester' => $r['semester'],
+            'status' => $r['status'],
+        ], $rows);
+
+        return array_merge(
+            $ambil($this->data->dosen(), 'Dosen', 'dosen'),
+            $ambil($this->data->mahasiswa(), 'Mahasiswa', 'pengaju'),
+            $ambil(KegiatanProdiData::semua(), 'Prodi', 'penanggung_jawab'),
+        );
+    }
+
     private function unduh(Request $request, string $jenis): Response
     {
         $kaprodi = $request->routeIs('kaprodi.*');
         $rows = match ($jenis) {
             'dosen' => $this->data->dosen(),
             'mahasiswa' => $this->data->mahasiswa(),
+            'semua' => $this->gabungan(),
             default => KegiatanProdiData::semua(),
         };
 
         // Tahun: bila kosong/tidak valid pakai tahun terbaru; bila terbalik ditukar.
-        $tahunList = $jenis === 'prodi' ? KegiatanProdiData::tahun($rows) : $this->data->tahun($rows);
+        $tahunList = in_array($jenis, ['prodi', 'semua'], true) ? KegiatanProdiData::tahun($rows) : $this->data->tahun($rows);
         $terbaru = end($tahunList) ?: (int) date('Y');
         $dari = (int) $request->query('dari', $terbaru);
         $sampai = (int) $request->query('sampai', $terbaru);

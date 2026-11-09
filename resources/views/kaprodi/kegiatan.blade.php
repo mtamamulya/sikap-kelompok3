@@ -1,6 +1,6 @@
 {{--
     resources/views/kaprodi/kegiatan.blade.php
-    Kegiatan gabungan kaprodi (Dosen | Mahasiswa | Prodi), DataTables 2.x. HANYA kegiatan yang sudah disetujui.
+    Kegiatan gabungan kaprodi (Semua | Dosen | Mahasiswa | Prodi), DataTables 2.x. HANYA kegiatan yang sudah disetujui.
     Aksi: lihat, hapus, tambah (kaprodi: CRUD). Laporan PDF/Excel per tab. Sorting kolom tetap ada.
 --}}
 @extends('layouts.kaprodi')
@@ -8,7 +8,7 @@
 @section('title', 'Kegiatan')
 
 @php
-    $tabs = ['dosen' => 'Dosen', 'mahasiswa' => 'Mahasiswa', 'prodi' => 'Prodi'];
+    $tabs = ['semua' => 'Semua', 'dosen' => 'Dosen', 'mahasiswa' => 'Mahasiswa', 'prodi' => 'Prodi'];
     $selectCls = 'h-10 w-full appearance-none rounded-lg border border-[#E8E8EC] bg-white px-4 pr-10 text-base text-[#2E2E2E] outline-none focus:border-[#2277FF] cursor-pointer';
     $chev = '<svg class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1C2024]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6" /></svg>';
 @endphp
@@ -140,7 +140,7 @@
         {{-- Area Laporan & Ekspor Dinamis --}}
         <form id="formLaporan" method="GET" action="{{ route('kaprodi.kegiatan.dosen.laporan') }}" class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 bg-gray-50/30 p-5">
             <div class="flex flex-col gap-1">
-                <h2 id="laporanJudul" class="text-lg font-bold text-gray-800">Laporan Data Kegiatan Dosen</h2>
+                <h2 id="laporanJudul" class="text-lg font-bold text-gray-800">Laporan Seluruh Data Kegiatan</h2>
                 <p class="text-sm text-gray-500">Unduh rekap kegiatan berdasarkan kurun waktu (tahun).</p>
             </div>
             
@@ -232,6 +232,7 @@
                 <thead>
                     <tr>
                         <th>Nama Kegiatan</th>
+                        <th>Jenis</th>
                         <th>Kategori</th>
                         <th id="thPengaju">Pengaju</th>
                         <th>Tanggal</th>
@@ -271,27 +272,34 @@
     var TAHUN = @json($tahun);   // tahun yang ada per tab (untuk dropdown laporan)
 
     var URL_DETAIL = {
+        semua:     null,   // tab Semua memakai URL sesuai jenis tiap baris
         dosen:     @json(route('kaprodi.kegiatan.dosen.show', ['id' => '__ID__'])),
         mahasiswa: @json(route('kaprodi.kegiatan.mahasiswa.show', ['id' => '__ID__'])),
         prodi:     null   // detail kegiatan prodi menyusul (Fase C)
     };
     var URL_DELETE = {
+        semua:     null,
         dosen:     @json(route('kaprodi.kegiatan.dosen.destroy', ['id' => '__ID__'])),
         mahasiswa: @json(route('kaprodi.kegiatan.mahasiswa.destroy', ['id' => '__ID__'])),
         prodi:     null   // hapus kegiatan prodi menyusul (Fase C)
     };
     var URL_LAPORAN = {
+        semua:     @json(route('kaprodi.kegiatan.semua.laporan')),
         dosen:     @json(route('kaprodi.kegiatan.dosen.laporan')),
         mahasiswa: @json(route('kaprodi.kegiatan.mahasiswa.laporan')),
         prodi:     @json(route('kaprodi.kegiatan.prodi.laporan'))
     };
     
     var CSRF = @json(csrf_token());
-    var PENGAJU = { dosen: 'Pengaju', mahasiswa: 'Pengaju', prodi: 'Penanggung Jawab' };
+    var PENGAJU = { semua: 'Pengaju / Penanggung Jawab', dosen: 'Pengaju', mahasiswa: 'Pengaju', prodi: 'Penanggung Jawab' };
     
     var STATUS = {
         'Disetujui': 'border-[#D6EDB5] bg-[#E6F3D3] text-[#4C7D08]'
     };
+
+    var JUDUL_LAPORAN = { semua: 'Laporan Seluruh Data Kegiatan', dosen: 'Laporan Data Kegiatan Dosen', mahasiswa: 'Laporan Data Kegiatan Mahasiswa', prodi: 'Laporan Data Kegiatan Prodi' };
+    var LABEL_JENIS = { dosen: 'Dosen', mahasiswa: 'Mahasiswa', prodi: 'Prodi' };
+    var WARNA_JENIS = { dosen: 'border-[#C9DDFB] bg-[#EAF2FF] text-[#2277FF]', mahasiswa: 'border-[#F5E0B0] bg-[#FFF5DD] text-[#9A6A00]', prodi: 'border-[#D9CFF5] bg-[#F1ECFF] text-[#6B4FCB]' };
 
     var $ = function (id) { return document.getElementById(id); };
     var filter = { semester: '', kategori: '', kelas: '' };
@@ -325,6 +333,13 @@
         order: [],
         columns: [
             { data: 'nama', render: TXT, className: 'truncate' },
+            {
+                data: 'jenis', visible: tab === 'semua',
+                render: function (d, type) {
+                    if (type !== 'display') return LABEL_JENIS[d] || d;
+                    return '<span class="inline-flex rounded-lg border px-2 py-0.5 text-xs font-medium ' + (WARNA_JENIS[d] || '') + '">' + esc(LABEL_JENIS[d] || d) + '</span>';
+                }
+            },
             { data: 'kategori', render: TXT, className: 'truncate' },
             { data: 'pengaju', render: TXT, className: 'truncate' },
             { 
@@ -344,11 +359,11 @@
             {
                 data: null, orderable: false, searchable: false,
                 render: function (d, type, r) {
-                    var lihatBtn = URL_DETAIL[tab]
-                        ? '<a href="' + URL_DETAIL[tab].replace('__ID__', encodeURIComponent(r.id)) + '" title="Lihat" class="rounded-md bg-[#CDDEF9] p-1.5 text-[#2277FF] hover:bg-[#BBD2F6] cursor-pointer">' + I_EYE + '</a>'
+                    var lihatBtn = URL_DETAIL[r.jenis]
+                        ? '<a href="' + URL_DETAIL[r.jenis].replace('__ID__', encodeURIComponent(r.id)) + '" title="Lihat" class="rounded-md bg-[#CDDEF9] p-1.5 text-[#2277FF] hover:bg-[#BBD2F6] cursor-pointer">' + I_EYE + '</a>'
                         : '<button type="button" title="Detail belum tersedia" disabled class="cursor-not-allowed rounded-md bg-[#CDDEF9] p-1.5 text-[#2277FF] opacity-50">' + I_EYE + '</button>';
                     
-                    var hapusBtn = URL_DELETE[tab]
+                    var hapusBtn = URL_DELETE[r.jenis]
                         ? '<button type="button" title="Hapus" data-act="delete" data-id="' + esc(r.id) + '" class="rounded-md bg-[#FFD9D9] p-1.5 text-[#E5484D] hover:bg-[#FFC9C9] cursor-pointer">' + I_TRASH + '</button>'
                         : '';
 
@@ -357,11 +372,11 @@
             }
         ],
         createdRow: function (tr, r) {
-            var td = tr.children;
+            var td = tr.children, o = tab === 'semua' ? 1 : 0;   // kolom Jenis hanya ada di tab Semua
             td[0].title = r.nama || '';
-            td[1].title = r.kategori || '';
-            td[2].title = r.pengaju || '';
-            td[3].title = r.tanggal || '';
+            td[1 + o].title = r.kategori || '';
+            td[2 + o].title = r.pengaju || '';
+            td[3 + o].title = r.tanggal || '';
         },
         layout: { topStart: null, topEnd: null, bottomStart: null, bottomEnd: null, bottom: 'paging' },
         pagingType: 'simple_numbers',
@@ -416,7 +431,7 @@
         if (URL_LAPORAN[tab]) {
             formLaporan.action = URL_LAPORAN[tab];
             formLaporan.style.display = 'flex';
-            laporanJudul.textContent = 'Laporan Data Kegiatan ' + tab.charAt(0).toUpperCase() + tab.slice(1);
+            laporanJudul.textContent = JUDUL_LAPORAN[tab];
         } else {
             formLaporan.style.display = 'none';
         }
@@ -442,6 +457,7 @@
         isiTahun();
         isiKategori();
 
+        table.column(1).visible(tab === 'semua', false);   // kolom Jenis
         table.clear();
         var dataBaru = (RAW_DATA[tab] || []).filter(function(r) { return r.status === 'Disetujui'; });
         table.rows.add(dataBaru);
@@ -467,7 +483,7 @@
     }
     if (URL_LAPORAN[tab]) {
         document.getElementById('formLaporan').action = URL_LAPORAN[tab];
-        document.getElementById('laporanJudul').textContent = 'Laporan Data Kegiatan ' + tab.charAt(0).toUpperCase() + tab.slice(1);
+        document.getElementById('laporanJudul').textContent = JUDUL_LAPORAN[tab];
     } else {
         document.getElementById('formLaporan').style.display = 'none';
     }
@@ -483,13 +499,13 @@
     $('fKelas').addEventListener('change', function (e) { filter.kelas = e.target.value; table.draw(); togglePager(); });
 
     var modal = $('modalHapus'), modalNama = $('modalHapusNama'), btnBatal = $('modalHapusBatal'), btnYa = $('modalHapusYa');
-    var idHapus = null;
+    var idHapus = null, jenisHapus = null;
 
     function kirimHapus(id) {
-        if (!URL_DELETE[tab]) return;
+        if (!URL_DELETE[jenisHapus]) return;
         var f = document.createElement('form');
         f.method = 'POST';
-        f.action = URL_DELETE[tab].replace('__ID__', encodeURIComponent(id));
+        f.action = URL_DELETE[jenisHapus].replace('__ID__', encodeURIComponent(id));
         f.innerHTML = '<input type="hidden" name="_token" value="' + CSRF + '"><input type="hidden" name="_method" value="DELETE">';
         document.body.appendChild(f);
         f.submit();
@@ -499,6 +515,7 @@
         var b = e.target.closest('button[data-act="delete"]'); if (!b) return;
         var rowData = table.row(b.closest('tr')).data();
         idHapus = b.dataset.id;
+        jenisHapus = rowData ? rowData.jenis : tab;
         if (typeof modal.showModal !== 'function') {
             if (confirm('Hapus kegiatan "' + (rowData ? rowData.nama : '') + '"?')) kirimHapus(idHapus);
             return;
