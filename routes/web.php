@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenDashboardController;
+use App\Http\Controllers\DosenPengajaranController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
@@ -39,10 +40,14 @@ Route::view('/pengabdian/create', 'dosen.pengabdian.create')->name('pengabdian.c
 Route::view('/pengabdian/{id}', 'dosen.pengabdian.show')->whereNumber('id')->name('pengabdian.show');
 Route::view('/pengabdian/{id}/edit', 'dosen.pengabdian.edit')->whereNumber('id')->name('pengabdian.edit');
 
-Route::view('/pengajaran', 'dosen.pengajaran.index')->name('pengajaran.index');
-Route::view('/pengajaran/create', 'dosen.pengajaran.create')->name('pengajaran.create');
-Route::view('/pengajaran/{id}', 'dosen.pengajaran.show')->whereNumber('id')->name('pengajaran.show');
-Route::view('/pengajaran/{id}/edit', 'dosen.pengajaran.edit')->whereNumber('id')->name('pengajaran.edit');
+// KODE BARU (Terhubung ke PengajaranController):
+Route::get('/pengajaran', [DosenPengajaranController::class, 'index'])->name('pengajaran.index');
+Route::get('/pengajaran/create', [DosenPengajaranController::class, 'create'])->name('pengajaran.create');
+Route::post('/pengajaran', [DosenPengajaranController::class, 'store'])->name('pengajaran.store');
+Route::get('/pengajaran/{id}', [DosenPengajaranController::class, 'show'])->whereNumber('id')->name('pengajaran.show');
+Route::get('/pengajaran/{id}/edit', [DosenPengajaranController::class, 'edit'])->whereNumber('id')->name('pengajaran.edit');
+Route::put('/pengajaran/{id}', [DosenPengajaranController::class, 'update'])->whereNumber('id')->name('pengajaran.update');
+Route::delete('/pengajaran/{id}', [DosenPengajaranController::class, 'destroy'])->whereNumber('id')->name('pengajaran.destroy');
 
 Route::redirect('/kegiatan', '/mahasiswa/kegiatan');
 Route::redirect('/kegiatan/create', '/mahasiswa/kegiatan/create');

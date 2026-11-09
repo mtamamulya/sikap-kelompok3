@@ -34,9 +34,11 @@
         enctype="multipart/form-data" wajib supaya file bisa dikirim ke backend.
         Atribut name="..." sudah disiapkan supaya backend nanti tinggal membaca datanya.
     --}}
-    <form x-data="formPengajaran()" x-on:submit.prevent="simpan()"
-          method="POST" action="#" enctype="multipart/form-data"
-          class="flex flex-col gap-5 rounded-lg bg-white p-4.5 shadow-sm">
+    <form x-data="formPengajaran()"
+      method="POST" 
+      action="{{ route('pengajaran.store') }}" 
+      enctype="multipart/form-data"
+      class="flex flex-col gap-5 rounded-lg bg-white p-4.5 shadow-sm">
         @csrf
 
         {{-- 1. KELAS DAN PERIODE --}}
@@ -219,7 +221,7 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('formPengajaran', () => ({
-            tahunAkademik: @js($daftarTahunAkademik[0]),
+            tahunAkademik: @js($daftarTahunAkademik[0] ?? '2025/2026 Ganjil'),
             prodi: '', kelas: '', matkul: '',
 
             // Semester = kata terakhir dari Tahun akademik ("2025/2026 Ganjil" => "Ganjil")
@@ -236,7 +238,7 @@
                 ].filter(Boolean).join(' · ');
             },
 
-            // Dokumen. Dokumen 1 selalu ada, sisanya bisa ditambah / dihapus.
+            // Dokumen pendukung
             nextId: 2,
             dokumen: [
                 { id: 1, nama: '', jenis: '', keterangan: '', tautan: '' },
@@ -245,9 +247,6 @@
                 this.dokumen.push({ id: this.nextId++, nama: '', jenis: '', keterangan: '', tautan: '' });
             },
             hapusDokumen(i) { this.dokumen.splice(i, 1); },
-// Simpan (simulasi)
-            tersimpan: false,
-            simpan() { this.tersimpan = true; this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Data berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' }); },
         }));
     });
 </script>
