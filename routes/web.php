@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\DosenDashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
@@ -11,7 +12,7 @@ use App\Http\Controllers\LandingMahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 // Ganti redirect otomatis ini dengan Landing Page TRK
-Route::view('/', 'home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
 Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');

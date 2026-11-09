@@ -79,23 +79,6 @@
     ],
 ];
 
-    $stats = [
-        ['50+', 'Total prestasi'],
-        ['20+', 'Juara nasional'],
-        ['10+', 'Juara internasional'],
-    ];
-
-    $achievements = [
-        ['slug' => 'fifa-asean-cup-2026', 'badge' => 'Juara 1', 'color' => '#FFCA00', 'title' => 'The Winner of FIFA ASEAN CUP 2026', 'sub' => 'Timnas Indonesia', 'img' => 'ebc028afee08adce8cf5861ee20aba78e53cdebe?width=990'],
-        ['slug' => 'juara-1-cybersecurity-olivia-2026', 'badge' => 'Juara 1', 'color' => '#FFCA00', 'title' => 'Juara 1 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026', 'sub' => 'Prestasi TRK', 'img' => '0e73c35db1e01f91b006db7ff31041acad798b8a?width=610'],
-        ['slug' => 'juara-2-elektro-expo-2026', 'badge' => 'Juara 2', 'color' => '#949494', 'title' => 'Juara 2 Elektro Expo 2026 IoT-Desain Produk Inovasi', 'sub' => 'Prestasi TRK', 'img' => 'b8cc31f5c40b1edb042ae90a5fa0f6f0d670fa43?width=610'],
-        ['slug' => 'juara-3-cybersecurity-olivia-2026', 'badge' => 'Juara 3', 'color' => '#AD5C00', 'title' => 'Juara 3 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026', 'sub' => 'Prestasi TRK', 'img' => 'b225631a249c148729deae4d9bd444e5f998c573?width=670'],
-        ['slug' => 'juara-3-lomba-jaringan-nasional', 'badge' => 'Juara 3', 'color' => '#AD5C00', 'title' => 'Juara 3 Lomba Jaringan Komputer Nasional', 'sub' => 'Prestasi TRK', 'img' => null],
-        ['slug' => 'finalis-hackathon-jateng', 'badge' => 'Finalis', 'color' => '#0B3A8C', 'title' => 'Finalis Hackathon Jawa Tengah', 'sub' => 'Prestasi TRK', 'img' => null],
-        ['slug' => 'juara-1-lomba-uiux-regional', 'badge' => 'Juara 1', 'color' => '#FFCA00', 'title' => 'Juara 1 Lomba Desain UI/UX Regional', 'sub' => 'Prestasi TRK', 'img' => null],
-        ['slug' => 'medali-perak-pameran-inovasi', 'badge' => 'Medali perak', 'color' => '#949494', 'title' => 'Medali Perak Pameran Inovasi Internasional', 'sub' => 'Prestasi TRK', 'img' => null],
-    ];
-
     $facilities = [
         ['name' => 'LAB KOMPUTER', 'img' => 'd85de1fefd9f5de7f85646e5eae18e98f4154ff2?width=720', 'cls' => 'sm:row-span-2 min-h-[320px]'],
         ['name' => 'CO-WORKING SPACE', 'img' => 'd4d26540f985d832c65d0719054314a08b288e4a?width=920', 'cls' => 'lg:col-span-2 min-h-[220px]'],
@@ -344,7 +327,7 @@
             </div>
 
             <div class="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($achievements as $a)
+                @forelse ($prestasi as $a)
                     @php
                         // Judul jadi link hanya jika slug-nya ada di config/berita.php
                         $punyaBerita = ! empty($a['slug']) && array_key_exists($a['slug'], config('berita', []));
@@ -374,7 +357,9 @@
                             <div class="text-[9px] font-medium">{{ $a['sub'] }}</div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="col-span-full py-8 text-center text-sm font-medium text-[#1F6FEB]">Belum ada data prestasi.</p>
+                @endforelse
             </div>
 
             <a href="{{ route('prestasi.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
