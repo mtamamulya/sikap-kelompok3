@@ -62,6 +62,9 @@ Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas
 Route::get('/kabar', [PublicBeritaController::class, 'index'])->name('publik.berita.index');
 Route::get('/kabar/{slug}', [PublicBeritaController::class, 'show'])->name('publik.berita.show');
 Route::get('/prestasi-trk', [PrestasiController::class, 'index'])->name('publik.prestasi.index');
+Route::get('/prestasi-trk/{prestasi}', [PrestasiController::class, 'show'])
+    ->whereNumber('prestasi')
+    ->name('publik.prestasi.show');
 
 // ---------- Login & Pemulihan ----------
 Route::view('/login', 'login')->name('login');
