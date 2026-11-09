@@ -2,28 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Prestasi;
 
 class PrestasiController extends Controller
 {
-    // Halaman daftar prestasi: /prestasi (tujuan tombol "Muat lebih banyak" di landing)
-    public function index(Request $request)
+    public function index()
     {
-        // TODO-DB: ganti dengan Prestasi::orderBy('juara')->paginate(8)
-        $semua = collect(config('prestasi', []))->values();
+        $with = [
+            'kegiatan:id_kegiatan,nama_kegiatan,tanggal_mulai,tanggal_selesai,lokasi,deskripsi',
+            'buktiPrestasi.jenisDokumen:id_jenis_dokumen,nama_jenis_dokumen',
+        ];
 
-        $perHalaman = 8;
-        $halaman = LengthAwarePaginator::resolveCurrentPage();
+        $prestasi = Prestasi::query()
+            ->with($with)
+            ->latest('id_prestasi')
+            ->paginate(8);
 
-        $prestasi = new LengthAwarePaginator(
-            $semua->forPage($halaman, $perHalaman)->values(),
-            $semua->count(),
-            $perHalaman,
-            $halaman,
-            ['path' => $request->url()]
-        );
+        $terbaru = Prestasi::query()
+            ->with($with)
+            ->latest('id_prestasi')
+            ->take(8)
+            ->get();
 
-        return view('prestasi-index', compact('prestasi'));
+        return view('prestasi-index', compact('prestasi', 'terbaru'));
+    }
+
+    public function show(int $prestasi)
+    {
+        $record = Prestasi::query()
+            ->with([
+                'kegiatan:id_kegiatan,nama_kegiatan,tanggal_mulai,tanggal_selesai,lokasi,deskripsi',
+                'buktiPrestasi.jenisDokumen:id_jenis_dokumen,nama_jenis_dokumen',
+            ])
+            ->findOrFail($prestasi);
+
+        $terkait = Prestasi::query()
+            ->with('kegiatan:id_kegiatan,nama_kegiatan')
+            ->whereKeyNot($record->getKey())
+            ->latest('id_prestasi')
+            ->take(4)
+            ->get();
+
+        return view('prestasi-show', compact('record', 'terkait'));
     }
 }

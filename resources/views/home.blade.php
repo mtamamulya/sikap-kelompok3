@@ -328,41 +328,34 @@
 
             <div class="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 @forelse ($prestasi as $a)
-                    @php
-                        // Judul jadi link hanya jika slug-nya ada di config/berita.php
-                        $punyaBerita = ! empty($a['slug']) && array_key_exists($a['slug'], config('berita', []));
-                    @endphp
-
-                    {{-- Tinggi kartu dipangkas ekstrim menjadi h-[180px] agar muat 1 layar --}}
-                    <div class="relative h-[180px] overflow-hidden rounded-[12px] bg-[#DCE8FA] font-['Poppins',sans-serif] shadow-sm transition-transform hover:-translate-y-1">
-                        @if ($a['img'])
-                            <img src="{{ $A . $a['img'] }}" alt="" class="absolute inset-0 h-full w-full object-cover">
-                        @else
-                            <svg class="absolute left-1/2 top-6 -translate-x-1/2" width="60" height="70" viewBox="0 0 120 140" fill="none" aria-hidden="true">
-                                <path d="M60 72C76.5685 72 90 58.5685 90 42C90 25.4315 76.5685 12 60 12C43.4315 12 30 25.4315 30 42C30 58.5685 43.4315 72 60 72Z" fill="#9DBFF0" />
-                                <path d="M8 140C8 106 32 84 60 84C88 84 112 106 112 140H8Z" fill="#9DBFF0" />
-                            </svg>
-                        @endif
+                    <a href="{{ route('publik.prestasi.show', $a['id']) }}"
+                       aria-label="Lihat detail prestasi {{ $a['title'] }}"
+                       class="relative block h-[180px] overflow-hidden rounded-[12px] bg-[#DCE8FA] font-['Poppins',sans-serif] shadow-sm transition-transform hover:-translate-y-1">
+                        <svg class="absolute left-1/2 top-6 -translate-x-1/2" width="60" height="70" viewBox="0 0 120 140" fill="none" aria-hidden="true">
+                            <path d="M60 72C76.5685 72 90 58.5685 90 42C90 25.4315 76.5685 12 60 12C43.4315 12 30 25.4315 30 42C30 58.5685 43.4315 72 60 72Z" fill="#9DBFF0" />
+                            <path d="M8 140C8 106 32 84 60 84C88 84 112 106 112 140H8Z" fill="#9DBFF0" />
+                        </svg>
 
                         <span class="absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[9px] font-semibold text-white" style="background: {{ $a['color'] }}">{{ $a['badge'] }}</span>
 
                         <div class="absolute inset-x-0 bottom-0 flex min-h-[60px] flex-col justify-center gap-0.5 p-2.5 text-[#0B3A8C] {{ $a['img'] ? 'bg-[linear-gradient(180deg,rgba(153,125,20,0)_-70%,#FFD121_30%)]' : 'bg-[#F5C400]' }}">
                             <div class="line-clamp-2 text-xs font-bold leading-tight">
-                                @if ($punyaBerita)
-                                    <a href="{{ route('berita.show', $a['slug']) }}" class="hover:underline">{{ $a['title'] }}</a>
-                                @else
-                                    {{ $a['title'] }}
-                                @endif
+                                {{ $a['title'] }}
                             </div>
-                            <div class="text-[9px] font-medium">{{ $a['sub'] }}</div>
+                            <div class="truncate text-[9px] font-medium">
+                                {{ $a['badge'] }}{{ $a['sub'] ? ' · '.$a['sub'] : '' }}
+                            </div>
+                            @if ($a['catatan'])
+                                <div class="line-clamp-2 text-[9px] leading-3">{{ $a['catatan'] }}</div>
+                            @endif
                         </div>
-                    </div>
+                    </a>
                 @empty
                     <p class="col-span-full py-8 text-center text-sm font-medium text-[#1F6FEB]">Belum ada data prestasi.</p>
                 @endforelse
             </div>
 
-            <a href="{{ route('prestasi.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
+            <a href="{{ route('publik.prestasi.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
         </div>
     </section>
 

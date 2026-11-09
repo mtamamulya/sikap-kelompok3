@@ -16,11 +16,9 @@ class HomeController extends Controller
             ->map(function (Prestasi $record) {
                 $badge = $record->capaian ?: ucfirst($record->jenis_prestasi);
                 $event = $record->kegiatan?->nama_kegiatan;
-                $title = collect([$record->capaian ?: $record->catatan, $event])
-                    ->filter()
-                    ->implode(' - ');
 
                 return [
+                    'id' => $record->getKey(),
                     'slug' => null,
                     'badge' => $badge,
                     'color' => match (strtolower($badge)) {
@@ -29,9 +27,9 @@ class HomeController extends Controller
                         'juara 3' => '#AD5C00',
                         default => '#0B3A8C',
                     },
-                    'title' => $title ?: $record->bidang_lomba ?: ucfirst($record->jenis_prestasi),
-                    'sub' => $record->bidang_lomba ?: ucfirst($record->jenis_prestasi),
-                    'img' => null,
+                    'title' => $event ?: ($record->bidang_lomba ?: 'Prestasi'),
+                    'sub' => $record->bidang_lomba,
+                    'catatan' => $record->catatan,
                 ];
             });
 
