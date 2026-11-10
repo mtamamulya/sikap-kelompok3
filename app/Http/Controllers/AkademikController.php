@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\MataKuliah; // Panggil Model MataKuliah yang sudah ada
 
 class AkademikController extends Controller

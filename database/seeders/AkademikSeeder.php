@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Prodi;
-use App\Models\MataKuliah;
 use App\Models\Kurikulum;
+use App\Models\MataKuliah;
+use App\Models\Prodi;
+use Illuminate\Database\Seeder;
 
 class AkademikSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class AkademikSeeder extends Seeder
             ['kode_prodi' => 'TRK'],
             [
                 'nama_prodi' => 'Teknologi Rekayasa Komputer',
-                'jenjang'    => 'D4',
+                'jenjang' => 'D4',
             ]
         );
 
@@ -27,12 +27,12 @@ class AkademikSeeder extends Seeder
         MataKuliah::firstOrCreate(
             ['id_kurikulum' => $kurikulum->id_kurikulum, 'kode_mk' => 'TRK601'],
             [
-                'semester'     => 7,
-                'nama_mk'      => 'Kecerdasan Buatan',
-                'sks_teori'    => 2,
-                'sks_praktik'  => 0,
-                'jam_teori'    => 2,
-                'jam_praktek'  => 0,
+                'semester' => 7,
+                'nama_mk' => 'Kecerdasan Buatan',
+                'sks_teori' => 2,
+                'sks_praktik' => 0,
+                'jam_teori' => 2,
+                'jam_praktek' => 0,
             ]
         );
     }
