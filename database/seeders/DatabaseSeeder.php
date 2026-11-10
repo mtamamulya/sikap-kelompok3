@@ -16,7 +16,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(FormIsianKategoriSeeder::class);
+        $this->call([
+            FormIsianKategoriSeeder::class,
+            JenisDokumenSeeder::class,
+        ]);
 
         // 1. Buat 4 Role Utama
         $roles = [
