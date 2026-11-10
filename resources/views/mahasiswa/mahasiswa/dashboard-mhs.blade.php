@@ -11,9 +11,9 @@
     $selectCls = 'w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white py-2 pl-3.5 pr-9 text-sm text-[#0A0A0A] outline-none focus:border-[#27F]';
 
     // Gaya kartu statistik dashboard ini, tanpa mengubah komponen yang dipakai halaman lain.
-    $kartuCls  = 'group relative flex h-full flex-col gap-3 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-5 pl-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D1D5DB] hover:shadow-md';
-    $judulCls  = 'text-sm font-bold text-[#111827]';
-    $angkaCls  = 'text-3xl font-bold leading-none';
+    $kartuCls  = 'group relative flex h-full flex-col gap-3 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-3 pl-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D1D5DB] hover:shadow-md sm:p-5 sm:pl-6';
+    $judulCls  = 'text-xs font-bold text-[#111827] sm:text-sm';
+    $angkaCls  = 'text-2xl font-bold leading-none sm:text-3xl';
     $satuanCls = 'text-xs text-[#6B7280]';
     $ketCls    = 'text-xs text-[#6B7280]';
 @endphp
@@ -21,13 +21,13 @@
 <div class="flex flex-col gap-6">
 
     {{-- Kartu statistik --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <div class="{{ $kartuCls }}">
             <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #2277FF"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">Tahun Akademik</span>
-                <span class="flex size-10 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] transition-transform duration-300 group-hover:scale-110">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -43,8 +43,8 @@
             <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #06B6D4"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">SKS Ditempuh</span>
-                <span class="flex size-10 items-center justify-center rounded-xl bg-[#ECFEFF] text-[#0891B2] transition-transform duration-300 group-hover:scale-110">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#ECFEFF] text-[#0891B2] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -63,8 +63,8 @@
             <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #8B5CF6"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">Semester Berjalan</span>
-                <span class="flex size-10 items-center justify-center rounded-xl bg-[#F5F3FF] text-[#7C3AED] transition-transform duration-300 group-hover:scale-110">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#F5F3FF] text-[#7C3AED] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -80,8 +80,8 @@
             <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #10B981"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">Pengajuan Aktif</span>
-                <span class="flex size-10 items-center justify-center rounded-xl bg-[#ECFDF5] text-[#059669] transition-transform duration-300 group-hover:scale-110">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2"/><path d="M9 15l2 2l4-4"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#ECFDF5] text-[#059669] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2"/><path d="M9 15l2 2l4-4"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">

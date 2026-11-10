@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenDashboardController;
 use App\Http\Controllers\KegiatanController;
@@ -10,7 +9,6 @@ use Illuminate\Support\Facades\Route;
 
 // Ganti redirect otomatis ini dengan Landing Page TRK
 Route::view('/', 'home')->name('home');
-Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
 Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');
@@ -46,7 +44,7 @@ Route::view('/pengajaran/{id}/edit', 'dosen.pengajaran.edit')->whereNumber('id')
 
 Route::redirect('/kegiatan', '/mahasiswa/kegiatan');
 Route::redirect('/kegiatan/create', '/mahasiswa/kegiatan/create');
-Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan.index')->name('kegiatan.index');
+Route::get('/mahasiswa/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
 Route::view('/mahasiswa/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
 
 // Mengirimkan semua variabel dummy yang dibutuhkan kegiatan.blade.php
