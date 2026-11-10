@@ -56,10 +56,14 @@ class FrontendLayoutTest extends TestCase
         foreach (['/dosen/dashboard', '/dosen/kegiatan', '/dosen/kegiatan/create', '/profil', '/notifikasi', '/pengajuan/dosen', '/pengajuan/mahasiswa', '/pengajuan/dosen/1', '/pengajuan/mahasiswa/1', '/verifikasi/1'] as $path) {
             $this->get($path)->assertOk()->assertSee('class="frontend-shell dosen-shell', false);
         }
-        foreach (['penelitian', 'pengabdian', 'pengajaran', 'prestasi'] as $module) {
+        foreach (['penelitian', 'pengabdian', 'prestasi'] as $module) {
             foreach (['', '/create', '/1', '/1/edit'] as $suffix) {
                 $this->get('/'.$module.$suffix)->assertOk()->assertSee('class="frontend-shell dosen-shell', false);
             }
+        }
+        // Pengajaran sudah memakai database: daftar & form bisa dibuka, detail/edit dicek di PengajaranTest.
+        foreach (['/pengajaran', '/pengajaran/create'] as $path) {
+            $this->get($path)->assertOk()->assertSee('class="frontend-shell dosen-shell', false);
         }
     }
 

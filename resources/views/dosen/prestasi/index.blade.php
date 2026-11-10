@@ -44,7 +44,7 @@
          Kalau backend sudah ada, pencarian / filter / urutan bisa diganti parameter ?q=...&urut=... dan pagination dari Laravel. --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
              x-data="prestasi(@js($prestasi))">
-
+ 
         <div class="flex flex-wrap items-center gap-4">
             <div class="relative min-w-60 flex-[1_1_320px]">
                 <label for="q" class="sr-only">Cari nama prestasi</label>
@@ -52,8 +52,8 @@
                 <input id="q" name="q" type="search" x-model="cari" x-on:input="halaman = 1" placeholder="Cari nama, penghargaan, atau penyelenggara..."
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
-
-            <div class="relative w-full">
+ 
+            <div class="relative w-full sm:w-46">
                 <label for="tingkat" class="sr-only">Filter tingkat prestasi</label>
                 <select id="tingkat" x-model="f.tingkat" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Tingkat Prestasi</option>
