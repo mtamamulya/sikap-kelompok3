@@ -45,3 +45,9 @@ Route::prefix('integrasi')
     });
 
 Route::get('/berita', [BeritaController::class, 'index']);
+
+Route::get('/tes-hello', function () {
+    return response()->json([
+        'message' => 'Hello World dari backend!',
+    ]);
+});
