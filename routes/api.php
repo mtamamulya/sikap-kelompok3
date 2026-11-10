@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
+use App\Http\Controllers\Api\PrestasiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,4 +46,5 @@ Route::prefix('integrasi')
     });
 
 Route::get('/berita', [BeritaController::class, 'index']);
+Route::get('/prestasi', [PrestasiController::class, 'index']);
 require __DIR__.'/api-admin-kaprodi.php';
