@@ -10,13 +10,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use RuntimeException;
-use Throwable;
 
 class AdminPrestasiController extends Controller
 {
@@ -28,6 +25,7 @@ class AdminPrestasiController extends Controller
         'kegiatan.anggota.user.dosen',
         'kegiatan.anggota.user.mahasiswa',
         'buktiPrestasi',
+        'buktiPrestasi.jenisDokumen',
     ];
 
     public function index(): View
@@ -59,8 +57,8 @@ class AdminPrestasiController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $this->validasi($request, true);
-        $this->simpan($data, $request);
+        $data = $this->validasi($request);
+        $this->simpan($data);
 
         return redirect()->route('admin.prestasi')
             ->with('success', 'Prestasi berhasil ditambahkan.');
@@ -81,18 +79,8 @@ class AdminPrestasiController extends Controller
     {
         $item = Prestasi::findOrFail($id);
 
-        // Jangan tampilkan pesan "berhasil" bila form lama hanya mengirim
-        // atribut tampilan yang belum mempunyai padanan kolom database.
-        if (! $request->hasAny([
-            'id_kegiatan', 'jenis_prestasi', 'bidang_lomba', 'catatan', 'capaian',
-        ]) && ! $request->hasFile('foto')) {
-            throw ValidationException::withMessages([
-                'id_kegiatan' => 'Form edit belum mengirim kolom prestasi yang didukung database.',
-            ]);
-        }
-
-        $data = $this->validasi($request, false);
-        $this->simpan($data, $request, $item);
+        $data = $this->validasi($request, $item);
+        $this->simpan($data, $item);
 
         return redirect()->route('admin.prestasi')
             ->with('success', 'Prestasi berhasil diperbarui.');
@@ -133,6 +121,7 @@ class AdminPrestasiController extends Controller
         $kegiatan = $item->kegiatan;
         $pemilik = $kegiatan?->user;
         $tanggal = $kegiatan?->tanggal_selesai;
+        $formData = $item->form_data ?? [];
 
         $anggota = $kegiatan?->anggota
             ?->map(fn ($a) => $this->namaUser($a->user))
@@ -140,14 +129,47 @@ class AdminPrestasiController extends Controller
             ->unique()
             ->values()
             ->all() ?? [];
+        $anggotaForm = $formData['anggota'] ?? [];
+        if ($anggotaForm === []) {
+            $anggotaForm = $kegiatan?->anggota
+                ?->map(fn ($a) => [
+                'nama' => $this->namaUser($a->user) ?? '',
+                'peran' => $a->peran ?? 'Anggota',
+            ])
+            ->values()
+            ->all() ?? [];
+        }
+        $dokumen = $item->buktiPrestasi->map(fn ($b) => [
+            'id' => $b->id_bukti_prestasi,
+            'jenis' => $b->jenisDokumen?->nama_jenis_dokumen === 'Sertifikat'
+                ? 'Sertifikat'
+                : 'Dokumentasi kegiatan',
+            'nama' => $b->nama_file ?? basename($b->link),
+            'ukuran' => '',
+            'url' => $b->link,
+        ])->all();
 
         return [
             'id' => $item->id_prestasi,
             'id_kegiatan' => $item->id_kegiatan,
-            // Jika capaian belum ada di tabel, gunakan nama kegiatan sementara.
-            'nama' => $item->getAttribute('capaian') ?: ($kegiatan?->nama_kegiatan ?? '-'),
+            'sumber' => $formData['sumber'] ?? ($kegiatan ? 'sebelumnya' : 'mandiri'),
+            'kegiatan' => $formData['kegiatan'] ?? $kegiatan?->nama_kegiatan ?? '',
+            'nama_lomba' => $formData['nama_lomba'] ?? $item->getAttribute('capaian') ?? $kegiatan?->nama_kegiatan ?? '',
+            'penyelenggara' => $formData['penyelenggara'] ?? $this->namaUser($pemilik) ?? '',
+            'lokasi' => $formData['lokasi'] ?? $kegiatan?->lokasi ?? '',
+            'dosen' => $formData['dosen'] ?? '',
+            'tingkat' => $formData['tingkat'] ?? 'Internal',
+            'capaian' => $formData['capaian'] ?? $item->getAttribute('capaian') ?? '',
+            'jenis' => $formData['jenis'] ?? ucfirst(str_replace('-', '', $item->jenis_prestasi)),
+            'kategori_form' => $formData['kategori'] ?? $item->bidang_lomba ?? '',
+            'tanggal_mulai' => $formData['tanggal_mulai'] ?? $kegiatan?->tanggal_mulai?->toDateString() ?? '',
+            'tanggal_selesai' => $formData['tanggal_selesai'] ?? $kegiatan?->tanggal_selesai?->toDateString() ?? '',
+            'bentuk' => $formData['bentuk'] ?? ($anggotaForm === [] ? 'Individu' : 'Tim'),
+            'anggota_form' => $anggotaForm,
+            'deskripsi' => $formData['deskripsi'] ?? $item->catatan ?? '',
+            'dokumen' => $dokumen,
+            'nama' => ($formData['nama_lomba'] ?? null) ?: ($item->getAttribute('capaian') ?: ($kegiatan?->nama_kegiatan ?? '-')),
             'jenis_prestasi' => $item->jenis_prestasi,
-            'capaian' => $item->getAttribute('capaian'),
             'bidang_lomba' => $item->bidang_lomba,
             'catatan' => $item->catatan,
             // Kategori kegiatan bukan otomatis "Lomba/Penghargaan".
@@ -186,101 +208,201 @@ class AdminPrestasiController extends Controller
 
     private function pilihanForm(): array
     {
+        $kegiatan = Kegiatan::with([
+            'user.dosen',
+            'user.mahasiswa',
+        ])->orderBy('nama_kegiatan')->get();
+
         return [
-            'kegiatanOptions' => Kegiatan::with([
-                    'user.dosen',
-                    'user.mahasiswa',
-                ])
-                ->orderBy('nama_kegiatan')
-                ->get(['id_kegiatan', 'id_user', 'nama_kegiatan']),
+            'kegiatanOptions' => $kegiatan,
+            'kegiatanList' => $kegiatan->map(fn (Kegiatan $k) => [
+                'id' => $k->id_kegiatan,
+                'label' => $k->nama_kegiatan,
+                'nama' => $k->nama_kegiatan,
+                'penyelenggara' => $this->namaUser($k->user) ?? '',
+            ])->all(),
+            'tingkatList' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'],
+            'capaianList' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'],
+            'jenisList' => ['Akademik', 'Nonakademik'],
+            'jenisDokList' => ['Sertifikat', 'Dokumentasi kegiatan'],
+            'daftarMahasiswa' => DB::table('mahasiswa')->orderBy('nama')->pluck('nama')->all(),
+            'peranList' => ['Ketua', 'Anggota'],
 
             'jenisDokumenOptions' => JenisDokumen::orderBy('nama_jenis_dokumen')
                 ->get(['id_jenis_dokumen', 'nama_jenis_dokumen']),
-            'mendukungCapaian' => Schema::hasColumn('prestasi', 'capaian'),
         ];
     }
 
-    /** Validasi mengikuti kolom fisik, bukan nama input simulasi. */
-    private function validasi(Request $request, bool $baru): array
+    private function validasi(Request $request, ?Prestasi $item = null): array
     {
         $rules = [
+            'sumber' => ['required', Rule::in(['sebelumnya', 'mandiri'])],
+            'kegiatan' => ['required_if:sumber,sebelumnya', 'nullable', 'string', 'max:150'],
             'id_kegiatan' => [
-                $baru ? 'required' : 'sometimes', 'integer',
+                'required_if:sumber,sebelumnya', 'nullable', 'integer',
                 Rule::exists('kegiatan', 'id_kegiatan'),
             ],
-            'jenis_prestasi' => [
-                $baru ? 'required' : 'sometimes',
-                Rule::in(['akademik', 'non-akademik']),
-            ],
-            'bidang_lomba' => ['sometimes', 'nullable', 'string', 'max:150'],
-            'catatan' => ['sometimes', 'nullable', 'string'],
-            'capaian' => ['sometimes', 'nullable', 'string'],
-            'foto' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
-            'id_jenis_dokumen' => [
-                'required_with:foto', 'nullable', 'integer',
-                Rule::exists('jenis_dokumen', 'id_jenis_dokumen'),
-            ],
-        ];
-
-        $data = $request->validate($rules);
-
-        // Migration yang diberikan pengguna belum memiliki kolom capaian.
-        if ($request->filled('capaian') && ! Schema::hasColumn('prestasi', 'capaian')) {
-            throw ValidationException::withMessages([
-                'capaian' => 'Kolom capaian belum ada pada tabel prestasi. Koordinasikan migration tim.',
-            ]);
-        }
-
-        return $data;
-    }
-
-    /** Simpan atribut prestasi dan, jika ada, satu bukti baru. */
-    private function simpan(array $data, Request $request, ?Prestasi $item = null): void
-    {
-        $path = null;
-
-        try {
-            if ($request->hasFile('foto')) {
-                $path = $request->file('foto')->store('bukti-prestasi', 'public');
-                if (! $path) {
-                    throw new RuntimeException('Gagal menyimpan berkas bukti prestasi.');
-                }
-            }
-
-            DB::transaction(function () use ($data, $request, $item, $path) {
-                $attributes = Arr::only($data, [
-                    'id_kegiatan', 'jenis_prestasi', 'bidang_lomba', 'catatan',
-                ]);
-
-                if (array_key_exists('capaian', $data) && Schema::hasColumn('prestasi', 'capaian')) {
-                    $attributes['capaian'] = $data['capaian'];
-                }
-
-                if ($item) {
-                    $item->update($attributes);
-                } else {
-                    $item = Prestasi::create($attributes);
-                }
-
-                if ($path !== null) {
-                    $bukti = [
-                        'id_jenis_dokumen' => $data['id_jenis_dokumen'],
-                        'link' => $path,
-                    ];
-
-                    if (Schema::hasColumn('bukti_prestasi', 'nama_file')) {
-                        $bukti['nama_file'] = $request->file('foto')->getClientOriginalName();
+            'nama_lomba' => ['required', 'string', 'max:150'],
+            'penyelenggara' => ['required', 'string', 'max:150'],
+            'lokasi' => ['required', 'string', 'max:150'],
+            'dosen' => ['nullable', 'string', 'max:100'],
+            'tingkat' => ['required', Rule::in(['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'])],
+            'capaian' => ['required', Rule::in(['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'])],
+            'jenis' => ['required', Rule::in(['Akademik', 'Nonakademik'])],
+            'kategori' => ['nullable', 'string', 'max:100'],
+            'tanggal_mulai' => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
+            'bentuk' => ['required', Rule::in(['Individu', 'Tim'])],
+            'anggota' => ['exclude_unless:bentuk,Tim', 'required', 'array', 'min:1'],
+            'anggota.*.nama' => ['required', 'string', 'max:150'],
+            'anggota.*.peran' => ['required', 'string', 'max:100'],
+            'deskripsi' => ['nullable', 'string', 'max:1000'],
+            'dokumen' => ['nullable', 'array', 'max:5'],
+            'dokumen.*' => ['array:url,jenis'],
+            'dokumen.*.url' => [
+                'nullable', 'url', 'max:2048',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if ($value === null || $value === '') {
+                        return;
                     }
 
-                    $item->buktiPrestasi()->create($bukti);
+                    $host = strtolower((string) parse_url($value, PHP_URL_HOST));
+                    $scheme = strtolower((string) parse_url($value, PHP_URL_SCHEME));
+                    $domainDiizinkan = in_array($host, [
+                        'drive.google.com',
+                        'docs.google.com',
+                        '1drv.ms',
+                        'onedrive.live.com',
+                    ], true) || str_ends_with($host, '.sharepoint.com');
+
+                    if ($scheme !== 'https' || ! $domainDiizinkan) {
+                        $fail('Tautan harus berupa tautan berbagi Google Drive atau OneDrive yang aman (https).');
+                    }
+                },
+            ],
+            'dokumen.*.jenis' => ['nullable', Rule::in(['Sertifikat', 'Dokumentasi kegiatan'])],
+            'dokumen_pertahankan' => ['nullable', 'array', 'max:5'],
+            'dokumen_pertahankan.*' => ['integer'],
+            'dokumen_hapus' => ['nullable', 'array'],
+            'dokumen_hapus.*' => ['integer'],
+        ];
+
+        $validator = Validator::make($request->all(), $rules, [
+            'required' => ':attribute wajib diisi.',
+            'required_if' => ':attribute wajib diisi.',
+            'in' => ':attribute tidak valid.',
+            'max' => ':attribute terlalu panjang atau terlalu banyak.',
+            'after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
+            'anggota.required' => 'Tambahkan minimal satu anggota tim.',
+            'anggota.min' => 'Tambahkan minimal satu anggota tim.',
+        ]);
+
+        $validator->after(function ($validator) use ($request, $item) {
+            $sumber = $request->input('sumber');
+            $kegiatanId = $request->input('id_kegiatan');
+            if ($sumber === 'sebelumnya' && $kegiatanId) {
+                $namaKegiatan = Kegiatan::whereKey($kegiatanId)->value('nama_kegiatan');
+                if ($namaKegiatan !== $request->input('kegiatan')) {
+                    $validator->errors()->add('kegiatan', 'Pilih kegiatan dari daftar yang tersedia.');
                 }
-            });
-        } catch (Throwable $e) {
-            // Jika transaksi database gagal, jangan tinggalkan file yatim.
-            if ($path !== null) {
-                Storage::disk('public')->delete($path);
             }
-            throw $e;
-        }
+
+            $dokumenList = $request->input('dokumen', []);
+            $jumlahDokumenBaru = 0;
+            $tautan = [];
+            if (is_array($dokumenList)) {
+                foreach ($dokumenList as $index => $dokumen) {
+                    if (! is_array($dokumen)) {
+                        continue;
+                    }
+
+                    $punyaTautan = filled($dokumen['url'] ?? null);
+                    $punyaJenis = filled($dokumen['jenis'] ?? null);
+                    if ($punyaTautan && $punyaJenis) {
+                        $jumlahDokumenBaru++;
+                        $tautan[] = strtolower($dokumen['url']);
+                    }
+                    if ($punyaTautan !== $punyaJenis) {
+                        $field = $punyaTautan ? "dokumen.$index.jenis" : "dokumen.$index.url";
+                        $validator->errors()->add($field, $punyaTautan
+                            ? 'Pilih jenis dokumen untuk tautan ini.'
+                            : 'Masukkan tautan untuk jenis dokumen ini.');
+                    }
+                }
+            }
+
+            $dokumenDipertahankan = $request->input('dokumen_pertahankan', []);
+            $dokumenDipertahankan = is_array($dokumenDipertahankan) ? $dokumenDipertahankan : [];
+            if ($item && $dokumenDipertahankan !== []) {
+                $buktiDipertahankan = $item->buktiPrestasi()
+                    ->whereIn('id_bukti_prestasi', $dokumenDipertahankan)
+                    ->get(['id_bukti_prestasi', 'link']);
+                if ($buktiDipertahankan->count() !== count(array_unique($dokumenDipertahankan))) {
+                    $validator->errors()->add('dokumen_pertahankan', 'Dokumen yang dipertahankan tidak valid.');
+                }
+                foreach ($buktiDipertahankan as $bukti) {
+                    $tautan[] = strtolower($bukti->link);
+                }
+            } elseif (! $item && $dokumenDipertahankan !== []) {
+                $validator->errors()->add('dokumen_pertahankan', 'Dokumen lama tidak dapat digunakan untuk prestasi baru.');
+            }
+
+            if (count($tautan) !== count(array_unique($tautan))) {
+                $validator->errors()->add('dokumen', 'Tautan dokumen tidak boleh duplikat.');
+            }
+
+            $jumlahDipertahankan = count($dokumenDipertahankan);
+            if ($jumlahDokumenBaru + $jumlahDipertahankan === 0) {
+                $validator->errors()->add('dokumen', 'Tambahkan minimal satu tautan bukti prestasi.');
+            } elseif ($jumlahDokumenBaru + $jumlahDipertahankan > 5) {
+                $validator->errors()->add('dokumen', 'Maksimal 5 dokumen.');
+            }
+        });
+
+        return $validator->validate();
+    }
+
+    /** Simpan data formulir dan tautan bukti prestasi. */
+    private function simpan(array $data, ?Prestasi $item = null): void
+    {
+        $formData = Arr::only($data, [
+            'sumber', 'kegiatan', 'nama_lomba', 'penyelenggara', 'lokasi',
+            'dosen', 'tingkat', 'capaian', 'jenis', 'kategori',
+            'tanggal_mulai', 'tanggal_selesai', 'bentuk', 'anggota', 'deskripsi',
+        ]);
+        $attributes = [
+            'id_kegiatan' => $data['sumber'] === 'sebelumnya' ? $data['id_kegiatan'] : null,
+            'jenis_prestasi' => $data['jenis'] === 'Akademik' ? 'akademik' : 'non-akademik',
+            'bidang_lomba' => $data['kategori'] ?? null,
+            'catatan' => $data['deskripsi'] ?? null,
+            'capaian' => $data['capaian'],
+            'form_data' => $formData,
+        ];
+        $dokumenDipertahankan = $data['dokumen_pertahankan'] ?? [];
+
+        DB::transaction(function () use ($data, $attributes, $item, $dokumenDipertahankan) {
+            if ($item) {
+                $item->update($attributes);
+                $item->buktiPrestasi()
+                    ->whereNotIn('id_bukti_prestasi', $dokumenDipertahankan)
+                    ->delete();
+            } else {
+                $item = Prestasi::create($attributes);
+            }
+
+            foreach ($data['dokumen'] ?? [] as $dokumen) {
+                if (blank($dokumen['url'] ?? null) || blank($dokumen['jenis'] ?? null)) {
+                    continue;
+                }
+
+                $jenis = JenisDokumen::firstOrCreate([
+                    'nama_jenis_dokumen' => $dokumen['jenis'],
+                ]);
+                $item->buktiPrestasi()->create([
+                    'id_jenis_dokumen' => $jenis->id_jenis_dokumen,
+                    'link' => $dokumen['url'],
+                ]);
+            }
+        });
     }
 }
