@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BeritaController;
+use App\Http\Controllers\Api\PrestasiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,4 +33,5 @@ Route::get('/ping', function () {
 // TODO: Daftarkan endpoint API fitur di sini
 
 Route::get('/berita', [BeritaController::class, 'index']);
+
 require __DIR__.'/api-admin-kaprodi.php';
