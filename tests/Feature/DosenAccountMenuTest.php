@@ -13,11 +13,17 @@ class DosenAccountMenuTest extends TestCase
     use RefreshDatabase;
 
     private function lecturer(): User
-    {
-        $role = DB::table('roles')->insertGetId(['nama_role' => 'dosen'], 'id_role');
+{
+    $role = DB::table('roles')->where('nama_role', 'dosen')->value('id_role') 
+        ?? DB::table('roles')->insertGetId(['nama_role' => 'dosen'], 'id_role');
 
-        return User::create(['id_role' => $role, 'email' => 'yanto@example.test', 'password' => 'password']);
-    }
+    return User::create([
+        'id_role'  => $role, 
+        'email'    => 'yanto@example.test', 
+        'password' => 'password',
+        'status'   => true, // <-- Tambahkan ini agar akun dianggap aktif oleh middleware
+    ]);
+}
 
     public function test_header_and_dropdown_use_the_logged_in_lecturer_name(): void
     {
