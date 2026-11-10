@@ -1,16 +1,14 @@
 {{--
     resources/views/admin/mahasiswa.blade.php
-    Daftar mahasiswa: cari, filter tingkat & status, paginasi (sudah berfungsi).
-    Aksi: lihat (ke halaman detail) dan hapus (modal konfirmasi -> DELETE lewat form + CSRF).
-    Tombol Tambah Mahasiswa menjadi link bila route admin.mahasiswa.create dibuat.
-    Tabel memakai DataTables 2.x (sorting & paginasi ditangani library).
+    Daftar mahasiswa: cari, filter tingkat & status, paginasi.
+    Aksi: lihat detail dan tombol ubah status aktif/nonaktif (modal konfirmasi -> PATCH lewat form + CSRF).
 --}}
 @extends('layouts.admin')
 
 @section('title', 'Data Mahasiswa')
 
 @section('content')
-{{-- CSS DataTables + penyesuaian tampilan (sama dengan halaman Dosen, Kegiatan & Prestasi) --}}
+{{-- CSS DataTables + penyesuaian tampilan (disamakan dengan Data Dosen) --}}
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
 <style>
     /* ---------- Kotak tabel ---------- */
@@ -99,15 +97,14 @@
     #tabel-wrap .dt-paging .dt-paging-button.previous:hover:not(.disabled) { background-color: #1A66E0 !important; border-color: #1A66E0 !important; }
     #tabel-wrap .dt-paging .dt-paging-button.next:hover:not(.disabled) { background-color: #BBD2F6 !important; }
 
-    /* ---------- Modal Konfirmasi (Hapus & Sinkronisasi) ---------- */
-    .dialog-overlay { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }
-    .dialog-overlay::backdrop { background: rgb(10 10 10 / .45); }
-    .dialog-overlay[open] { animation: modalMasuk .15s ease-out; }
+    /* ---------- Modal Konfirmasi (Disamakan 100% dengan Dosen) ---------- */
+    #modalStatus, #modalSinkron { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }
+    #modalStatus::backdrop, #modalSinkron::backdrop { background: rgb(10 10 10 / .45); }
+    #modalStatus[open], #modalSinkron[open] { animation: modalMasuk .15s ease-out; }
     @keyframes modalMasuk { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
     
     .modal-kartu { padding: 24px; border-radius: 12px; background: #fff; text-align: center; box-shadow: 0 20px 50px rgb(0 0 0 / .2); }
-    .modal-ikon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 9999px; }
-    .modal-ikon-danger { background: #FFD9D9; color: #E5484D; }
+    .modal-ikon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 9999px; background: #FFD9D9; color: #E5484D; }
     .modal-ikon-warning { background: #FDE2CA; color: #DC6803; }
     
     .modal-judul { font-size: 18px; font-weight: 700; line-height: 24px; color: #0A0A0A; }
@@ -120,13 +117,23 @@
     .modal-btn-batal { background: #fff; border-color: #E8E8EC; color: #2E2E2E; }
     .modal-btn-batal:hover { background: #F9F9FB; }
     
-    .modal-btn-hapus { background: #E5484D; color: #fff; }
-    .modal-btn-hapus:hover { background: #D13A3F; }
-    .modal-btn-hapus:disabled { opacity: .7; cursor: not-allowed; }
+    .modal-btn-ya { background: #E5484D; color: #fff; }
+    .modal-btn-ya:hover { background: #D13A3F; }
+    .modal-btn-ya:disabled { opacity: .7; cursor: not-allowed; }
     
-    .modal-btn-sinkron { background: #10B981; color: #fff; } /* Emerald 500 */
-    .modal-btn-sinkron:hover { background: #059669; } /* Emerald 600 */
+    .modal-btn-sinkron { background: #10B981; color: #fff; }
+    .modal-btn-sinkron:hover { background: #059669; }
     .modal-btn-sinkron:disabled { opacity: .7; cursor: not-allowed; }
+
+    /* Varian "aktifkan" (biru/hijau); bawaan = "nonaktifkan" (merah) */
+    #modalStatus[data-mode="aktif"] .modal-ikon { background: #DDF3D0; color: #3A8A1E; }
+    #modalStatus[data-mode="aktif"] .modal-btn-ya { background: #2277FF; }
+    #modalStatus[data-mode="aktif"] .modal-btn-ya:hover { background: #1A66E0; }
+
+    /* ---------- Tombol ubah status (krem panah putar oranye) ---------- */
+    .btn-status { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: #FBE5CB; color: #FFAA49; cursor: pointer; transition: background .15s; }
+    .btn-status:hover { background: #F8D9B5; }
+    .btn-status:focus-visible { outline: 2px solid #FFAA49; outline-offset: 2px; }
 </style>
 
 <main class="p-4 pb-10 sm:p-6">
@@ -137,7 +144,6 @@
         </div>
         
         <div class="flex items-center gap-2">
-            {{-- Tombol Buka Modal Sinkronisasi --}}
             <button type="button" id="btnSinkron" class="mt-2 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-emerald-600 px-4 text-[15px] font-medium text-white shadow hover:bg-emerald-700">
                 Sinkronisasi Kelas
             </button>
@@ -151,6 +157,9 @@
 
     @if (session('status'))
         <div class="mt-4 rounded-md border border-[#D6EDB5] bg-[#E6F3D3] px-4 py-3 text-sm text-[#4C7D08]" role="status">{{ session('status') }}</div>
+    @endif
+    @if (session('success'))
+        <div class="mt-4 rounded-md border border-[#D6EDB5] bg-[#E6F3D3] px-4 py-3 text-sm text-[#4C7D08]" role="status">{{ session('success') }}</div>
     @endif
     @if (session('error'))
         <div class="mt-4 rounded-md border border-[#FFD9D9] bg-[#FFEDED] px-4 py-3 text-sm text-[#E5484D]" role="status">{{ session('error') }}</div>
@@ -177,7 +186,7 @@
                 <select id="fStatus" class="h-10 w-full cursor-pointer appearance-none rounded-md border border-[#E4E4E7] bg-white px-4 pr-9 text-sm outline-none focus:border-[#1F73FF]">
                     <option value="all">Semua Status</option>
                     <option value="Aktif">Aktif</option>
-                    <option value="Non-aktif">Non-aktif</option>
+                    <option value="Nonaktif">Nonaktif</option>
                 </select>
                 <svg class="pointer-events-none absolute right-3 top-[11px]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6" /></svg>
             </div>
@@ -206,18 +215,18 @@
     @csrf
 </form>
 
-{{-- Modal konfirmasi hapus --}}
-<dialog id="modalHapus" class="dialog-overlay" aria-labelledby="modalHapusJudul" aria-describedby="modalHapusTeks">
+{{-- Modal konfirmasi aktifkan / nonaktifkan (persis seperti Dosen) --}}
+<dialog id="modalStatus" data-mode="nonaktif" aria-labelledby="modalStatusJudul" aria-describedby="modalStatusTeks">
     <div class="modal-kartu">
-        <div class="modal-ikon modal-ikon-danger">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v3" /></svg>
+        <div class="modal-ikon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
         </div>
-        <h2 id="modalHapusJudul" class="modal-judul">Hapus mahasiswa?</h2>
-        <p id="modalHapusTeks" class="modal-teks"><strong id="modalHapusNama"></strong> akan dihapus permanen.</p>
-        <p id="modalHapusError" class="modal-error" hidden></p>
+        <h2 id="modalStatusJudul" class="modal-judul">Nonaktifkan mahasiswa?</h2>
+        <p id="modalStatusTeks" class="modal-teks"><strong id="modalStatusNama"></strong> <span id="modalStatusSuffix"></span></p>
+        <p id="modalStatusError" class="modal-error" hidden></p>
         <div class="modal-aksi">
-            <button type="button" id="modalHapusBatal" class="modal-btn modal-btn-batal">Batal</button>
-            <button type="button" id="modalHapusYa" class="modal-btn modal-btn-hapus">Hapus</button>
+            <button type="button" id="modalStatusBatal" class="modal-btn modal-btn-batal">Batal</button>
+            <button type="button" id="modalStatusYa" class="modal-btn modal-btn-ya">Nonaktifkan</button>
         </div>
     </div>
 </dialog>
@@ -245,7 +254,15 @@
 (function () {
     var data = @json($students);
     var URL_DETAIL = @js(route('admin.mahasiswa.show', ['id' => '__ID__']));
-    var URL_DELETE = @js(\Illuminate\Support\Facades\Route::has('admin.mahasiswa.destroy') ? route('admin.mahasiswa.destroy', ['id' => '__ID__']) : null);
+    
+    // Cek route dengan aman agar JS tidak error bila nama route di backend berbeda
+    var URL_STATUS = @js(
+        \Illuminate\Support\Facades\Route::has('admin.mahasiswa.toggle-status') 
+            ? route('admin.mahasiswa.toggle-status', ['id' => '__ID__']) 
+            : (\Illuminate\Support\Facades\Route::has('admin.mahasiswa.status') 
+                ? route('admin.mahasiswa.status', ['id' => '__ID__']) 
+                : null)
+    );
     var CSRF = @json(csrf_token());
 
     var $ = function (id) { return document.getElementById(id); };
@@ -260,15 +277,17 @@
     function svg(w, sw, paths) {
         return '<svg width="' + w + '" height="' + w + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
     }
-    var I_EYE   = svg(16, 1.5, '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />');
-    var I_TRASH = svg(16, 1.5, '<path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v3" />');
+    var I_EYE  = svg(16, 1.5, '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />');
+    var I_SYNC = svg(16, 1.5, '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />');
 
     var TXT = DataTable.render.text();
 
     DataTable.ext.search.push(function (settings, searchData, dataIndex, r) {
         if (settings.nTable.id !== 'tabel') return true;
+        var st = String(r.status).toLowerCase();
+        var fSt = String(filter.status).toLowerCase();
         return (filter.level === 'all' || r.level === filter.level) &&
-               (filter.status === 'all' || r.status === filter.status);
+               (filter.status === 'all' || st === fSt);
     });
 
     var table = new DataTable('#tabel', {
@@ -285,17 +304,20 @@
                 data: 'status', searchable: false,
                 render: function (d, type) {
                     if (type !== 'display') return d;
-                    var cls = d === 'Aktif' ? 'bg-[#DDF3D0] text-[#3A8A1E]' : 'bg-[#EDEDF0] text-[#55555C]';
-                    return '<span class="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium ' + cls + '">' + esc(d) + '</span>';
+                    var on = (d === 'Aktif' || d === 'aktif' || d == 1);
+                    return '<span class="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium ' +
+                        (on ? 'bg-[#DDF3D0] text-[#3A8A1E]' : 'bg-[#EDEDF0] text-[#55555C]') + '">' + (on ? 'Aktif' : 'Nonaktif') + '</span>';
                 }
             },
             {
                 data: null, orderable: false, searchable: false,
                 render: function (d, type, r) {
                     var id = esc(r.id);
+                    var isAktif = (r.status === 'Aktif' || r.status === 'aktif' || r.status == 1);
+                    var title = isAktif ? 'Nonaktifkan mahasiswa' : 'Aktifkan mahasiswa';
                     return '<div class="flex gap-2">' +
                         '<button type="button" title="Lihat detail" aria-label="Lihat detail" data-act="view" data-id="' + id + '" class="flex size-8 cursor-pointer items-center justify-center rounded-md bg-[#D4E3FF] text-[#1F73FF] hover:bg-[#C2D8FF]">' + I_EYE + '</button>' +
-                        '<button type="button" title="Hapus" aria-label="Hapus" data-act="delete" data-id="' + id + '" class="flex size-8 cursor-pointer items-center justify-center rounded-md bg-[#FFD9D9] text-[#E5484D] hover:bg-[#FFC9C9]">' + I_TRASH + '</button>' +
+                        '<button type="button" title="' + title + '" aria-label="' + title + '" data-act="status" data-id="' + id + '" class="btn-status">' + I_SYNC + '</button>' +
                     '</div>';
                 }
             }
@@ -327,15 +349,15 @@
     $('fLevel').addEventListener('change', function (e) { filter.level = e.target.value; table.draw(); });
     $('fStatus').addEventListener('change', function (e) { filter.status = e.target.value; table.draw(); });
 
-    // ---------- Logika Modal Hapus ----------
-    var modalHapus = $('modalHapus'), btnYaHapus = $('modalHapusYa'), pesanError = $('modalHapusError');
-    var idHapus = null;
+    // ---------- Logika Ubah Status (Aktif / Nonaktif) ----------
+    var modal = $('modalStatus'), btnYa = $('modalStatusYa'), pesanError = $('modalStatusError');
+    var idStatus = null;
 
-    function kirimHapus(id) {
+    function kirimStatus(id) {
         var f = document.createElement('form');
         f.method = 'POST';
-        f.action = URL_DELETE.replace('__ID__', encodeURIComponent(id));
-        f.innerHTML = '<input type="hidden" name="_token" value="' + CSRF + '"><input type="hidden" name="_method" value="DELETE">';
+        f.action = URL_STATUS.replace('__ID__', encodeURIComponent(id));
+        f.innerHTML = '<input type="hidden" name="_token" value="' + CSRF + '"><input type="hidden" name="_method" value="PATCH">';
         document.body.appendChild(f);
         f.submit();
     }
@@ -348,32 +370,41 @@
             window.location.href = URL_DETAIL.replace('__ID__', encodeURIComponent(b.dataset.id));
             return;
         }
-        if (b.dataset.act === 'delete') {
-            idHapus = b.dataset.id;
-            if (typeof modalHapus.showModal !== 'function') {
-                if (URL_DELETE && confirm('Hapus mahasiswa "' + (r ? r.name : '') + '"?')) kirimHapus(idHapus);
+        if (b.dataset.act === 'status') {
+            idStatus = b.dataset.id;
+            var nonaktifkan = !!r && (r.status === 'Aktif' || r.status === 'aktif' || r.status == 1);
+            var nama = r ? r.name : '';
+            if (typeof modal.showModal !== 'function') {
+                if (URL_STATUS && confirm((nonaktifkan ? 'Nonaktifkan' : 'Aktifkan') + ' mahasiswa "' + nama + '"?')) kirimStatus(idStatus);
                 return;
             }
-            $('modalHapusNama').textContent = '"' + (r ? r.name : '') + '"';
+            modal.dataset.mode = nonaktifkan ? 'nonaktif' : 'aktif';
+            $('modalStatusJudul').textContent = nonaktifkan ? 'Nonaktifkan mahasiswa?' : 'Aktifkan mahasiswa?';
+            $('modalStatusNama').textContent = '"' + nama + '"';
+            $('modalStatusSuffix').textContent = nonaktifkan
+                ? 'tidak dapat melakukan login ke sistem. Data mahasiswa tetap tersimpan.'
+                : 'dapat kembali melakukan login ke sistem.';
+            btnYa.textContent = nonaktifkan ? 'Nonaktifkan' : 'Aktifkan';
             pesanError.hidden = true;
-            modalHapus.showModal();
+            modal.showModal();
         }
     });
 
-    $('modalHapusBatal').addEventListener('click', function () { modalHapus.close(); });
-    modalHapus.addEventListener('click', function (e) { if (e.target === modalHapus) modalHapus.close(); });
-    modalHapus.addEventListener('close', function () { idHapus = null; btnYaHapus.disabled = false; btnYaHapus.textContent = 'Hapus'; });
+    $('modalStatusBatal').addEventListener('click', function () { modal.close(); });
+    modal.addEventListener('click', function (e) { if (e.target === modal) modal.close(); });
+    modal.addEventListener('close', function () { idStatus = null; btnYa.disabled = false; });
     
-    btnYaHapus.addEventListener('click', function () {
-        if (!idHapus) return;
-        if (!URL_DELETE) {
-            pesanError.textContent = 'Fitur hapus belum tersedia: route admin.mahasiswa.destroy belum dibuat.';
+    btnYa.addEventListener('click', function () {
+        if (!idStatus) return;
+        if (!URL_STATUS) {
+            pesanError.textContent = 'Fitur ini belum tersedia: route status mahasiswa belum terdaftar di web.php.';
             pesanError.hidden = false;
+            btnYa.disabled = false;
             return;
         }
-        btnYaHapus.disabled = true;
-        btnYaHapus.textContent = 'Menghapus...';
-        kirimHapus(idHapus);
+        btnYa.disabled = true;
+        btnYa.textContent = 'Memproses...';
+        kirimStatus(idStatus);
     });
 
     // ---------- Logika Modal Sinkronisasi ----------
@@ -386,7 +417,6 @@
         if (typeof modalSinkron.showModal === 'function') {
             modalSinkron.showModal();
         } else {
-            // Fallback apabila browser pengguna masih sangat lama
             if(confirm('Sinkronkan penempatan kelas semua mahasiswa aktif untuk semester ini?')) {
                 formSinkron.submit();
             }
@@ -401,7 +431,6 @@
         btnYaSinkron.textContent = 'Menyinkronkan...';
         formSinkron.submit();
     });
-
 })();
 </script>
 @endpush

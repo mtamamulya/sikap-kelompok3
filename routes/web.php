@@ -122,7 +122,7 @@ Route::get('/kegiatan/{id}', fn ($id) => redirect()->route('kegiatan.show', $id)
 
 // Route Sinkronisasi Kelas
 Route::post('/admin/mahasiswa/buat-kelas', [LandingMahasiswaController::class, 'buatKelasSemester'])->name('admin.mahasiswa.buat-kelas');
-// Route Hapus Mahasiswa (Method DELETE)
-Route::delete('/admin/mahasiswa/{id}', [LandingMahasiswaController::class, 'destroy'])->name('admin.mahasiswa.destroy');
+
+Route::patch('/admin/mahasiswa/{id}/toggle-status', [LandingMahasiswaController::class, 'toggleStatus'])->name('admin.mahasiswa.toggle-status');
 
 require __DIR__.'/admin-kaprodi.php';

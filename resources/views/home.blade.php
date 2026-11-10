@@ -279,7 +279,7 @@
                 @endif
 
                 {{-- Kontainer card: diberi justify-center jika dosen <= 5 --}}
-                <div id="dosen-scroller" data-count="{{ $totalDosen }}" class="flex gap-3.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden {{ $totalDosen <= 5 ? 'justify-center' : '' }}">
+                <div id="dosen-scroller" data-count="{{ $totalDosen }}" class="-mx-5 flex gap-3.5 overflow-x-auto px-5 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0 {{ $totalDosen <= 5 ? 'md:justify-center' : '' }}">
                     @forelse ($kartuDosen as $d)
                         <div class="relative h-[240px] w-[170px] shrink-0 overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1 md:h-[260px] md:w-[185px]">
                             @if ($d['foto'])

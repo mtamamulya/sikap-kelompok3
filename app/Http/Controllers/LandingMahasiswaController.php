@@ -262,4 +262,16 @@ class LandingMahasiswaController extends Controller
             }
         }, $unik];
     }
+
+    /**
+     * Ubah status aktif / nonaktif mahasiswa.
+     */
+    public function toggleStatus(string $id): \Illuminate\Http\RedirectResponse
+    {
+        $success = $this->store->toggleStatus($id);
+        
+        abort_unless($success, 404);
+
+        return redirect()->back()->with('status', 'Status mahasiswa berhasil diperbarui.');
+    }
 }
