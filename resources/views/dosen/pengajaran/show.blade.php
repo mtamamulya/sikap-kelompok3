@@ -5,29 +5,7 @@
 @section('content')
 
 @php
-    // DATA TIRUAN. $id berasal dari alamat (/pengajaran/{id}).
-    // Nanti diganti data pengajaran dari controller / database oleh tim backend.
-    $p = [
-        'tahun_akademik' => '2025 / 2026 Ganjil',
-        'semester'       => 'Ganjil',
-        'prodi'          => 'Teknologi Rekayasa Komputer',
-        'kelas'          => 'Kelas TI-2B',
-        'matkul'         => 'Jaringan Komputer',
-        'dosen'          => 'Kuwat Santoso (akun Anda)',
-        'kode'           => 'TI2101',
-        'sks'            => 3,
-        'dosen_lengkap'  => 'Kuwat Santoso , S.T., M.Kom.',
-    ];
-
-    // Dokumen pendukung. 'tautan' = alamat dokumen di cloud (Google Drive dll.), dibuka di tab baru.
-    $dokumen = [
-        [
-            'nama'       => 'Surat Tugas Mengajar',
-            'jenis'      => 'Surat Tugas',
-            'keterangan' => 'Ini adalah surat mengajar selama 1 semester',
-            'tautan'     => 'https://drive.google.com/drive/folders/contoh',
-        ],
-    ];
+    // $p (data pengajaran) dan $dokumen dikirim oleh DosenPengajaranController@show.
 
     $sectionClass = 'flex flex-col gap-4.5 rounded-lg border border-gray-200 bg-white p-4.5';
     $numClass     = 'flex size-[26px] shrink-0 items-center justify-center rounded-full bg-brand text-[13px] font-semibold text-white';

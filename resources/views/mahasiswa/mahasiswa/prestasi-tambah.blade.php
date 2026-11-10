@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', isset($prestasi) ? 'Edit prestasi' : 'Tambah prestasi')
 
@@ -16,12 +16,12 @@
     $cardCls = 'rounded-xl border border-[#E5E7EB] bg-white shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]';
     $radioCls = 'flex cursor-pointer items-center gap-2.5 text-sm';
 
-    // Pilihan jenis dokumen (hanya dua). Samakan dengan daftar $jenisDok di MahasiswaController@validasiPrestasi.
-    $jenisDokList = ['Sertifikat', 'Dokumentasi kegiatan'];
+    // Pilihan jenis dokumen harus sama dengan validasi di MahasiswaController.
+    $jenisDokList = $jenisDokList ?? ['Sertifikat', 'Dokumentasi kegiatan'];
     $selDok = 'h-[38px] w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white pl-3 pr-9 text-sm text-[#0A0A0A] outline-none transition focus:border-[#2277FF] focus:ring-2 focus:ring-[#2277FF]/15';
 
     // Anggota tim. Kirim $daftarMahasiswa dan $peranList dari controller (cadangan di bawah ini hanya contoh).
-    $daftarMahasiswa = $daftarMahasiswa ?? ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', 'Arya Bima', 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'];
+    $daftarMahasiswa = $daftarMahasiswa ?? ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', config('mahasiswa.nama'), 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'];
     $peranList       = $peranList ?? ['Ketua', 'Anggota'];
 
     // Mode edit: controller mengirim $prestasi (data yang sudah ada). Tanpa itu, form dalam mode tambah.
@@ -30,21 +30,11 @@
     $edit        = isset($prestasi);
     $v           = fn (string $f, $default = '') => old($f, $prestasi[$f] ?? $default);
     $dokumenLama = $prestasi['dokumen'] ?? [];
+    $dokumenInput = old('dokumen', []);
+    $dokumenInput = is_array($dokumenInput) ? array_values($dokumenInput) : [];
     $urlSimpan   = $edit
         ? (Route::has('mahasiswa.prestasi.update') ? route('mahasiswa.prestasi.update', $prestasi['id']) : '#')
         : route('mahasiswa.prestasi.simpan');
-
-    // Daftar link dokumen yang sudah ditambahkan. Jika validasi server gagal, isi ulang dari isian sebelumnya.
-    // Mulai kosong: tabel baru muncul setelah ada link yang ditambahkan.
-    $linkLama  = old('link_dokumen');
-    $jenisLama = array_values((array) old('jenis_dokumen', []));
-    $dokAwal   = $linkLama !== null
-        ? collect(array_values((array) $linkLama))->map(fn ($l, $i) => [
-            'id'    => $i + 1,
-            'link'  => (string) $l,
-            'jenis' => (string) ($jenisLama[$i] ?? ''),
-        ])->all()
-        : [];
 @endphp
 
 <div class="flex flex-col gap-6">
@@ -58,14 +48,14 @@
             Kembali ke prestasi
         </a>
         <div class="flex flex-col gap-1">
-            <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px]">{{ $edit ? 'Edit prestasi' : 'Tambah prestasi' }}</h1>
-            <p class="text-base text-[#6B7280]">{{ $edit ? 'Perbarui informasi pencapaian dan tautan bukti pendukung.' : 'Lengkapi informasi pencapaian dan tautkan bukti pendukung.' }}</p>
+            <h1 class="text-2xl font-bold leading-tight tracking-[-0.2px] sm:text-[32px] sm:leading-[38px]">{{ $edit ? 'Edit prestasi' : 'Tambah prestasi' }}</h1>
+            <p class="text-base text-[#6B7280]">{{ $edit ? 'Perbarui informasi pencapaian dan bukti pendukung.' : 'Lengkapi informasi pencapaian dan tautan bukti pendukung.' }}</p>
         </div>
     </div>
 
     <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
 
-        {{-- ================= FORMULIR (tanpa unggah file, jadi tanpa enctype multipart) ================= --}}
+        {{-- ================= FORMULIR ================= --}}
         <form method="POST" action="{{ $urlSimpan }}" novalidate
               x-data="formPrestasi(@js([
                   'sumber'          => $v('sumber', 'mandiri'),
@@ -78,7 +68,8 @@
                   'anggota'         => $v('anggota', []),
                   'daftarMahasiswa' => $daftarMahasiswa,
                   'dokumenLama'     => $dokumenLama,
-                  'docs'            => $dokAwal,
+                  'dokumenInput'    => $dokumenInput,
+                  'errors'          => $errors->getMessages(),
               ]))"
               x-on:submit="cekKirim($event)"
               class="flex flex-col gap-4">
@@ -112,7 +103,7 @@
 
                     <div class="flex flex-col gap-2 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] p-3.5 transition-opacity"
                          x-bind:class="sumber === 'mandiri' ? 'opacity-70' : ''">
-                        <label for="kegiatan" class="{{ $label }}">Kegiatan sebelumnya</label>
+                        <label for="kegiatan" class="{{ $label }}">Kegiatan sebelumnya (opsional)</label>
                         <div class="relative">
                             <input id="kegiatan" name="kegiatan" list="daftar-kegiatan" autocomplete="off"
                                    x-model="kegiatan" x-on:input="pilihKegiatan()" x-bind:disabled="sumber === 'mandiri'"
@@ -164,12 +155,12 @@
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="flex flex-col gap-1.5">
-                            <label for="dosen" class="{{ $label }}">Dosen pembimbing</label>
+                            <label for="dosen" class="{{ $label }}">Dosen pembimbing (opsional)</label>
                             <input id="dosen" name="dosen" value="{{ $v('dosen') }}" placeholder="Nama dosen pembimbing" class="{{ $in('dosen') }}">
                             {!! $galat('dosen') !!}
                         </div>
                         <div class="flex flex-col gap-1.5">
-                            <label for="kategori" class="{{ $label }}">Kategori / bidang</label>
+                            <label for="kategori" class="{{ $label }}">Kategori / bidang (opsional)</label>
                             <input id="kategori" name="kategori" value="{{ $v('kategori') }}" placeholder="Contoh: CTF" class="{{ $in('kategori') }}">
                             {!! $galat('kategori') !!}
                         </div>
@@ -276,15 +267,15 @@
 
                                 {{-- Tabel anggota: baru tampil setelah ada anggota yang ditambahkan --}}
                                 <div x-show="anggota.length > 0" x-cloak class="overflow-hidden rounded-lg border border-[#E5E7EB] text-sm text-[#1C2024]">
-                                    <div class="grid grid-cols-[minmax(0,1fr)_120px_64px] bg-[#F9FAFB] text-xs font-medium text-[#6B7280]">
+                                    <div class="hidden grid-cols-[minmax(0,1fr)_120px_64px] bg-[#F9FAFB] text-xs font-medium text-[#6B7280] sm:grid">
                                         <div class="px-3 py-2">Nama</div>
                                         <div class="px-3 py-2">Peran</div>
                                         <div class="px-3 py-2">Aksi</div>
                                     </div>
 
                                     <template x-for="(a, i) in anggota" x-bind:key="a.id">
-                                        <div class="grid grid-cols-[minmax(0,1fr)_120px_64px] items-center border-t border-[#E5E7EB]">
-                                            <div class="truncate px-3 py-2" x-text="a.nama"></div>
+                                        <div class="grid grid-cols-[minmax(0,1fr)_120px_64px] items-center border-t border-[#E5E7EB] max-sm:grid-cols-[minmax(0,1fr)_64px]">
+                                            <div class="min-w-0 px-3 py-2 max-sm:col-span-2 max-sm:truncate" x-text="a.nama"></div>
                                             <div class="px-3 py-2" x-text="a.peran"></div>
                                             <div class="px-3 py-1.5">
                                                 <input type="hidden" x-bind:name="'anggota[' + i + '][nama]'" x-bind:value="a.nama" x-bind:disabled="bentuk !== 'Tim'">
@@ -303,7 +294,7 @@
 
                     {{-- Deskripsi --}}
                     <div class="flex flex-col gap-1.5">
-                        <label for="deskripsi" class="{{ $label }}">Deskripsi</label>
+                        <label for="deskripsi" class="{{ $label }}">Deskripsi (opsional)</label>
                         <textarea id="deskripsi" name="deskripsi" rows="4" maxlength="1000" x-model="deskripsi"
                                   placeholder="Jelaskan pencapaian, kontribusi Anda, dan informasi tambahan yang relevan."
                                   class="w-full resize-y rounded-lg border bg-white px-3 py-2.5 text-sm outline-none transition placeholder:text-[#A8A8A8] focus:border-[#2277FF] focus:ring-2 focus:ring-[#2277FF]/15 {{ $errors->has('deskripsi') ? 'border-[#FF3F3F]' : 'border-[#E5E7EB]' }}"></textarea>
@@ -318,21 +309,19 @@
                 <section class="flex flex-col gap-3">
                     <div class="flex flex-col gap-1">
                         <h2 class="{{ $label }}">Bukti prestasi {!! $wajib !!}</h2>
-                        <p class="text-[13px] text-[#6B7280]">Tempel tautan ke dokumen bukti, misalnya dari Google Drive atau OneDrive, pilih jenisnya, lalu klik Tambah. Maksimal 5 dokumen.</p>
+                        <p class="text-[13px] text-[#6B7280]">Tempel tautan Google Drive atau OneDrive, pilih jenisnya, lalu klik Tambah. Maksimal 5 dokumen.</p>
                     </div>
 
                     <div class="flex flex-col gap-3 rounded-lg border border-[#E5E7EB] bg-white p-3.5">
-
-                        {{-- Input link, pilih jenis dokumen, tambah --}}
                         <div class="flex flex-col gap-2 sm:flex-row">
                             <div class="relative min-w-0 flex-1">
+                                <label for="link-dokumen" class="sr-only">Tautan bukti prestasi</label>
                                 <svg class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#A8A8A8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 15l6 -6"/><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"/><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"/></svg>
-                                <input type="url" inputmode="url" autocomplete="off" spellcheck="false"
-                                       aria-label="Link dokumen"
+                                <input id="link-dokumen" type="url" inputmode="url" autocomplete="off" spellcheck="false"
                                        x-model.trim="linkBaru"
                                        x-on:input="galatDok = ''"
                                        x-on:keydown.enter.prevent="tambahDok()"
-                                       placeholder="https://drive.google.com/file/d/..."
+                                       placeholder="https://drive.google.com/... atau https://1drv.ms/..."
                                        class="h-[38px] w-full rounded-lg border bg-white pl-9 pr-3 text-sm text-[#0A0A0A] outline-none transition placeholder:text-[#A8A8A8] focus:border-[#2277FF] focus:ring-2 focus:ring-[#2277FF]/15"
                                        x-bind:class="galatDok ? 'border-[#FF3F3F]' : 'border-[#E5E7EB]'">
                             </div>
@@ -354,64 +343,68 @@
                             </button>
                         </div>
 
-                        <p x-show="galatDok" x-cloak x-text="galatDok" class="-mt-1 text-xs text-[#FF3F3F]"></p>
-                        <p x-show="!galatDok" class="-mt-1 {{ $hint }}">Awali dengan https://. Pastikan tautan dapat dibuka tanpa meminta akses.</p>
-
-                        {{-- Galat dari server untuk tautan atau jenis dokumen --}}
-                        @foreach (collect($errors->get('link_dokumen.*'))->merge($errors->get('jenis_dokumen.*'))->flatten()->unique() as $pesan)
-                            <p class="text-xs text-[#FF3F3F]">{{ $pesan }}</p>
+                        <p x-show="galatDok" x-cloak x-text="galatDok" class="text-xs text-[#FF3F3F]"></p>
+                        <p x-show="!galatDok" class="{{ $hint }}">Gunakan tautan HTTPS dan pastikan akses berbagi memungkinkan tautan dibuka.</p>
+                        @foreach ($errors->getMessages() as $field => $pesanList)
+                            @if (str_starts_with($field, 'dokumen.'))
+                                @foreach ($pesanList as $pesan)
+                                    <p class="text-xs text-[#FF3F3F]">{{ $pesan }}</p>
+                                @endforeach
+                            @endif
                         @endforeach
-                        {!! $galat('link_dokumen') !!}
-                        {!! $galat('jenis_dokumen') !!}
+                        {!! $galat('dokumen') !!}
+                    </div>
 
-                        {{-- Tabel link: baru tampil setelah ada dokumen (tersimpan atau baru ditambahkan) --}}
-                        <div x-show="dokLama.length + docs.length > 0" x-cloak class="overflow-hidden rounded-lg border border-[#E5E7EB] text-sm text-[#1C2024]">
-                            <div class="grid grid-cols-[minmax(0,1fr)_170px_64px] bg-[#F9FAFB] text-xs font-medium text-[#6B7280]">
-                                <div class="px-3 py-2">Link dokumen</div>
-                                <div class="px-3 py-2">Jenis</div>
-                                <div class="px-3 py-2">Aksi</div>
-                            </div>
-
-                            {{-- Dokumen yang sudah tersimpan (mode edit). Hapus = ditandai dihapus saat disimpan. --}}
-                            <template x-for="d in dokLama" x-bind:key="'lama-' + d.id">
-                                <div class="grid grid-cols-[minmax(0,1fr)_170px_64px] items-center border-t border-[#E5E7EB]">
-                                    <div class="truncate px-3 py-2">
-                                        <a x-show="d.url" x-bind:href="d.url" target="_blank" rel="noopener" class="text-[#0062FF] hover:underline" x-text="d.url"></a>
-                                        <span x-show="!d.url" x-text="d.nama"></span>
-                                    </div>
-                                    <div class="truncate px-3 py-2" x-text="d.jenis || 'Dokumen'"></div>
-                                    <div class="px-3 py-1.5">
-                                        <button type="button" aria-label="Hapus dokumen" x-on:click="hapusLama(d.id)"
-                                                class="rounded-md bg-[#FBCBCB] p-1.5 text-[#FF3F3F] transition hover:bg-[#F8B4B4]">
-                                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </template>
-
-                            {{-- Dokumen yang baru ditambahkan --}}
-                            <template x-for="(d, i) in docs" x-bind:key="d.id">
-                                <div class="grid grid-cols-[minmax(0,1fr)_170px_64px] items-center border-t border-[#E5E7EB]">
-                                    <div class="truncate px-3 py-2">
-                                        <a x-bind:href="d.link" target="_blank" rel="noopener" class="text-[#0062FF] hover:underline" x-bind:title="d.link" x-text="d.link"></a>
-                                    </div>
-                                    <div class="truncate px-3 py-2" x-text="d.jenis"></div>
-                                    <div class="px-3 py-1.5">
-                                        <input type="hidden" x-bind:name="'link_dokumen[' + i + ']'" x-bind:value="d.link">
-                                        <input type="hidden" x-bind:name="'jenis_dokumen[' + i + ']'" x-bind:value="d.jenis">
-                                        <button type="button" aria-label="Hapus dokumen" x-on:click="hapusDok(d.id)"
-                                                class="rounded-md bg-[#FBCBCB] p-1.5 text-[#FF3F3F] transition hover:bg-[#F8B4B4]">
-                                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </template>
+                    {{-- Dokumen tersimpan dan tautan baru ditampilkan dalam satu daftar. --}}
+                    <div x-show="dokLama.length + docs.length > 0" x-cloak class="overflow-hidden rounded-lg border border-[#E5E7EB] text-sm text-[#1C2024]">
+                        <div class="hidden grid-cols-[minmax(0,1fr)_170px_64px] bg-[#F9FAFB] text-xs font-medium text-[#6B7280] sm:grid">
+                            <div class="px-3 py-2">Tautan dokumen</div>
+                            <div class="px-3 py-2">Jenis</div>
+                            <div class="px-3 py-2">Aksi</div>
                         </div>
 
-                        <template x-for="id in dihapus" x-bind:key="id">
-                            <input type="hidden" name="dokumen_hapus[]" x-bind:value="id">
+                        <template x-for="d in dokLama" x-bind:key="'lama-' + d.id">
+                            <div class="grid grid-cols-[minmax(0,1fr)_64px] items-center border-t border-[#E5E7EB] sm:grid-cols-[minmax(0,1fr)_170px_64px]">
+                                <div class="min-w-0 px-3 py-2">
+                                    <a x-show="d.url" x-bind:href="d.url" target="_blank" rel="noopener"
+                                       class="block truncate text-[#0062FF] hover:underline" x-bind:title="d.url" x-text="d.url"></a>
+                                    <span x-show="!d.url" class="block truncate" x-text="d.nama"></span>
+                                    <span class="mt-1 block text-xs text-[#6B7280] sm:hidden" x-text="d.jenis || 'Dokumen'"></span>
+                                </div>
+                                <div class="hidden truncate px-3 py-2 sm:block" x-text="d.jenis || 'Dokumen'"></div>
+                                <div class="px-3 py-1.5">
+                                    <input type="hidden" name="dokumen_pertahankan[]" x-bind:value="d.id">
+                                    <button type="button" aria-label="Hapus dokumen tersimpan" x-on:click="hapusLama(d.id)"
+                                            class="rounded-md bg-[#FBCBCB] p-1.5 text-[#FF3F3F] transition hover:bg-[#F8B4B4]">
+                                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template x-for="(d, i) in docs" x-bind:key="d.id">
+                            <div class="grid grid-cols-[minmax(0,1fr)_64px] items-center border-t border-[#E5E7EB] sm:grid-cols-[minmax(0,1fr)_170px_64px]">
+                                <div class="min-w-0 px-3 py-2">
+                                    <a x-bind:href="d.url" target="_blank" rel="noopener"
+                                       class="block truncate text-[#0062FF] hover:underline" x-bind:title="d.url" x-text="d.url"></a>
+                                    <span class="mt-1 block text-xs text-[#6B7280] sm:hidden" x-text="d.jenis"></span>
+                                </div>
+                                <div class="hidden truncate px-3 py-2 sm:block" x-text="d.jenis"></div>
+                                <div class="px-3 py-1.5">
+                                    <input type="hidden" x-bind:name="'dokumen[' + i + '][url]'" x-bind:value="d.url">
+                                    <input type="hidden" x-bind:name="'dokumen[' + i + '][jenis]'" x-bind:value="d.jenis">
+                                    <button type="button" aria-label="Hapus tautan" x-on:click="hapusDok(d.id)"
+                                            class="rounded-md bg-[#FBCBCB] p-1.5 text-[#FF3F3F] transition hover:bg-[#F8B4B4]">
+                                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
                         </template>
                     </div>
+
+                    <template x-for="id in dihapus" x-bind:key="id">
+                        <input type="hidden" name="dokumen_hapus[]" x-bind:value="id">
+                    </template>
                 </section>
             </div>
 
@@ -443,7 +436,7 @@
             <div class="flex flex-col gap-2 rounded-xl bg-[#EEF4FF] p-4 text-[#003385]">
                 <span class="text-[#0162DD]">{!! $cert !!}</span>
                 <h3 class="text-sm font-semibold">Bukti yang dapat digunakan</h3>
-                <p class="text-[13px] leading-5">Sertifikat, piagam penghargaan, atau surat resmi penyelenggara yang memuat identitas dan capaian. Bagikan dokumen lewat tautan yang dapat dibuka oleh pihak yang memverifikasi.</p>
+                <p class="text-[13px] leading-5">Sertifikat, piagam penghargaan, atau surat resmi penyelenggara yang memuat identitas dan capaian.</p>
             </div>
         </aside>
     </div>
@@ -510,6 +503,22 @@
                 this.anggota = this.anggota.filter(a => a.id !== id);
             },
 
+            // ----- Dokumen (tautan) -----
+            maxDok: 5,
+            dokLama: (cfg.dokumenLama || []).map(d => ({ ...d })),
+            dihapus: [],
+            docs: (cfg.dokumenInput || []).map((d, i) => ({
+                    id: i + 1,
+                    url: d.url || '',
+                    jenis: d.jenis || '',
+                    galat: (cfg.errors[`dokumen.${i}.url`] || [])[0] || '',
+                    galatJenis: (cfg.errors[`dokumen.${i}.jenis`] || [])[0] || '',
+                })),
+            nextId: (cfg.dokumenInput || []).length + 1,
+            linkBaru: '',
+            jenisBaru: '',
+            galatDok: '',
+
             // Jika kegiatan yang dipilih ada di daftar, isi nama lomba dan penyelenggara otomatis.
             pilihKegiatan() {
                 const k = this.kegiatanList.find(x => x.label === this.kegiatan);
@@ -519,42 +528,41 @@
                 }
             },
 
-            // ----- Dokumen (tautan) -----
-            maxDok: 5,
-            dokLama: (cfg.dokumenLama || []).map(d => ({ ...d })),
-            dihapus: [],
-            docs: (cfg.docs || []).map(d => ({ ...d })),
-            nextId: (cfg.docs || []).length + 1,
-            linkBaru: '',
-            jenisBaru: '',
-            galatDok: '',
-
-            linkValid(v) {
+            linkValid(link) {
                 try {
-                    const u = new URL(v);
-                    return (u.protocol === 'https:' || u.protocol === 'http:') && u.hostname.includes('.');
-                } catch (e) {
+                    const url = new URL(link);
+                    const host = url.hostname.toLowerCase();
+                    const domainDiizinkan = [
+                        'drive.google.com',
+                        'docs.google.com',
+                        '1drv.ms',
+                        'onedrive.live.com',
+                    ].includes(host) || host.endsWith('.sharepoint.com');
+
+                    return url.protocol === 'https:' && domainDiizinkan;
+                } catch {
                     return false;
                 }
             },
 
             tambahDok() {
-                const link = this.linkBaru.trim();
+                const url = this.linkBaru.trim();
+                this.galatDok = '';
 
-                if (!link) {
-                    this.galatDok = 'Isi link dokumen terlebih dahulu.';
+                if (!url) {
+                    this.galatDok = 'Isi tautan dokumen terlebih dahulu.';
                     return;
                 }
-                if (!this.linkValid(link)) {
-                    this.galatDok = 'Link tidak valid. Gunakan alamat lengkap yang diawali https://';
+                if (!this.linkValid(url)) {
+                    this.galatDok = 'Gunakan tautan HTTPS Google Drive atau OneDrive yang valid.';
                     return;
                 }
                 if (!this.jenisBaru) {
                     this.galatDok = 'Pilih jenis dokumen.';
                     return;
                 }
-                if (this.docs.some(d => d.link.toLowerCase() === link.toLowerCase())) {
-                    this.galatDok = 'Link tersebut sudah ditambahkan.';
+                if ([...this.docs, ...this.dokLama].some(d => d.url && d.url.toLowerCase() === url.toLowerCase())) {
+                    this.galatDok = 'Tautan tersebut sudah ditambahkan.';
                     return;
                 }
                 if (this.docs.length + this.dokLama.length >= this.maxDok) {
@@ -562,10 +570,9 @@
                     return;
                 }
 
-                this.docs.push({ id: this.nextId++, link, jenis: this.jenisBaru });
+                this.docs.push({ id: this.nextId++, url, jenis: this.jenisBaru });
                 this.linkBaru = '';
                 this.jenisBaru = '';
-                this.galatDok = '';
             },
 
             hapusDok(id) {
@@ -580,7 +587,7 @@
                 this.galatDok = '';
             },
 
-            // Validasi sebelum kirim: tim wajib punya anggota; link yang sudah diketik harus ditambahkan dulu.
+            // Validasi sebelum kirim: minimal satu bukti, dan tautan baru harus ditambahkan ke daftar.
             cekKirim(e) {
                 let valid = true;
 
@@ -589,8 +596,13 @@
                     valid = false;
                 }
 
+                if (this.dokLama.length + this.docs.length === 0) {
+                    this.galatDok = 'Tambahkan minimal satu tautan bukti prestasi.';
+                    valid = false;
+                }
+
                 if (this.linkBaru.trim() !== '' || this.jenisBaru !== '') {
-                    this.galatDok = 'Klik Tambah untuk memasukkan link ke daftar, atau kosongkan kolom link dan jenis dokumen.';
+                    this.galatDok = 'Klik Tambah untuk memasukkan tautan ke daftar, atau kosongkan kolom tautan dan jenis.';
                     valid = false;
                 }
 

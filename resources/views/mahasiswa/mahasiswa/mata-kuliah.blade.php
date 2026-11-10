@@ -1,10 +1,9 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Mata Kuliah')
 
 @section('content')
 @php
-    // Tab: berjalan = Semester berjalan, katalog = Semua mata kuliah (Tingkat 1-4), semua = Riwayat mata kuliah.
     $subjudul = [
         'semua'    => 'Telusuri catatan mata kuliah Anda dari semester sebelumnya.',
         'berjalan' => 'Pantau mata kuliah dan beban studi Anda pada semester aktif.',
@@ -23,52 +22,40 @@
         'katalog'  => 'Temukan mata kuliah berdasarkan tingkat, semester, tahun akademik, atau nama mata kuliah.',
     ][$tab];
 
-    // Urutan tombol tab: Semester berjalan, Semua mata kuliah, Riwayat mata kuliah.
-    // Tab Riwayat memakai route .riwayat (tab "semua"); route 'mahasiswa.mata-kuliah' sekarang membuka Semester berjalan.
     $tabs = [
         ['berjalan', 'Semester Berjalan',   'mahasiswa.mata-kuliah.berjalan'],
         ['katalog',  'Semua Mata Kuliah',   'mahasiswa.mata-kuliah.katalog'],
         ['semua',    'Riwayat Mata Kuliah', 'mahasiswa.mata-kuliah.riwayat'],
     ];
 
-    $n           = $rows->count();
-    $pakaiSks    = $tab === 'berjalan';            // hanya Semester berjalan yang menampilkan SKS
-    $kolomAkhir  = $pakaiSks ? 'SKS' : 'Tahun Akademik';
+    $n = $rows->count();
+    $pakaiSks = $tab === 'berjalan';
+    $kolomAkhir = $pakaiSks ? 'SKS' : 'Tahun Akademik';
     $tingkatOpsi = [1 => 'Tingkat 1', 2 => 'Tingkat 2', 3 => 'Tingkat 3', 4 => 'Tingkat 4'];
+    $tahunOptions = array_combine($tahunList, $tahunList) ?: [];
+    $selects = [
+        ['semester', 'Semua Semester', ['Ganjil' => 'Ganjil', 'Genap' => 'Genap']],
+        ['tingkat', 'Semua Tingkat', $tingkatOpsi],
+        ['tahun', 'Tahun Akademik', $tahunOptions],
+    ];
 
-    // Pagination di semua tab. Ubah $perPage untuk mengatur jumlah baris per halaman.
-    $perPage     = 5;
-    $totalHal    = max(1, (int) ceil($n / $perPage));
-    $halaman     = max(1, min((int) request()->query('page', 1), $totalHal));
+    $perPage = 5;
+    $totalHal = max(1, (int) ceil($n / $perPage));
+    $halaman = max(1, min((int) request()->query('page', 1), $totalHal));
     $barisTampil = $rows->forPage($halaman, $perPage)->values();
-    $dari        = $n ? ($halaman - 1) * $perPage + 1 : 0;
-    $sampai      = min($halaman * $perPage, $n);
-    $urlHal      = fn (int $p) => request()->fullUrlWithQuery(['page' => $p]) . '#daftar-mata-kuliah';
-
-    // Nomor halaman: tampilkan semua jika sedikit, selain itu 1 … sekitar halaman aktif … terakhir.
-    if ($totalHal <= 7) {
-        $nomor = range(1, $totalHal);
-    } else {
-        $nomor = collect([1, $halaman - 1, $halaman, $halaman + 1, $totalHal])
+    $dari = $n ? ($halaman - 1) * $perPage + 1 : 0;
+    $sampai = min($halaman * $perPage, $n);
+    $urlHal = fn (int $p) => request()->fullUrlWithQuery(['page' => $p]).'#daftar-mata-kuliah';
+    $nomor = $totalHal <= 7
+        ? range(1, $totalHal)
+        : collect([1, $halaman - 1, $halaman, $halaman + 1, $totalHal])
             ->filter(fn ($p) => $p >= 1 && $p <= $totalHal)
             ->unique()->sort()->values()->all();
-    }
 
     $cardCls  = 'rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)] sm:p-6';
     $badgeCls = 'shrink-0 rounded-full border border-[#B8D0FA] bg-[#E8F0FE] px-3 py-1 text-xs font-medium text-[#0162DD]';
     $selCls   = 'h-10 w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white pl-3.5 pr-9 text-sm text-[#0A0A0A] outline-none transition-colors hover:border-[#C7D2E5] focus:border-[#27F]';
-    $pgBase   = 'inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2.5 text-xs font-semibold transition';
-    $pgOn     = $pgBase . ' border-[#27F] bg-[#27F] text-white';
-    $pgLink   = $pgBase . ' border-[#E5E7EB] bg-white text-[#0162DD] hover:bg-[#EFF6FF]';
-    $pgOff    = $pgBase . ' cursor-not-allowed border-[#E5E7EB] bg-[#F9FAFB] text-[#A8A8A8]';
     $infoIcon = '<svg class="mt-0.5 size-5 shrink-0 text-[#003385]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0"/><path d="M12 9h.01"/><path d="M11 12h1v4h1"/></svg>';
-
-    // Dropdown filter (tab Semua dan Riwayat): Semester, Tingkat, Tahun Akademik.
-    $selects = [
-        ['semester', 'Semua Semester', ['Ganjil' => 'Ganjil', 'Genap' => 'Genap']],
-        ['tingkat',  'Semua Tingkat',  $tingkatOpsi],
-        ['tahun',    'Tahun Akademik', array_combine($tahunList, $tahunList)],
-    ];
 @endphp
 
 <div class="flex flex-col gap-6">
@@ -101,13 +88,7 @@
                 <span class="{{ $badgeCls }}">Paket semester</span>
             </div>
 
-            <div class="flex gap-3 rounded-xl bg-[#EEF4FF] px-4 py-3.5 text-[#003385]">
-                {!! $infoIcon !!}
-                <div class="flex flex-col gap-0.5">
-                    <div class="text-sm font-semibold">Paket semester berjalan sudah ditetapkan</div>
-                    <p class="text-sm leading-5">Daftar berikut bersumber dari penetapan akademik, bukan pilihan mandiri atau daftar referensi periode.</p>
-                </div>
-            </div>
+        
 
             <dl class="grid grid-cols-1 divide-y divide-[#E5E7EB] overflow-hidden rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
                 <div class="px-5 py-4">
@@ -126,7 +107,7 @@
         </section>
     @endif
 
-    {{-- Kartu daftar mata kuliah: tinggi mengikuti isi, tanpa ruang kosong di bawah tabel --}}
+    {{-- Kartu daftar mata kuliah: tinggi mengikuti isi tabel --}}
     <section id="daftar-mata-kuliah" class="{{ $cardCls }} flex scroll-mt-24 flex-col gap-5">
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div class="flex flex-col gap-1">
@@ -137,12 +118,12 @@
         </div>
 
         @if ($tab !== 'berjalan')
-            {{-- Panel filter: pencarian + 3 dropdown + Reset, semua kontrol setinggi h-10, kolom dikunci --}}
+            {{-- Panel filter: semua kontrol setinggi h-10, kolom dikunci --}}
             <form method="GET" action="{{ url()->current() }}#daftar-mata-kuliah"
                   class="grid grid-cols-1 gap-3 rounded-xl border border-[#EEF0F3] bg-[#F9FAFB] p-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_180px_180px_180px_88px]">
                 <div class="flex h-10 items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3.5 transition-colors focus-within:border-[#27F] sm:col-span-2 xl:col-span-1">
                     <svg class="size-4 shrink-0 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M21 21l-6-6"/></svg>
-                    <input type="search" name="q" value="{{ $filter['q'] }}" placeholder="Cari mata kuliah..."
+                    <input type="search" name="q" value="{{ $filter['q'] }}" data-live-search placeholder="Cari mata kuliah..."
                            class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#A8A8A8]">
                 </div>
 
@@ -151,7 +132,7 @@
                         <select name="{{ $field }}" class="{{ $selCls }}" onchange="this.form.submit()" aria-label="{{ $placeholder }}">
                             <option value="">{{ $placeholder }}</option>
                             @foreach ($options as $val => $text)
-                                <option value="{{ $val }}" @selected((string) ($filter[$field] ?? '') === (string) $val)>{{ $text }}</option>
+                                <option value="{{ $val }}" @selected((string) $filter[$field] === (string) $val)>{{ $text }}</option>
                             @endforeach
                         </select>
                         <svg class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>
@@ -164,10 +145,26 @@
                 </a>
                 <button type="submit" class="sr-only">Terapkan</button>
             </form>
+
+            <div class="flex gap-3 rounded-xl bg-[#EEF4FF]">
+                
+            </div>
+        @elseif ($tab === 'katalog')
+            <div class="flex gap-3 rounded-xl bg-[#EEF4FF] px-4 py-3.5 text-[#003385]">
+                {!! $infoIcon !!}
+                <div class="flex flex-col gap-0.5">
+                    <div class="text-sm font-semibold">Katalog mata kuliah</div>
+                    <p class="text-sm leading-5">Katalog menampilkan referensi mata kuliah Tingkat 1 sampai Tingkat 4. Data ini bukan daftar paket semester yang sedang ditempuh.</p>
+                </div>
+            </div>
+        @else
+            <div class="flex gap-3 rounded-xl bg-[#EEF4FF]">
+             
+            </div>
         @endif
 
-        {{-- Tabel: lebar kolom dikunci (table-fixed), tanpa tinggi minimum --}}
-        <div class="overflow-x-auto rounded-lg border border-[#E5E7EB]">
+        {{-- Tabel desktop --}}
+        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block">
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
                     <col class="w-[30%]">
@@ -203,7 +200,33 @@
             </table>
         </div>
 
-        {{-- Footer: keterangan di kiri, pagination bernomor di kanan --}}
+        <div class="flex flex-col gap-3 md:hidden">
+            @forelse ($barisTampil as $r)
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3.5">
+                    <div class="min-w-0">
+                        <h3 class="break-words text-sm font-semibold text-[#111827]">{{ $r['mk'] }}</h3>
+                        <p class="mt-1 break-words text-xs text-[#6B7280]">{{ $r['dosen'] }}</p>
+                    </div>
+                    <dl class="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div>
+                            <dt class="text-[#6B7280]">Tingkat</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">Tingkat {{ $r['tingkat'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[#6B7280]">Semester</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $r['periode'] }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="text-[#6B7280]">{{ $kolomAkhir }}</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $pakaiSks ? ($r['sks'] ?? '—') : ($r['tahun'] ?? '—') }}</dd>
+                        </div>
+                    </dl>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">Tidak ada mata kuliah yang cocok dengan filter.</p>
+            @endforelse
+        </div>
+
         <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6B7280]">
             <span>
                 @if ($n)
@@ -213,8 +236,13 @@
                     0 mata kuliah ditampilkan
                 @endif
             </span>
-
             <nav aria-label="Navigasi halaman" class="flex flex-wrap items-center gap-1.5">
+                @php
+                    $pgBase = 'inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2.5 text-xs font-semibold transition';
+                    $pgOn = $pgBase.' border-[#27F] bg-[#27F] text-white';
+                    $pgLink = $pgBase.' border-[#E5E7EB] bg-white text-[#0162DD] hover:bg-[#EFF6FF]';
+                    $pgOff = $pgBase.' cursor-not-allowed border-[#E5E7EB] bg-[#F9FAFB] text-[#A8A8A8]';
+                @endphp
                 @if ($halaman > 1)
                     <a href="{{ $urlHal($halaman - 1) }}" rel="prev" class="{{ $pgLink }}">Sebelumnya</a>
                 @else

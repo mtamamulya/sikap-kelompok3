@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MataKuliah extends Model
 {
@@ -25,5 +26,10 @@ class MataKuliah extends Model
     public function kurikulum(): BelongsTo
     {
         return $this->belongsTo(Kurikulum::class, 'id_kurikulum', 'id_kurikulum');
+    }
+
+    public function enrollmentMataKuliah(): HasMany
+    {
+        return $this->hasMany(EnrollmentMataKuliah::class, 'id_mk', 'id_mk');
     }
 }

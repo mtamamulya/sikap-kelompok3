@@ -2,15 +2,29 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PengajuanFormTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function test_new_forms_do_not_prefill_team_members(): void
+    {
+        foreach ([route('pengajuan.create'), route('pengajuan.dosen.create')] as $url) {
+            $this->get($url)
+                ->assertOk()
+                ->assertDontSee('Ivan Sigit Santoso')
+                ->assertDontSee('Anisa Aulia Nurusyifa');
+        }
+    }
+
     public function test_form_offers_requested_categories_and_link_document_types(): void
     {
         $response = $this->get(route('pengajuan.create'));
 
         $response->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.create')
             ->assertSee('Pengabdian')
             ->assertSee('Dokumentasi')
             ->assertSee('Surat Mitra')
@@ -22,6 +36,52 @@ class PengajuanFormTest extends TestCase
             ->assertDontSee('Lainnya')
             ->assertDontSee('Pilih berkas')
             ->assertDontSee('Preview surat');
+    }
+
+    public function test_lomba_forms_offer_course_instructors_and_reject_invalid_names(): void
+    {
+        foreach ([route('pengajuan.create'), route('pengajuan.dosen.create')] as $url) {
+            $this->get($url)
+                ->assertOk()
+                ->assertSee('Cari nama dosen...')
+                ->assertSee('Tambah')
+                ->assertSee('Angga Wahyu Wibowo')
+                ->assertSee('Kecerdasan Buatan')
+                ->assertSee('Kuwat Santoso')
+                ->assertSee('Jaringan Komputer')
+                ->assertSee('Wiktasari')
+                ->assertSee('Sistem Basis Data')
+                ->assertSee('Tahan Prahara')
+                ->assertSee('Internet of Things')
+                ->assertSee('Prayitno')
+                ->assertSee('Computer Vision')
+                ->assertSee('Arif Setyawan')
+                ->assertSee('Sistem Operasi');
+        }
+
+        $submission = [
+            'category' => 'Lomba',
+            'title' => 'Lomba Kampus',
+            'participation' => 'Individu',
+            'level' => 'Kabupaten',
+            'organizer' => 'Panitia Kampus',
+            'advisors' => ['Angga Wahyu Wibowo', 'Kuwat Santoso'],
+            'location' => 'Semarang',
+            'start_date' => '2026-10-30',
+            'end_date' => '2026-10-31',
+        ];
+
+        $this->post(route('pengajuan.store'), $submission)
+            ->assertRedirect(route('pengajuan.show', 101))
+            ->assertSessionHas('pengajuan.items.0.data.advisors', ['Angga Wahyu Wibowo', 'Kuwat Santoso'])
+            ->assertSessionHas('pengajuan.items.0.data.advisor', 'Angga Wahyu Wibowo');
+
+        $submission['advisors'] = ['Angga Wahu Wibowo'];
+
+        $this->from(route('pengajuan.create'))
+            ->post(route('pengajuan.store'), $submission)
+            ->assertRedirect(route('pengajuan.create'))
+            ->assertSessionHasErrors('advisors.0');
     }
 
     public function test_each_category_accepts_link_documents(): void
@@ -85,10 +145,58 @@ class PengajuanFormTest extends TestCase
             ->assertSee('https://example.com/dokumen-7');
     }
 
+    public function test_new_submission_is_also_listed_as_an_activity(): void
+    {
+        $this->post(route('pengajuan.store'), [
+            'category' => 'Pengabdian',
+            'title' => 'Pengajuan yang menjadi kegiatan',
+            'organizer' => 'Program Studi',
+            'location' => 'Semarang',
+            'start_date' => '2026-10-30',
+            'end_date' => '2026-10-31',
+            'documents' => [[
+                'name' => 'Sertifikat Kegiatan',
+                'type' => 'Dokumentasi',
+                'url' => 'https://example.com/sertifikat',
+            ]],
+        ])->assertRedirect(route('pengajuan.show', 101));
+
+        $this->get(route('kegiatan.index'))
+            ->assertOk()
+            ->assertViewIs('mahasiswa.kegiatan.index')
+            ->assertSee('Pengajuan yang menjadi kegiatan')
+            ->assertSee('Buka tautan')
+            ->assertDontSee('Unduh Sertifikat')
+            ->assertViewHas('allActivities', fn ($activities) => $activities->contains(
+                fn ($activity) => $activity['name'] === 'Pengajuan yang menjadi kegiatan'
+                    && $activity['documents'][0]['url'] === 'https://example.com/sertifikat'
+            ));
+    }
+
+    public function test_activity_list_includes_activities_tagged_to_the_current_user(): void
+    {
+        $this->withSession(['pengajuan.items' => [[
+            'id' => 101,
+            'title' => 'Lomba yang ditag',
+            'category' => 'Lomba',
+            'status' => 'Diajukan',
+            'submitted_at' => now()->toIso8601String(),
+            'data' => ['members' => [['name' => 'Mahasiswa yang ditag', 'role' => 'Anggota']]],
+            'documents' => [],
+        ]]])
+            ->get(route('kegiatan.index'))
+            ->assertOk()
+            ->assertViewHas('allActivities', fn ($activities) => $activities->contains(
+                fn ($activity) => $activity['name'] === 'Lomba yang ditag'
+                    && $activity['members'][0]['name'] === 'Mahasiswa yang ditag'
+            ));
+    }
+
     public function test_detail_page_does_not_show_surat_preview(): void
     {
         $this->get(route('pengajuan.show', 1))
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.show')
             ->assertSee('Hapus pengajuan')
             ->assertDontSee('Preview surat')
             ->assertDontSee('Preview surat pengajuan');
@@ -130,11 +238,13 @@ class PengajuanFormTest extends TestCase
 
         $this->get(route('pengajuan.index'))
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.index')
             ->assertDontSee('Pengajuan status Diajukan');
 
         $this->withSession(['success' => 'Pengajuan berhasil dihapus.'])
             ->get(route('pengajuan.index'))
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.index')
             ->assertSee('Pengajuan berhasil dihapus.');
     }
 
@@ -157,7 +267,8 @@ class PengajuanFormTest extends TestCase
         //     ->assertOk()
         //     ->assertViewIs('dosen.pengajuan.mahasiswa')
         //     ->assertSee('Volunteer Bakti Sosial');
-        $this->get(route('pengajuan-segera'))->assertOk();
+        $this->get('/mahasiswa/pengajuan-segera')->assertNotFound();
+        $this->get('/pengajuan-segera')->assertNotFound();
     }
 
     public function test_dashboard_renders_with_develop_pengajuan_routes(): void
@@ -178,6 +289,7 @@ class PengajuanFormTest extends TestCase
 
         $response
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.dashboard')
             ->assertSee('TOTAL PENGAJUAN')
             ->assertSee('id="desktop-mahasiswa-submenu"', false)
             ->assertSee('id="mobile-pengajuan-nav"', false)
@@ -208,15 +320,17 @@ class PengajuanFormTest extends TestCase
         $mahasiswaResponse = $this->get(route('mahasiswa.dashboard'));
         $mahasiswaResponse
             ->assertOk()
-            ->assertViewIs('mahasiswa.dashboard-mhs')
-            ->assertSee('Selamat')
+            ->assertViewIs('mahasiswa.dashboard.dashboard')
+            ->assertSee(config('mahasiswa.nama'))
+            ->assertSee(config('mahasiswa.nim'))
             ->assertSee('Buat pengajuan dokumen baru')
-            ->assertSee('href="'.route('pengajuan.create').'"', false)
+            ->assertSee('href="'.route('pengajuan.index').'"', false)
             ->assertDontSee('Unduh KHS')
-            ->assertSee('href="'.route('dashboard').'"', false)
+            ->assertSee('href="'.route('mahasiswa.dashboard').'"', false)
             ->assertSee('href="'.route('mahasiswa.index').'"', false)
             ->assertSee('aria-current="page"', false)
             ->assertSee('aria-label="Buka atau tutup submenu Mahasiswa"', false)
+            ->assertSee('Mahasiswa')
             ->assertSee('cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js', false)
             ->assertSee('cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css', false)
             ->assertSee('Menu navigasi')
@@ -249,20 +363,25 @@ class PengajuanFormTest extends TestCase
         }
         $this->get(route('mahasiswa.index'))
             ->assertOk()
-            ->assertViewIs('mahasiswa.dashboard-mhs');
-        $this->get(route('mahasiswa.mata-kuliah'))->assertOk();
+            ->assertViewIs('mahasiswa.mahasiswa.dashboard-mhs');
+        $this->get(route('mahasiswa.mata-kuliah'))
+            ->assertOk()
+            ->assertViewIs('mahasiswa.mahasiswa.mata-kuliah');
         $this->get(route('mahasiswa.mata-kuliah', ['tab' => 'berjalan']))->assertOk();
         $this->get(route('mahasiswa.mata-kuliah', ['tab' => 'riwayat']))->assertOk();
         $this->get(route('mahasiswa.prestasi'))
             ->assertOk()
+            ->assertViewIs('mahasiswa.mahasiswa.prestasi')
             ->assertSee('md:hidden', false)
             ->assertDontSee('Catat prestasi Anda dengan bukti yang lengkap');
-        $this->get(route('mahasiswa.prestasi.tambah'))->assertOk();
-        $kegiatanResponse = $this->get(route('mahasiswa.kegiatan'));
+        $this->get(route('mahasiswa.prestasi.tambah'))
+            ->assertOk()
+            ->assertViewIs('mahasiswa.mahasiswa.prestasi-tambah');
+        $kegiatanResponse = $this->get(route('kegiatan.index'));
         $kegiatanResponse
             ->assertOk()
-            ->assertSee('md:hidden', false)
-            ->assertSee('href="'.route('mahasiswa.kegiatan').'"', false);
+            ->assertSee('href="'.route('kegiatan.index').'"', false)
+            ->assertSee('aria-current="page"', false);
         $this->assertDoesNotMatchRegularExpression(
             '/<a\b[^>]*href="'.preg_quote(route('mahasiswa.index'), '/').'"[^>]*aria-current="page"/s',
             $kegiatanResponse->getContent()
@@ -273,10 +392,12 @@ class PengajuanFormTest extends TestCase
     {
         $this->get(route('pengajuan.berita.index'))
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.berita.index')
             ->assertSee('Ajukan Berita')
             ->assertSee('Kegiatan Mahasiswa');
         $this->get(route('pengajuan.berita.create'))
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.berita.form')
             ->assertSee('Dari kegiatan sebelumnya')
             ->assertSee('Tanpa kegiatan sebelumnya')
             ->assertSee('Kategori berita')
@@ -287,6 +408,7 @@ class PengajuanFormTest extends TestCase
             ->assertRedirect(route('pengajuan.berita.show', 1));
         $this->get(route('pengajuan.berita.show', 1))
             ->assertOk()
+            ->assertViewIs('mahasiswa.pengajuan.berita.show')
             ->assertSee('Draft');
     }
 

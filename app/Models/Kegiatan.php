@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Validation\ValidationException;
 
 class Kegiatan extends Model
 {
@@ -27,6 +28,15 @@ class Kegiatan extends Model
             'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::updating(function (self $activity) {
+            if ($activity->isDirty('id_kategori') && $activity->detail()->exists()) {
+                throw ValidationException::withMessages(['id_kategori' => 'Kategori kegiatan yang sudah memiliki jawaban tidak dapat langsung diubah.']);
+            }
+        });
     }
 
     public function statusTerkini(): HasOne
@@ -56,14 +66,31 @@ class Kegiatan extends Model
         return $this->belongsTo(Kategori::class, 'id_kategori');
     }
 
-    public function detail(): HasOne
+    public function detail(): HasMany
     {
-        return $this->hasOne(DetailKegiatan::class, 'id_kegiatan');
+        return $this->hasMany(DetailKegiatan::class, 'id_kegiatan', 'id_kegiatan')->orderBy('id_detail_kegiatan');
     }
 
-    public function prestasi(): HasOne
+    public function prestasi(): HasMany
     {
-        return $this->hasOne(Prestasi::class, 'id_kegiatan');
+        return $this->hasMany(Prestasi::class, 'id_kegiatan', 'id_kegiatan');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+
+    public function berita(): HasMany
+    {
+        return $this->hasMany(Berita::class, 'id_kegiatan', 'id_kegiatan');
+    }
+
+    public function nilaiIsian(string $input): ?string
+    {
+        $details = $this->relationLoaded('detail') ? $this->detail : $this->detail()->with('isianKategori')->get();
+
+        return $details->first(fn ($detail) => $detail->isianKategori?->input === $input)?->isian;
     }
 
     public function dokumen(): HasMany

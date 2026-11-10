@@ -4,7 +4,7 @@
         'Prestasi' => ['route' => 'mahasiswa.prestasi', 'match' => 'mahasiswa.prestasi*'],
     ];
     $dashboardActive = request()->routeIs('mahasiswa.dashboard');
-    $mhsActive = request()->routeIs('mahasiswa.index', 'mahasiswa.mata-kuliah*', 'mahasiswa.prestasi*', 'mahasiswa.kegiatan', 'mahasiswa.profil');
+    $mhsActive = request()->routeIs('mahasiswa.index', 'mahasiswa.mata-kuliah*', 'mahasiswa.prestasi*', 'mahasiswa.profil');
     $mhsOpen = $mhsActive;
     $item = 'flex h-10 items-center gap-2 rounded-lg px-3 text-base tracking-[-0.18px] transition';
     $on = 'bg-[#2277FF] text-white';
@@ -13,7 +13,7 @@
 @endphp
 <aside class="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-6 overflow-y-auto border-r border-[#E5E7EB] bg-white pt-4 lg:flex">
     <div class="flex items-center gap-2.5 px-1">
-        <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0" />
+        <img src="{{ asset('images/logo_trk remove.png') }}" alt="Logo TRK" class="h-10 w-auto shrink-0" />
         <div class="text-[13px] font-bold leading-[1.15] tracking-tight text-[#003385]">
             TEKNOLOGI<br />REKAYASA KOMPUTER
         </div>
@@ -54,8 +54,8 @@
             </div>
         </div>
 
-        <a href="{{ route('mahasiswa.kegiatan') }}" @if (request()->routeIs('mahasiswa.kegiatan')) aria-current="page" @endif class="{{ $item }} {{ request()->routeIs('mahasiswa.kegiatan') ? $on : $off }}">
-            <i class="{{ $icon }} ti-rocket {{ request()->routeIs('mahasiswa.kegiatan') ? 'text-white' : 'text-[#2B3F6C]' }}"></i>
+        <a href="{{ route('kegiatan.index') }}" @if (request()->routeIs('kegiatan.*')) aria-current="page" @endif class="{{ $item }} {{ request()->routeIs('kegiatan.*') ? $on : $off }}">
+            <i class="{{ $icon }} ti-rocket {{ request()->routeIs('kegiatan.*') ? 'text-white' : 'text-[#2B3F6C]' }}"></i>
             <span class="flex-1">Kegiatan</span>
         </a>
     </nav>

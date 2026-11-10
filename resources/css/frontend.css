@@ -41,4 +41,20 @@ a.student-nav-link:hover,.student-nav-link.is-active{background:#eff6ff;color:#1
     .frontend-main :where(.rounded-lg,.rounded-xl,.rounded-2xl):where(.p-6,.p-8){padding:20px 16px}
     .frontend-main .dashboard-profile .group-hover\:text-white{overflow-wrap:anywhere}
 }
+@media(max-width:767px){
+    .mahasiswa-shell .frontend-main{padding:20px 12px 32px}
+    .pengajuan-shell .frontend-main{padding:0}
+    .mahasiswa-shell .frontend-main>div.flex.flex-col.gap-6{gap:16px}
+    .mahasiswa-shell .frontend-main :where(.rounded-lg,.rounded-xl,.rounded-2xl):where(.p-5,.p-6,.p-7,.p-8){padding:16px 14px}
+    .mahasiswa-shell .frontend-main h1{font-size:23px;line-height:30px}
+    .mahasiswa-shell .frontend-main h2{font-size:18px;line-height:26px}
+    .mahasiswa-shell .dashboard-profile{padding:16px 14px}
+    .mahasiswa-shell .dashboard-profile>div>div:first-child{gap:12px}
+    .mahasiswa-shell .dashboard-profile h1{font-size:20px;line-height:28px}
+    .mahasiswa-shell .dashboard-profile .size-20{width:56px;height:56px}
+    .mahasiswa-shell .semester-chart .pointer-events-none{display:none}
+    .pengajuan-shell header .h-14{height:52px}
+    .pengajuan-shell header .size-10{width:36px;height:36px}
+    .pengajuan-shell header [aria-controls=mobile-pengajuan-nav]{min-height:40px;height:40px}
+}
 @media(prefers-reduced-motion:reduce){.frontend-shell *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}

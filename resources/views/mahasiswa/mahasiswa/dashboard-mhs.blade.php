@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Dashboard Mahasiswa')
 
@@ -10,28 +10,24 @@
     $persen  = $ringkasan['sks_total'] > 0 ? round($ringkasan['sks_tempuh'] / $ringkasan['sks_total'] * 100) : 0;
     $selectCls = 'w-full appearance-none rounded-lg border border-[#E5E7EB] bg-white py-2 pl-3.5 pr-9 text-sm text-[#0A0A0A] outline-none focus:border-[#27F]';
 
-    // Kartu statistik: bentuk kartu dan judul (tebal) diatur di sini, tidak lagi lewat komponen stat-card.
-    $kartuCls  = 'flex h-full flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]';
-    $judulCls  = 'text-sm font-bold text-[#111827]';
-    $ikonCls   = 'shrink-0 text-[#2277FF]';
-
-    // Gaya isi kartu statistik
-    $angkaCls  = 'text-3xl font-bold leading-none';
+    // Gaya kartu statistik dashboard ini, tanpa mengubah komponen yang dipakai halaman lain.
+    $kartuCls  = 'group relative flex h-full flex-col gap-3 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-3 pl-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D1D5DB] hover:shadow-md sm:p-5 sm:pl-6';
+    $judulCls  = 'text-xs font-bold text-[#111827] sm:text-sm';
+    $angkaCls  = 'text-2xl font-bold leading-none sm:text-3xl';
     $satuanCls = 'text-xs text-[#6B7280]';
     $ketCls    = 'text-xs text-[#6B7280]';
 @endphp
 
 <div class="flex flex-col gap-6">
 
-    {{-- Kartu statistik (judul kartu tebal) --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-
-        {{-- Tahun Akademik --}}
+    {{-- Kartu statistik --}}
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <div class="{{ $kartuCls }}">
+            <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #2277FF"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">Tahun Akademik</span>
-                <span class="{{ $ikonCls }}">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -43,12 +39,12 @@
             </div>
         </div>
 
-        {{-- SKS Ditempuh --}}
         <div class="{{ $kartuCls }}">
+            <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #06B6D4"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">SKS Ditempuh</span>
-                <span class="{{ $ikonCls }}">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#ECFEFF] text-[#0891B2] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -63,12 +59,12 @@
             </div>
         </div>
 
-        {{-- Semester Berjalan --}}
         <div class="{{ $kartuCls }}">
+            <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #8B5CF6"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">Semester Berjalan</span>
-                <span class="{{ $ikonCls }}">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#F5F3FF] text-[#7C3AED] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -80,12 +76,12 @@
             </div>
         </div>
 
-        {{-- Pengajuan Aktif --}}
         <div class="{{ $kartuCls }}">
+            <span class="absolute inset-y-0 left-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: #10B981"></span>
             <div class="flex items-start justify-between gap-3">
                 <span class="{{ $judulCls }}">Pengajuan Aktif</span>
-                <span class="{{ $ikonCls }}">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2"/><path d="M9 15l2 2l4-4"/></svg>
+                <span class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#ECFDF5] text-[#059669] transition-transform duration-300 group-hover:scale-110 sm:size-10">
+                    <svg class="size-4 sm:size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2"/><path d="M9 15l2 2l4-4"/></svg>
                 </span>
             </div>
             <div class="flex flex-col gap-2.5">
@@ -98,12 +94,13 @@
         </div>
     </div>
 
+
     {{-- Filter dan tabel mata kuliah --}}
     <section class="flex flex-col gap-4 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]">
         <form method="GET" action="{{ url()->current() }}" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_180px_180px_180px_auto]">
             <div class="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3.5 py-2 focus-within:border-[#27F] sm:col-span-2 xl:col-span-1">
                 <svg class="size-4 shrink-0 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0"/><path d="M21 21l-6-6"/></svg>
-                <input type="search" name="q" value="{{ $filter['q'] }}" placeholder="Cari mata kuliah atau dosen..."
+                <input type="search" name="q" value="{{ $filter['q'] }}" data-live-search placeholder="Cari mata kuliah atau dosen..."
                        class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#A8A8A8]">
             </div>
 
@@ -131,7 +128,7 @@
             <button type="submit" class="sr-only">Terapkan</button>
         </form>
 
-        <div class="overflow-x-auto rounded-lg border border-[#E5E7EB]">
+        <div class="hidden overflow-x-auto rounded-lg border border-[#E5E7EB] md:block">
             {{-- table-fixed + colgroup: lebar kolom dikunci, tidak lagi mengikuti isi data --}}
             <table class="w-full min-w-[760px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
@@ -168,7 +165,34 @@
             </table>
         </div>
 
-        {{ $mataKuliah->links('mahasiswa.pagination.mahasiswa') }}
+        <div class="flex flex-col gap-3 md:hidden">
+            @forelse ($mataKuliah as $mk)
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3.5">
+                    <div class="min-w-0">
+                        <h2 class="break-words text-sm font-semibold text-[#111827]">{{ $mk['mk'] }}</h2>
+                        <p class="mt-1 break-words text-xs text-[#6B7280]">{{ $mk['dosen'] }}</p>
+                    </div>
+                    <dl class="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div>
+                            <dt class="text-[#6B7280]">Tingkat</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">Tingkat {{ $mk['tingkat'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-[#6B7280]">Semester</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $mk['semester'] }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="text-[#6B7280]">Tahun Akademik</dt>
+                            <dd class="mt-0.5 font-medium text-[#111827]">{{ $mk['tahun'] ?? ($mk['tahun_akademik'] ?? '—') }}</dd>
+                        </div>
+                    </dl>
+                </article>
+            @empty
+                <p class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">Tidak ada mata kuliah yang cocok dengan filter.</p>
+            @endforelse
+        </div>
+
+        {{ $mataKuliah->links('mahasiswa.mahasiswa.pagination.mahasiswa') }}
     </section>
 </div>
 @endsection

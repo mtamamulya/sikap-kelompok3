@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.mahasiswa-tim')
 
 @section('title', 'Prestasi mahasiswa')
 
@@ -37,7 +37,7 @@
 
     $bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    $namaMhs = $nama ?? 'Arya Bima';
+    $namaMhs = $nama ?? config('mahasiswa.nama');
 
     // Prestasi tim yang dibuat orang lain, di mana mahasiswa ini hanya DITAG sebagai anggota.
     // Untuk prestasi ini hanya tombol "lihat" yang tersedia (tanpa edit dan hapus).
@@ -46,17 +46,7 @@
 
     $prestasi = collect($rows)->map(function ($r, $i) use ($bulan, $ditagIds, $namaMhs) {
         $tgl   = \Illuminate\Support\Carbon::parse($r[7]);
-        $slug  = \Illuminate\Support\Str::slug($r[0]);
         $ditag = in_array($i + 1, $ditagIds, true);
-
-        // Bukti prestasi berupa TAUTAN (mis. Google Drive) yang diinput di halaman tambah prestasi.
-        // jenis = 'Sertifikat' atau 'Dokumentasi kegiatan'. Data asli: isi 'url' dari link_dokumen.
-        $bukti = [
-            ['jenis' => 'Sertifikat', 'url' => 'https://drive.google.com/file/d/contoh-sertifikat-' . $slug . '/view'],
-        ];
-        if ($r[2] === 'Tim') {
-            $bukti[] = ['jenis' => 'Dokumentasi kegiatan', 'url' => 'https://drive.google.com/drive/folders/contoh-dokumentasi-' . $slug];
-        }
 
         return [
             'id' => $i + 1,
@@ -70,7 +60,7 @@
             'tanggal' => $tgl->format('d') . ' ' . $bulan[$tgl->month - 1] . ' ' . $tgl->year,
             'tahun' => $tgl->year,
             'kegiatan' => $r[8] ?? 'Tidak terkait',
-            'bukti' => $bukti,
+            'bukti' => $r[9] ?? [],
             'ditag' => $ditag,
             'pembuat' => $ditag ? 'Ivan Sigit Santoso' : $namaMhs,
             'bisaUbah' => ! $ditag, // hanya pembuat yang boleh edit dan hapus
@@ -81,40 +71,32 @@
     $akademik = collect($prestasi)->where('jenis', 'Akademik')->count();
     $nonakademik = collect($prestasi)->where('jenis', 'Nonakademik')->count();
 
-    // URL aksi. Buat route ini di routes/web.php; jika belum ada, tombol edit tidak berpindah halaman
-    // dan hapus bekerja dalam mode contoh (baris hilang dari daftar dan tersimpan di browser).
-    //   Route::get('/mahasiswa/prestasi/{prestasi}/edit', ...)->name('mahasiswa.prestasi.edit');
-    //   Route::delete('/mahasiswa/prestasi/{prestasi}', ...)->name('mahasiswa.prestasi.hapus');
+    // URL aksi memakai route mahasiswa.prestasi.* yang terdaftar di routes/web.php.
     $urlEdit  = Route::has('mahasiswa.prestasi.edit')  ? route('mahasiswa.prestasi.edit', '__ID__')  : null;
     $urlHapus = Route::has('mahasiswa.prestasi.hapus') ? route('mahasiswa.prestasi.hapus', '__ID__') : null;
-    $urlDashboard = Route::has('mahasiswa.dashboard') ? route('mahasiswa.dashboard') : '#';
 
     // Ikon inline (Heroicons outline) supaya tidak perlu paket tambahan.
     $paths = [
         'plus' => 'M12 4.5v15m7.5-7.5h-15',
         'search' => 'm21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z',
         'down' => 'm19.5 8.25-7.5 7.5-7.5-7.5',
-        'left' => 'M15.75 19.5 8.25 12l7.5-7.5',
-        'right' => 'm8.25 4.5 7.5 7.5-7.5 7.5',
+        'link' => 'M13.19 8.53 9.84 11.88a3 3 0 0 0 4.24 4.24l3.54-3.54a5 5 0 0 0-7.07-7.07L8.52 7.54m2.29 7.93 3.35-3.35a3 3 0 0 0-4.24-4.24l-3.54 3.54a5 5 0 0 0 7.07 7.07l2.03-2.03',
         'info' => 'm11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z',
         'book' => 'M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25',
         'laptop' => 'M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25',
         'award' => 'M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z',
         'close' => 'M6 18 18 6M6 6l12 12',
         'external' => 'M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25',
-        'link' => 'M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244',
         'eye' => 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
         'pencil' => 'm16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.862 4.487Zm0 0L19.5 7.125',
         'trash' => 'm14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0',
     ];
     $icon = fn (string $n, string $c = 'size-5') => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="' . $c . '" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="' . $paths[$n] . '"/></svg>';
 
-    // Kontrol filter: tinggi 40px, gaya sama dengan halaman Mata Kuliah
-    $filter = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white text-sm text-[#0A0A0A] outline-none transition-colors hover:border-[#C7D2E5] focus:border-[#2277FF]';
-
-    // Tabel: header abu-abu muda dengan teks gelap, isi teks biasa
-    $th = 'px-4 text-left text-xs font-semibold text-[#111827]';
-    $td = 'px-4 py-3 align-middle text-[13px] text-[#111827]';
+    $filter = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white text-sm text-[#0A0A0A] outline-none transition-colors hover:border-[#C7D2E5] focus:border-[#2277FF] focus:ring-2 focus:ring-[#2277FF]/15';
+    $th = 'px-4 text-left text-xs font-semibold text-[#6B7280]';
+    $td = 'px-4 py-3 align-middle text-[13px] text-[#4B5563]';
+    $pageBtn = 'rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-[#0062FF] transition hover:bg-[#EFF6FF] disabled:cursor-not-allowed disabled:text-[#A8A8A8] disabled:hover:bg-white';
 
     // Tombol aksi di tabel: kotak 32px, warna lembut (biru = lihat, oranye = edit, merah = hapus)
     $aksiBtn = 'flex h-8 shrink-0 items-center justify-center rounded-lg transition focus-visible:outline-2 focus-visible:outline-offset-2';
@@ -135,15 +117,13 @@
         <div class="rounded-xl border border-[#D6EDB5] bg-[#E6F3D3] px-4 py-3 text-sm font-medium text-[#4C7D08]">{{ session('status') }}</div>
     @endif
 
-    {{-- Judul + breadcrumb + tombol tambah --}}
+    {{-- Judul --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
             <h1 class="text-[32px] font-bold leading-[38px] tracking-[-0.2px] text-[#111827]">Prestasi Mahasiswa</h1>
-            <p class="text-lg text-[#6B7280]">
-            </p>
             <p class="text-sm text-[#6B7280]">Kelola catatan pencapaian akademik dan nonakademik Anda.</p>
         </div>
-        <a href="{{ route('mahasiswa.prestasi.tambah') }}" class="inline-flex items-center gap-2 rounded-lg bg-[#2277FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1A63D9]">
+        <a href="{{ route('mahasiswa.prestasi.tambah') }}" class="inline-flex items-center gap-2 rounded-lg bg-[#2277FF] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1A63D9]">
             {!! $icon('plus') !!}
             Tambah prestasi
         </a>
@@ -151,7 +131,7 @@
 
     {{-- Kartu ringkasan: komponen x-mahasiswa.stat-card; angka mengikuti daftar yang tampil --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-        <x-mahasiswa.stat-card label="Total Prestasi">
+        <x-mahasiswa.stat-card label="Total prestasi" accent="#2277FF" icon-bg="#EFF6FF" icon-color="#2563EB">
             <x-slot:icon>{!! $icon('award') !!}</x-slot:icon>
             <div class="flex flex-wrap items-end gap-x-2 gap-y-1">
                 <span class="{{ $angkaCls }}" x-text="semua.length">{{ $total }}</span>
@@ -159,7 +139,7 @@
             </div>
         </x-mahasiswa.stat-card>
 
-        <x-mahasiswa.stat-card label="Akademik">
+        <x-mahasiswa.stat-card label="Akademik" accent="#8B5CF6" icon-bg="#F5F3FF" icon-color="#7C3AED">
             <x-slot:icon>{!! $icon('book') !!}</x-slot:icon>
             <div class="flex flex-wrap items-end gap-x-2 gap-y-1">
                 <span class="{{ $angkaCls }}" x-text="hitung('Akademik')">{{ $akademik }}</span>
@@ -167,7 +147,7 @@
             </div>
         </x-mahasiswa.stat-card>
 
-        <x-mahasiswa.stat-card label="Nonakademik">
+        <x-mahasiswa.stat-card label="Nonakademik" accent="#F59E0B" icon-bg="#FFFBEB" icon-color="#D97706">
             <x-slot:icon>{!! $icon('laptop') !!}</x-slot:icon>
             <div class="flex flex-wrap items-end gap-x-2 gap-y-1">
                 <span class="{{ $angkaCls }}" x-text="hitung('Nonakademik')">{{ $nonakademik }}</span>
@@ -176,19 +156,19 @@
         </x-mahasiswa.stat-card>
     </div>
 
-    {{-- Daftar prestasi: satu kartu putih bergaya desain Figma --}}
+    {{-- Daftar prestasi: kartu bergaya dashboard --}}
     <section class="flex flex-col gap-5 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)] sm:p-6">
         <div class="flex flex-col gap-1">
             <h2 class="text-xl font-bold text-[#111827]">Daftar Prestasi</h2>
-            <p class="text-sm text-[#6B7280]">Semua prestasi beserta capaian, penyelenggara, dan tautan bukti pendukung.</p>
+            <p class="text-sm text-[#6B7280]">Semua prestasi beserta capaian, penyelenggara, dan bukti pendukung.</p>
         </div>
 
-        {{-- Pencarian + filter dalam satu baris (label tetap ada untuk pembaca layar) --}}
         <form x-on:submit.prevent class="flex flex-wrap items-center gap-3">
             <div class="relative min-w-[240px] flex-1">
                 <label for="q" class="sr-only">Cari prestasi</label>
                 <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B7280]">{!! $icon('search', 'size-4') !!}</span>
-                <input id="q" x-model.debounce.200ms="q" placeholder="Cari judul prestasi..." class="{{ $filter }} pl-10 pr-3.5 placeholder:text-[#A8A8A8]">
+                <input id="q" x-model.debounce.200ms="q" placeholder="Cari judul prestasi..."
+                       class="{{ $filter }} pl-10 pr-3.5 placeholder:text-[#A8A8A8]">
             </div>
 
             @foreach ([
@@ -214,9 +194,9 @@
             </button>
         </form>
 
-        {{-- Tabel: 7 kolom, lebar dikunci (table-fixed + colgroup), tinggi baris tetap 64px,
-             tinggi minimum = header 44px + 10 baris x 64px + garis pemisah, supaya kartu tidak berubah tinggi antar halaman --}}
-        <div class="min-h-[696px] overflow-x-auto rounded-lg border border-[#E5E7EB]">
+        {{-- Tabel: 7 kolom, lebar dikunci (table-fixed + colgroup), tinggi baris tetap 80px,
+             tinggi minimum = header 44px + 8 baris x 80px + border 2px --}}
+        <div class="hidden overflow-x-auto rounded-xl border border-[#E5E7EB] md:block md:min-h-[686px]">
             <table class="w-full min-w-[900px] table-fixed border-collapse">
                 <colgroup>
                     <col class="w-[26%]"> {{-- Prestasi / lomba --}}
@@ -227,48 +207,58 @@
                     <col class="w-[7%]">  {{-- Tahun --}}
                     <col class="w-[15%]"> {{-- Aksi --}}
                 </colgroup>
-                <thead class="bg-[#F3F4F6]">
-                    <tr class="h-11">
+                <thead class="bg-[#F9FAFB]">
+                    <tr class="h-11 border-b border-[#E5E7EB]">
                         @foreach (['Prestasi / lomba', 'Capaian', 'Tingkat', 'Jenis', 'Penyelenggara', 'Tahun'] as $h)
                             <th scope="col" class="{{ $th }} whitespace-nowrap">{{ $h }}</th>
                         @endforeach
                         <th scope="col" class="{{ $th }} whitespace-nowrap text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-[#E5E7EB]">
+                <tbody class="divide-y divide-[#EEF0F3]">
                     <template x-for="p in tampil" :key="p.id">
-                        <tr class="h-[64px] transition-colors hover:bg-[#F9FAFB]">
+                        <tr class="h-[80px] transition-colors hover:bg-[#F5F8FF]">
                             {{-- Prestasi / lomba --}}
                             <td class="{{ $td }}">
-                                <div class="truncate text-[13px] font-medium leading-5 text-[#111827]" x-text="p.nama" x-bind:title="p.nama"></div>
-                                <div class="mt-0.5 flex items-center gap-1.5 text-xs text-[#6B7280]">
+                                <div class="{{ $clamp }} text-sm font-semibold leading-5 text-[#111827]" x-text="p.nama" x-bind:title="p.nama"></div>
+                                <div class="mt-1 flex items-center gap-1.5 text-xs text-[#6B7280]">
                                     <span class="truncate" x-text="p.kategori + ' • ' + p.bentuk"></span>
                                     <span x-show="p.ditag" class="shrink-0 rounded-md bg-[#EEF4FF] px-1.5 py-0.5 text-[11px] font-semibold text-[#0162DD]">Ditag</span>
                                 </div>
                             </td>
 
                             {{-- Capaian --}}
-                            <td class="{{ $td }} truncate" x-text="p.capaian" x-bind:title="p.capaian"></td>
+                            <td class="{{ $td }}">
+                                <span class="inline-flex max-w-full items-center truncate rounded-full bg-[#F3F4F6] px-2.5 py-1 text-xs font-semibold text-[#111827]" x-text="p.capaian"></span>
+                            </td>
 
                             {{-- Tingkat --}}
-                            <td class="{{ $td }} truncate" x-text="p.tingkat" x-bind:title="p.tingkat"></td>
+                            <td class="{{ $td }}">
+                                <span class="inline-flex max-w-full items-center truncate rounded-md border border-[#E5E7EB] bg-white px-2 py-0.5 text-xs font-medium text-[#374151]" x-text="p.tingkat"></span>
+                            </td>
 
                             {{-- Jenis --}}
-                            <td class="{{ $td }} truncate" x-text="p.jenis" x-bind:title="p.jenis"></td>
+                            <td class="{{ $td }}">
+                                <span class="inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                                      x-bind:class="p.jenis === 'Akademik'
+                                          ? 'border-[#B8D0FA] bg-[#EEF4FF] text-[#0162DD]'
+                                          : 'border-[#F5D9A8] bg-[#FFF7E6] text-[#B25E09]'"
+                                      x-text="p.jenis"></span>
+                            </td>
 
                             {{-- Penyelenggara --}}
                             <td class="{{ $td }}"><div class="{{ $clamp }}" x-text="p.penyelenggara" x-bind:title="p.penyelenggara"></div></td>
 
                             {{-- Tahun --}}
-                            <td class="{{ $td }} whitespace-nowrap" x-text="p.tahun"></td>
+                            <td class="{{ $td }} whitespace-nowrap font-medium" x-text="p.tahun"></td>
 
                             {{-- Aksi: semua bisa melihat; edit dan hapus hanya untuk pembuat (bukan anggota yang ditag).
                                  Lebar grup dikunci 112px dan diletakkan di tengah kolom, jadi tombol selalu rapi.
                                  Anggota yang ditag: satu tombol "Lihat" selebar grup. --}}
                             <td class="px-2 py-3 align-middle">
                                 <div class="mx-auto flex w-[112px] items-center justify-center gap-2">
-                                    <button type="button" title="Lihat detail prestasi" aria-label="Lihat detail prestasi"
-                                            x-on:click="lihatDetail(p)"
+                                    <button type="button" title="Lihat detail dan bukti" aria-label="Lihat detail dan bukti"
+                                            x-on:click="lihatBukti(p)"
                                             class="{{ $aksiBtn }} bg-[#E0EAFD] text-[#2277FF] hover:bg-[#CDDEFB] focus-visible:outline-[#2277FF]"
                                             x-bind:class="p.bisaUbah ? 'w-8' : 'w-full gap-1.5 text-xs font-semibold'">
                                         {!! $icon('eye', 'size-[18px]') !!}
@@ -305,52 +295,74 @@
             </table>
         </div>
 
-        {{-- Footer: keterangan jumlah di kiri, pagination bernomor di kanan --}}
-        <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6B7280]">
+        <div class="flex flex-col gap-3 md:hidden">
+            <div x-show="terfilter.length === 0" x-cloak class="rounded-xl border border-dashed border-[#D1D5DB] px-4 py-8 text-center text-sm text-[#6B7280]">
+                <span x-show="semua.length === 0">Belum ada prestasi yang tercatat.</span>
+                <span x-show="semua.length > 0">Tidak ada prestasi yang cocok dengan filter.</span>
+                <button type="button" x-show="semua.length > 0" x-on:click="reset()" class="ml-1 font-semibold text-[#0062FF] hover:underline">Reset filter</button>
+            </div>
+            <template x-for="p in tampil" :key="p.id">
+                <article class="flex min-w-0 flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+                    <div class="min-w-0">
+                        <div class="break-words text-sm font-semibold leading-5 text-[#111827]" x-text="p.nama"></div>
+                        <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#6B7280]">
+                            <span x-text="p.kategori + ' • ' + p.bentuk"></span>
+                            <span x-show="p.ditag" class="rounded-md bg-[#EEF4FF] px-1.5 py-0.5 text-[11px] font-semibold text-[#0162DD]">Ditag</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full bg-[#F3F4F6] px-2.5 py-1 text-xs font-semibold text-[#111827]" x-text="p.capaian"></span>
+                        <span class="rounded-md border border-[#E5E7EB] px-2 py-1 text-xs font-medium text-[#374151]" x-text="p.tingkat"></span>
+                        <span class="rounded-full border px-2.5 py-1 text-xs font-medium"
+                              x-bind:class="p.jenis === 'Akademik' ? 'border-[#B8D0FA] bg-[#EEF4FF] text-[#0162DD]' : 'border-[#F5D9A8] bg-[#FFF7E6] text-[#B25E09]'"
+                              x-text="p.jenis"></span>
+                    </div>
+                    <div class="flex min-w-0 items-start justify-between gap-3 border-t border-[#EEF0F3] pt-3 text-xs">
+                        <div class="min-w-0">
+                            <div class="break-words font-medium text-[#374151]" x-text="p.penyelenggara"></div>
+                            <div class="mt-1 text-[#6B7280]" x-text="p.tahun"></div>
+                        </div>
+                        <div class="flex shrink-0 items-center gap-2">
+                            <button type="button" title="Lihat detail dan bukti" aria-label="Lihat detail dan bukti"
+                                    x-on:click="lihatBukti(p)"
+                                    class="{{ $aksiBtn }} size-10 bg-[#E0EAFD] text-[#2277FF] hover:bg-[#CDDEFB] focus-visible:outline-[#2277FF]">
+                                {!! $icon('eye', 'size-[18px]') !!}
+                            </button>
+                            <template x-if="p.bisaUbah">
+                                <a x-bind:href="urlEdit(p)" title="Edit prestasi" aria-label="Edit prestasi"
+                                   class="{{ $aksiBtn }} size-10 bg-[#FDEBD3] text-[#F59E0B] hover:bg-[#FBDDB4] focus-visible:outline-[#F59E0B]">
+                                    {!! $icon('pencil', 'size-[18px]') !!}
+                                </a>
+                            </template>
+                            <template x-if="p.bisaUbah">
+                                <button type="button" title="Hapus prestasi" aria-label="Hapus prestasi"
+                                        x-on:click="mintaHapus(p)"
+                                        class="{{ $aksiBtn }} size-10 bg-[#FBCBCB] text-[#FF3F3F] hover:bg-[#F8B4B4] focus-visible:outline-[#FF3F3F]">
+                                    {!! $icon('trash', 'size-[18px]') !!}
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </article>
+            </template>
+        </div>
+
+        <div class="flex flex-col gap-3 text-xs text-[#6B7280] sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span x-text="terfilter.length
                     ? `${dari}–${sampai} dari ${terfilter.length} prestasi ditampilkan`
                     : '0 prestasi ditampilkan'"></span>
-                <span class="sr-only" aria-live="polite" x-text="`Halaman ${halaman} dari ${totalHalaman}`"></span>
                 <button type="button" x-show="dihapus.length > 0" x-cloak x-on:click="pulihkan()"
                         class="font-semibold text-[#0062FF] hover:underline">Pulihkan data contoh</button>
             </div>
 
-            <nav aria-label="Halaman daftar prestasi" class="flex flex-wrap items-center gap-2">
-                <button type="button" aria-label="Halaman sebelumnya" x-on:click="halaman--" x-bind:disabled="halaman <= 1"
-                        class="flex size-8 items-center justify-center rounded-md bg-[#2277FF] text-white transition hover:bg-[#1A63D9] disabled:cursor-not-allowed disabled:bg-[#B8D0FA] disabled:hover:bg-[#B8D0FA]">
-                    {!! $icon('left', 'size-4') !!}
-                </button>
-
-                <template x-for="(h, i) in daftarHalaman" x-bind:key="i">
-                    <button type="button" x-text="h"
-                            x-bind:disabled="h === '...'"
-                            x-bind:aria-current="h === halaman ? 'page' : null"
-                            x-on:click="if (h !== '...') halaman = h"
-                            class="flex size-8 items-center justify-center rounded-md border text-xs transition"
-                            x-bind:class="h === halaman
-                                ? 'border-[#2277FF] bg-white font-semibold text-[#2277FF]'
-                                : (h === '...'
-                                    ? 'cursor-default border-[#E5E7EB] bg-white text-[#6B7280]'
-                                    : 'border-[#E5E7EB] bg-white text-[#111827] hover:bg-[#F2F6FD]')"></button>
-                </template>
-
-                <button type="button" aria-label="Halaman berikutnya" x-on:click="halaman++" x-bind:disabled="halaman >= totalHalaman"
-                        class="flex size-8 items-center justify-center rounded-md bg-[#2277FF] text-white transition hover:bg-[#1A63D9] disabled:cursor-not-allowed disabled:bg-[#B8D0FA] disabled:hover:bg-[#B8D0FA]">
-                    {!! $icon('right', 'size-4') !!}
-                </button>
-            </nav>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <button type="button" class="{{ $pageBtn }}" x-on:click="halaman--" x-bind:disabled="halaman <= 1">Sebelumnya</button>
+                <span x-text="`Halaman ${halaman} dari ${totalHalaman}`"></span>
+                <button type="button" class="{{ $pageBtn }}" x-on:click="halaman++" x-bind:disabled="halaman >= totalHalaman">Berikutnya</button>
+            </div>
         </div>
     </section>
-
-    {{-- Tips --}}
-    <div class="flex items-start gap-3 rounded-xl bg-[#EFF6FF] p-4 text-[#003385]">
-        <span class="mt-0.5 shrink-0">{!! $icon('award') !!}</span>
-        <div class="flex flex-col gap-0.5">
-            <span class="text-sm font-semibold">Catat prestasi Anda dengan bukti yang lengkap</span>
-            <p class="text-[13px] leading-[1.5]">Prestasi dapat ditambahkan dari kegiatan sebelumnya atau secara mandiri tanpa kegiatan terkait.</p>
-        </div>
-    </div>
 
     {{-- Form tersembunyi untuk menghapus (dipakai saat route hapus sudah dibuat) --}}
     <form x-ref="formHapus" method="POST" action="#" class="hidden">
@@ -380,7 +392,7 @@
                 <h2 id="judul-hapus" class="mt-4 text-lg font-bold text-[#111827]">Hapus prestasi?</h2>
                 <p class="mt-2 text-sm leading-5 text-[#6B7280]">
                     Prestasi <span class="font-semibold text-[#111827]" x-text="hapusPrestasi.nama"></span>
-                    beserta tautan bukti pendukungnya akan dihapus dari daftar.
+                    beserta bukti pendukungnya akan dihapus dari daftar.
                 </p>
                 <div class="mt-6 flex justify-end gap-2">
                     <button type="button" x-on:click="batalHapus()"
@@ -393,13 +405,13 @@
     </template>
 
     {{-- ================= MODAL: DETAIL PRESTASI ================= --}}
-    <template x-if="detailPrestasi">
+    <template x-if="buktiPrestasi">
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
              role="dialog" aria-modal="true" aria-labelledby="judul-detail"
-             x-on:keydown.escape.window="tutupDetail()">
+             x-on:keydown.escape.window="tutupBukti()">
 
             {{-- Latar gelap: klik untuk menutup --}}
-            <div class="absolute inset-0 bg-black/50" x-on:click="tutupDetail()"></div>
+            <div class="absolute inset-0 bg-black/50" x-on:click="tutupBukti()"></div>
 
             <div class="relative z-10 flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
 
@@ -407,9 +419,9 @@
                 <div class="flex items-start justify-between gap-4 border-b border-[#E5E7EB] px-5 py-4">
                     <div class="min-w-0">
                         <p class="text-xs font-medium text-[#6B7280]">Detail prestasi</p>
-                        <h2 id="judul-detail" class="text-lg font-bold leading-6 text-[#111827]" x-text="detailPrestasi.nama"></h2>
+                        <h2 id="judul-detail" class="text-lg font-bold leading-6 text-[#111827]" x-text="buktiPrestasi.nama"></h2>
                     </div>
-                    <button type="button" aria-label="Tutup" x-on:click="tutupDetail()"
+                    <button type="button" aria-label="Tutup" x-on:click="tutupBukti()"
                             class="shrink-0 rounded-lg p-1.5 text-[#6B7280] transition hover:bg-[#F3F4F6] hover:text-[#111827]">
                         {!! $icon('close', 'size-5') !!}
                     </button>
@@ -417,14 +429,13 @@
 
                 {{-- Isi --}}
                 <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
-
                     {{-- Catatan untuk anggota yang ditag --}}
-                    <div x-show="detailPrestasi.ditag" class="flex gap-2.5 rounded-xl bg-[#EEF4FF] p-3.5 text-[#003385]">
+                    <div x-show="buktiPrestasi.ditag" class="flex gap-2.5 rounded-xl bg-[#EEF4FF] p-3.5 text-[#003385]">
                         <span class="mt-0.5 shrink-0">{!! $icon('info', 'size-5') !!}</span>
-                        <p class="text-[13px] leading-5">Anda ditandai sebagai anggota tim oleh <span class="font-semibold" x-text="detailPrestasi.pembuat"></span>. Prestasi ini hanya dapat dilihat, tidak dapat diubah atau dihapus.</p>
+                        <p class="text-[13px] leading-5">Anda ditandai sebagai anggota tim oleh <span class="font-semibold" x-text="buktiPrestasi.pembuat"></span>. Prestasi ini hanya dapat dilihat, tidak dapat diubah atau dihapus.</p>
                     </div>
 
-                    {{-- Informasi prestasi --}}
+                    {{-- Semua informasi tampil penuh terlebih dahulu --}}
                     <div class="rounded-xl border border-[#E5E7EB] p-4">
                         <h3 class="text-sm font-semibold text-[#111827]">Informasi prestasi</h3>
                         <dl class="mt-3 flex flex-col gap-2.5 text-[13px]">
@@ -437,23 +448,28 @@
                         </dl>
                     </div>
 
-                    {{-- Tautan bukti (link Google Drive yang diinput saat menambah prestasi) --}}
+                    {{-- Link bukti ditempatkan di bawah seluruh informasi prestasi --}}
                     <div class="rounded-xl border border-[#E5E7EB] p-4">
                         <h3 class="text-sm font-semibold text-[#111827]">Tautan bukti prestasi</h3>
-
-                        <p x-show="detailPrestasi.bukti.length === 0" class="mt-3 text-[13px] text-[#6B7280]">Belum ada tautan bukti yang ditambahkan.</p>
-
+                        <p x-show="buktiPrestasi.bukti.length === 0" class="mt-3 text-[13px] text-[#6B7280]">
+                            Belum ada tautan bukti yang ditambahkan.
+                        </p>
                         <div class="mt-3 flex flex-col gap-2">
-                            <template x-for="(b, i) in detailPrestasi.bukti" :key="i">
-                                <div class="flex items-center gap-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] p-3">
+                            <template x-for="(b, i) in buktiPrestasi.bukti" :key="i">
+                                <div class="flex min-w-0 items-center gap-3 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] p-3">
                                     <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EEF4FF] text-[#0162DD]">
                                         {!! $icon('link', 'size-5') !!}
                                     </span>
                                     <div class="min-w-0 flex-1">
-                                        <p class="text-[13px] font-semibold text-[#111827]" x-text="b.jenis"></p>
-                                        <p class="truncate text-xs text-[#6B7280]" x-text="b.url" x-bind:title="b.url"></p>
+                                        <p class="text-[13px] font-semibold text-[#111827]" x-text="b.jenis || 'Dokumen bukti'"></p>
+                                        <template x-if="b.url">
+                                            <a x-bind:href="b.url" target="_blank" rel="noopener noreferrer"
+                                               class="block truncate text-xs text-[#6B7280] hover:text-[#0062FF]"
+                                               x-bind:title="b.url" x-text="b.url"></a>
+                                        </template>
+                                        <p x-show="!b.url" class="text-xs text-[#6B7280]">Tautan bukti belum tersedia.</p>
                                     </div>
-                                    <a x-bind:href="b.url" target="_blank" rel="noopener noreferrer"
+                                    <a x-show="b.url" x-bind:href="b.url" target="_blank" rel="noopener noreferrer"
                                        class="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-3 text-xs font-semibold text-[#0062FF] transition hover:bg-[#EFF6FF]">
                                         {!! $icon('external', 'size-4') !!} Buka
                                     </a>
@@ -465,7 +481,7 @@
 
                 {{-- Kaki --}}
                 <div class="flex justify-end border-t border-[#E5E7EB] px-5 py-3">
-                    <button type="button" x-on:click="tutupDetail()"
+                    <button type="button" x-on:click="tutupBukti()"
                             class="h-[38px] rounded-lg border border-[#E5E7EB] bg-white px-5 text-sm font-semibold text-[#111827] transition hover:bg-[#F3F4F6]">Tutup</button>
                 </div>
             </div>
@@ -476,7 +492,6 @@
 <script>
     // Dideklarasikan global supaya bisa dipakai x-data (Alpine dimuat setelah script ini).
     const DATA_PRESTASI = @js($prestasi);
-    const NAMA_MHS = @js($namaMhs);
     const URL_EDIT = @js($urlEdit);   // null jika route belum dibuat
     const URL_HAPUS = @js($urlHapus); // null jika route belum dibuat
     const KUNCI_HAPUS = 'prestasi-mhs-dihapus';
@@ -493,16 +508,15 @@
         return {
             semua: [],
             dihapus: [],       // id prestasi yang sudah dihapus (mode contoh)
-            namaMhs: NAMA_MHS,
             q: '',
             tingkat: '',
             jenis: '',
             tahun: '',
             halaman: 1,
-            perHalaman: 10,
+            perHalaman: 8,
 
             // Modal dan notifikasi
-            detailPrestasi: null,
+            buktiPrestasi: null,
             hapusPrestasi: null,
             toast: '',
             terakhir: null,    // prestasi yang baru dihapus (untuk Urungkan)
@@ -546,25 +560,6 @@
 
             get sampai() {
                 return Math.min(this.halaman * this.perHalaman, this.terfilter.length);
-            },
-
-            // Nomor halaman untuk pagination: 1 2 ... 9 10. Halaman aktif dan tetangganya selalu tampil.
-            get daftarHalaman() {
-                const total = this.totalHalaman;
-                const aktif = this.halaman;
-
-                if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-
-                const angka = [...new Set([1, 2, total - 1, total, aktif - 1, aktif, aktif + 1])]
-                    .filter(n => n >= 1 && n <= total)
-                    .sort((a, b) => a - b);
-
-                const hasil = [];
-                angka.forEach((n, i) => {
-                    if (i > 0 && n - angka[i - 1] > 1) hasil.push('...');
-                    hasil.push(n);
-                });
-                return hasil;
             },
 
             reset() {
@@ -647,9 +642,9 @@
                 this.tampilToast('Data contoh dipulihkan.');
             },
 
-            // ----- Aksi: lihat detail prestasi -----
+            // ----- Aksi: lihat detail dan bukti -----
             get detail() {
-                const p = this.detailPrestasi;
+                const p = this.buktiPrestasi;
                 if (!p) return [];
                 return [
                     ['Capaian', p.capaian],
@@ -664,13 +659,13 @@
                 ];
             },
 
-            lihatDetail(p) {
-                this.detailPrestasi = p;
+            lihatBukti(p) {
+                this.buktiPrestasi = p;
                 this.kunci(true);
             },
 
-            tutupDetail() {
-                this.detailPrestasi = null;
+            tutupBukti() {
+                this.buktiPrestasi = null;
                 this.kunci(false);
             },
         };
