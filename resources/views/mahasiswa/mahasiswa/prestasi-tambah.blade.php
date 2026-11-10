@@ -170,20 +170,24 @@
                     <div class="grid gap-4 sm:grid-cols-3">
                         @foreach ([
                             ['tingkat', 'Tingkat kejuaraan', 'Pilih tingkat',  $tingkatList, 'Dari kabupaten/kota hingga internasional'],
-                            ['capaian', 'Capaian peringkat', 'Pilih capaian',  $capaianList, 'Juara 1, 2, 3, dan seterusnya'],
+                            ['capaian', 'Capaian peringkat', 'Contoh: Juara 1 atau Best Paper',  [], 'Contoh: Juara 1, Best Paper, atau Finalis'],
                             ['jenis',   'Jenis prestasi',    'Pilih jenis',    $jenisList,   'Akademik atau nonakademik'],
                         ] as [$f, $judul, $placeholder, $opsi, $ket])
                             <div class="flex flex-col gap-1.5">
                                 <label for="{{ $f }}" class="{{ $label }}">{{ $judul }} {!! $wajib !!}</label>
-                                <div class="relative">
-                                    <select id="{{ $f }}" name="{{ $f }}" class="{{ $in($f) }} appearance-none pr-9">
-                                        <option value="">{{ $placeholder }}</option>
-                                        @foreach ($opsi as $o)
-                                            <option value="{{ $o }}" @selected($v($f) === $o)>{{ $o }}</option>
-                                        @endforeach
-                                    </select>
-                                    {!! $chev !!}
-                                </div>
+                                @if ($f === 'capaian')
+                                    <input id="{{ $f }}" name="{{ $f }}" value="{{ $v($f) }}" placeholder="{{ $placeholder }}" maxlength="100" class="{{ $in($f) }}">
+                                @else
+                                    <div class="relative">
+                                        <select id="{{ $f }}" name="{{ $f }}" class="{{ $in($f) }} appearance-none pr-9">
+                                            <option value="">{{ $placeholder }}</option>
+                                            @foreach ($opsi as $o)
+                                                <option value="{{ $o }}" @selected($v($f) === $o)>{{ $o }}</option>
+                                            @endforeach
+                                        </select>
+                                        {!! $chev !!}
+                                    </div>
+                                @endif
                                 {!! $galat($f) ?: '<span class="' . $hint . '">' . e($ket) . '</span>' !!}
                             </div>
                         @endforeach

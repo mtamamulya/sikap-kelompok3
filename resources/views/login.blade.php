@@ -65,20 +65,30 @@
                 <label class="flex w-full flex-col gap-1">
                     <span class="text-[13px] font-medium tracking-[-0.16px] text-[#374151]">Email</span>
                     <input type="email" name="email" value="{{ old('email') }}" required autocomplete="username" placeholder="Masukkan email terdaftar"
-                           class="h-10 w-full rounded-md border border-[#BDBDBD] bg-[#FEFEFE] px-3 text-sm text-[#2c2c2c] shadow-[1px_2px_2px_0_rgba(0,0,0,0.12)_inset] outline-none placeholder:text-[#A8A8A8] focus:border-[#2277FF]">
+                           class="font-['Plus_Jakarta_Sans',sans-serif] h-10 w-full rounded-md border border-[#BDBDBD] bg-[#FEFEFE] px-3 text-sm text-[#2c2c2c] shadow-[1px_2px_2px_0_rgba(0,0,0,0.12)_inset] outline-none placeholder:text-[#A8A8A8] focus:border-[#2277FF]">
                     <span class="text-[11px] tracking-[-0.12px] text-[#6B7280]">Gunakan email yang terhubung dengan POLINES.</span>
                 </label>
 
                 <label class="flex w-full flex-col gap-1">
                     <span class="text-[13px] font-medium tracking-[-0.16px] text-[#374151]">Sandi</span>
-                    <div class="flex items-center">
-                        <input type="password" name="password" required autocomplete="current-password" placeholder="Masukkan sandi" class="password h-10 w-full rounded-md border border-[#BDBDBD] bg-[#FEFEFE] px-3 text-sm text-[#2c2c2c] shadow-[1px_2px_2px_0_rgba(0,0,0,0.12)_inset] outline-none placeholder:text-[#A8A8A8] focus:border-[#2277FF]"
-                            class="h-10 w-full rounded-md border border-[#BDBDBD] bg-[#FEFEFE] px-3 text-sm text-[#2c2c2c] shadow-[1px_2px_2px_0_rgba(0,0,0,0.12)_inset] outline-none placeholder:text-[#A8A8A8] focus:border-[#2277FF]">
-                        <button type="button" class="togglePassword togglePassword focus:outline-none -ml-8" 
-                                class="focus:outline-none -ml-8">
-                            <img src=
-                                "https://media.geeksforgeeks.org/wp-content/uploads/20240227164304/visible.png" 
-                                 alt="" class="w-4">
+                    <div class="relative flex items-center" x-data="{ show: false }">
+                        <input :type="show ? 'text' : 'password'" name="password" required autocomplete="current-password" placeholder="Masukkan sandi"
+                               class="font-['Plus_Jakarta_Sans',sans-serif] h-10 w-full rounded-md border border-[#BDBDBD] bg-[#FEFEFE] pl-3 pr-10 text-sm text-[#2c2c2c] shadow-[1px_2px_2px_0_rgba(0,0,0,0.12)_inset] outline-none placeholder:text-[#A8A8A8] focus:border-[#2277FF]">
+                        <button type="button" @click="show = !show"
+                                class="absolute right-3 flex items-center justify-center text-[#757575] hover:text-[#2277FF] focus:outline-none"
+                                :aria-label="show ? 'Sembunyikan sandi' : 'Tampilkan sandi'">
+                            {{-- Ikon Mata Terbuka (saat show == false) --}}
+                            <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            {{-- Ikon Mata Dicoret (saat show == true) --}}
+                            <svg x-show="show" x-cloak xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+                                <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+                                <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+                                <path d="m2 2 20 20" />
+                            </svg>
                         </button>
                     </div>
                 </label>
