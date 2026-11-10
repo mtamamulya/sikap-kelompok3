@@ -11,7 +11,11 @@ class Pengajaran extends Model
 
     protected $primaryKey = 'id_pengajaran';
 
-    protected $fillable = ['id_enrollment_kelas_mk', 'id_dokumen'];
+    // Tambahkan atribut lain jika ada kolom tambahan di tabel pengajaran (misal: id_user, status, dll)
+    protected $fillable = [
+        'id_enrollment_kelas_mk',
+        'id_dokumen',
+    ];
 
     public function enrollmentKelasMataKuliah(): BelongsTo
     {

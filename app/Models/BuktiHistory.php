@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Validation\ValidationException;
 
 class BuktiHistory extends Model
 {
@@ -15,6 +16,17 @@ class BuktiHistory extends Model
         'id_dokumen',
         'id_timeline',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $proof) {
+            $document = Dokumen::find($proof->id_dokumen);
+            $timeline = Timeline::find($proof->id_timeline);
+            if (! $document || ! $timeline || $document->id_kegiatan !== $timeline->id_kegiatan) {
+                throw ValidationException::withMessages(['id_dokumen' => 'Dokumen bukti harus berasal dari kegiatan timeline yang sama.']);
+            }
+        });
+    }
 
     public function dokumen(): BelongsTo
     {

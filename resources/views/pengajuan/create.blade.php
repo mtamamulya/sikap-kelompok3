@@ -6,8 +6,9 @@
     $v = fn ($k, $def = '') => old($k, $d[$k] ?? $def);
     $input = 'h-10 w-full rounded-lg border border-[#E5E7EB] bg-white px-3 text-[13px] outline-none placeholder:text-[#9CA3AF] focus:border-[#2277FF]';
     $select = $input.' appearance-none pr-9';
-    $defaultMembers = [['name' => 'Ivan Sigit Santoso', 'role' => 'Anggota'], ['name' => 'Anisa Aulia Nurusyifa', 'role' => 'Anggota']];
-    $members = old('members') ? json_decode(old('members'), true) : ($d['members'] ?? $defaultMembers);
+    $members = old('members') !== null
+        ? (json_decode(old('members'), true) ?: [])
+        : ($d['members'] ?? []);
     $initialUploads = collect($item['documents'] ?? [])->map(fn ($f, $i) => [
         'id' => 'old'.$i, 'name' => $f['name'], 'size' => $f['size'], 'progress' => 100,
         'status' => 'done', 'path' => $f['path'], 'error' => '',

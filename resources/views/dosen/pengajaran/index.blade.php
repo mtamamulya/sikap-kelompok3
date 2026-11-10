@@ -5,27 +5,7 @@
 @section('content')
 
 @php
-    // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
-    $pengajaran = [
-        ['matkul' => 'Kecerdasan Buatan',   'kelas' => '2A', 'tahun' => '2025/2026', 'semester' => 'Ganjil'],
-        ['matkul' => 'Jaringan Komputer',   'kelas' => '2C', 'tahun' => '2025/2026', 'semester' => 'Ganjil'],
-        ['matkul' => 'Sistem Basis Data',   'kelas' => '3A', 'tahun' => '2025/2026', 'semester' => 'Genap'],
-        ['matkul' => 'Internet of Things',  'kelas' => '1B', 'tahun' => '2024/2025', 'semester' => 'Genap'],
-        ['matkul' => 'Computer Vision',     'kelas' => '2C', 'tahun' => '2024/2025', 'semester' => 'Ganjil'],
-        ['matkul' => 'Sistem Operasi',      'kelas' => '2A', 'tahun' => '2024/2025', 'semester' => 'Ganjil'],
-        ['matkul' => 'Jaringan Komputer',   'kelas' => '2B', 'tahun' => '2024/2025', 'semester' => 'Ganjil'],
-        ['matkul' => 'Sistem Basis Data',   'kelas' => '3A', 'tahun' => '2023/2024', 'semester' => 'Genap'],
-        ['matkul' => 'Sistem Operasi',      'kelas' => '1C', 'tahun' => '2023/2024', 'semester' => 'Genap'],
-        ['matkul' => 'Internet of Things',  'kelas' => '2A', 'tahun' => '2023/2024', 'semester' => 'Ganjil'],
-    ];
-
-    // id tetap (1, 2, 3, ...) supaya tautan ke Detail / Edit tidak berubah saat tabel dicari, difilter, atau diurutkan.
-    foreach ($pengajaran as $n => &$d) { $d['id'] = $n + 1; }
-    unset($d);
-
-    $daftarKelas    = ['1A', '1B', '1C', '2A', '2B', '2C', '3A'];
-    $daftarTahun    = ['2025/2026', '2024/2025', '2023/2024'];
-    $daftarSemester = ['Ganjil', 'Genap'];
+    // $pengajaran, $daftarKelas, $daftarTahun, $daftarSemester dikirim oleh DosenPengajaranController@index.
 
     $selectClass = 'h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white pr-9 pl-3.5 text-[15px] text-gray-900';
 @endphp
@@ -42,8 +22,8 @@
         </a>
     </div>
 
-    {{-- Pencarian, filter, urut kolom, dan pagination berjalan di browser (Alpine.js + quick sort pada data tiruan).
-         Kalau backend sudah ada, pencarian / filter / urutan bisa diganti parameter ?q=...&urut=... dan pagination dari Laravel. --}}
+    {{-- Pencarian, filter, urut kolom, dan pagination berjalan di browser (Alpine.js + quick sort) atas data pengajaran dosen yang login.
+         Kalau datanya sudah banyak, bisa diganti parameter ?q=...&urut=... dan pagination dari Laravel. --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
              x-data="pengajaran(@js($pengajaran))">
 
@@ -55,7 +35,7 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full sm:w-46">
                 <label for="kelas" class="sr-only">Filter kelas</label>
                 <select id="kelas" x-model="f.kelas" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Kelas</option>
@@ -66,7 +46,7 @@
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full sm:w-46">
                 <label for="tahun" class="sr-only">Filter tahun akademik</label>
                 <select id="tahun" x-model="f.tahun" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>
@@ -77,7 +57,7 @@
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
-            <div class="relative w-46">
+            <div class="relative w-full sm:w-46">
                 <label for="semester" class="sr-only">Filter semester</label>
                 <select id="semester" x-model="f.semester" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Semester</option>

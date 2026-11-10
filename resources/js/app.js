@@ -22,11 +22,12 @@ function initializeNavigation() {
     if (!navigation || !key) return;
     let previouslyOpen = false;
     Alpine.effect(() => {
-        const open = mobile.matches && state[key];
+        const menuTerbuka = state[key];            // selalu dibaca, supaya efek ini selalu ikut berubah
+        const open = mobile.matches && menuTerbuka;
         navigation.inert = mobile.matches && !open;
         if (workspace) workspace.inert = open;
-        if (open && !previouslyOpen) requestAnimationFrame(() => navigation.querySelector('a,button,summary')?.focus());
-        if (!open && previouslyOpen) toggle?.focus();
+        if (open && !previouslyOpen) requestAnimationFrame(() => navigation.querySelector('a,button,summary')?.focus({ preventScroll: true }));
+        if (!open && previouslyOpen) toggle?.focus({ preventScroll: true });
         previouslyOpen = open;
     });
     mobile.addEventListener('change', () => {

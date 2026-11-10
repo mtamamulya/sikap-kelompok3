@@ -45,7 +45,7 @@
          Kalau backend sudah ada, pencarian / filter / urutan bisa diganti parameter ?q=...&urut=... dan pagination dari Laravel. --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
              x-data="penelitian(@js($penelitian))">
-
+ 
         <div class="flex flex-wrap items-center gap-4">
             <div class="relative min-w-60 flex-[1_1_320px]">
                 <label for="q" class="sr-only">Cari judul penelitian</label>
@@ -53,8 +53,8 @@
                 <input id="q" name="q" type="search" x-model="cari" x-on:input="halaman = 1" placeholder="Cari judul atau ketua penelitian..."
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
-
-            <div class="relative w-46">
+ 
+            <div class="relative w-full sm:w-46">
                 <label for="tahun" class="sr-only">Filter tahun</label>
                 <select id="tahun" x-model="f.tahun" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>
@@ -64,8 +64,8 @@
                 </select>
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
-
-            <div class="relative w-46">
+ 
+            <div class="relative w-full sm:w-46">
                 <label for="dana" class="sr-only">Filter sumber dana</label>
                 <select id="dana" x-model="f.dana" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Sumber Dana</option>

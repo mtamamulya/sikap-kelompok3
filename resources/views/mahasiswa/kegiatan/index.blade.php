@@ -4,6 +4,9 @@
 
 @section('content')
 @php
+    $liveActivities = $allActivities;
+    $liveSemesters = $semesters;
+
     // Data Statistik Ringkasan
     $summaryCards = [
         [
@@ -98,13 +101,22 @@
         ['id' => 18, 'name' => 'Kompetisi Robotics & Automation', 'type' => 'Lomba', 'date' => '18 Des 2024', 'raw_date' => '2024-12-18', 'status' => 'done', 'note' => 'Juara Harapan 1.', 'action' => 'Lihat detail', 'capaian' => 'Juara Harapan 1', 'tingkat' => 'Nasional', 'penyelenggara' => 'ITB Robotics Club', 'file_name' => 'sertifikat-robotics-2024.pdf', 'file_size' => '1.8 MB'],
     ];
 
-    $allActivities = array_merge($page1, $page2, $page3);
+    $allActivities = array_merge($page1, $page2, $page3, $liveActivities->all());
+    $categories = collect($allActivities)->pluck('type')->filter()->unique()->sort()->values();
+    if ($liveSemesters->isNotEmpty()) {
+        $semesters = $liveSemesters;
+    }
+    foreach ($summaryCards as &$card) {
+        $card['value'] = count(array_filter($allActivities, fn ($activity) => mb_strtoupper($activity['type']) === $card['label']
+            || ($card['label'] === 'KKL' && in_array(mb_strtolower($activity['type']), ['kkl', 'kuliah kerja lapangan'], true))));
+    }
+    unset($card);
 @endphp
 
-<div x-data="kegiatanApp(@js($allActivities))" class="flex flex-col gap-6">
+<div x-data="kegiatanApp(@js($allActivities), @js(array_merge([''], $categories->all())))" class="flex flex-col gap-6">
 
     <!-- Grid Ringkasan Kegiatan -->
-    <div class="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         @foreach($summaryCards as $c)
             <div class="group relative min-w-0 overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D1D5DB] hover:shadow-md sm:p-5">
                 <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300 group-hover:w-2" style="background-color: {{ $c['border_accent'] }};"></div>
@@ -129,7 +141,7 @@
     </div>
 
     <!-- Grafik Kegiatan per Semester (Dengan Efek Hover Fokus & Zoom Card) -->
-    <section class="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:border-[#D1D5DB] hover:shadow-lg sm:p-4 lg:hover:scale-[1.01]">
+    <section class="semester-chart flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:border-[#D1D5DB] hover:shadow-lg sm:p-4 lg:hover:scale-[1.01]">
         <div class="flex flex-col gap-0.5">
             <h2 class="text-xl font-bold text-[#111827]">Kegiatan per semester</h2>
             <p class="text-sm leading-[1.5] text-[#6B7280]">
@@ -208,7 +220,7 @@
                      x-transition:leave-end="opacity-0 translate-y-[-10px] scale-95"
                      class="absolute left-0 top-[64px] z-50 max-h-[240px] w-full overflow-y-auto rounded-xl border border-[#E5E7EB] bg-white py-1.5 shadow-xl scrollbar-hide">
 
-                    <template x-for="cat in ['', 'Lomba', 'Pengabdian', 'Volunteer', 'Kunjungan Industri', 'Kuliah Kerja Lapangan', 'Magang', 'Pelatihan', 'Seminar', 'Penelitian']">
+                    <template x-for="cat in categoryOptions" :key="cat">
                         <button type="button" @click="selectedCategory = cat; open = false"
                                 class="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs transition-colors"
                                 :class="selectedCategory === cat ? 'bg-[#EFF6FF] text-[#2563EB] font-semibold' : 'text-[#4B5563] hover:bg-[#F9FAFB] hover:text-[#111827]'">
@@ -291,9 +303,7 @@
                         </div>
                         <div class="w-[115px] text-xs text-[#6B7280]" x-text="a.date"></div>
                         <div class="flex w-[235px] flex-col items-start gap-1">
-                            <span class="rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]">
-                                Selesai
-                            </span>
+                            <span class="rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]" x-text="a.status === 'done' ? 'Selesai' : a.status"></span>
                             <span x-show="a.note" class="text-[11px] text-[#6B7280]" x-text="a.note"></span>
                         </div>
                         <div class="w-[195px] flex justify-end">
@@ -323,7 +333,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-2 border-t border-[#EEF0F3] pt-3">
                         <div class="flex min-w-0 flex-col gap-1">
                             <span class="text-xs text-[#6B7280]" x-text="a.date"></span>
-                            <span class="w-fit rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]">Selesai</span>
+                            <span class="w-fit rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]" x-text="a.status === 'done' ? 'Selesai' : a.status"></span>
                             <span x-show="a.note" class="break-words text-xs text-[#6B7280]" x-text="a.note"></span>
                         </div>
                         <button type="button" @click="openModal(a)" class="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg bg-[#EFF6FF] px-3 text-xs font-semibold text-[#2563EB] hover:bg-blue-100">
@@ -391,7 +401,7 @@
 
             <div class="flex items-start justify-between border-b border-[#F3F4F6] pb-4">
                 <div>
-                    <span class="text-xs font-semibold text-[#6B7280]">Bukti prestasi</span>
+                    <span class="text-xs font-semibold text-[#6B7280]">Detail kegiatan</span>
                     <h3 class="text-xl font-bold text-[#111827]" x-text="activeItem?.name"></h3>
                 </div>
                 <button @click="closeModal()" class="rounded-lg p-1 text-[#9CA3AF] hover:bg-gray-100 hover:text-[#111827] transition">
@@ -400,49 +410,34 @@
             </div>
 
             <div class="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-12">
-                <div class="lg:col-span-7 flex flex-col gap-3">
-                    <div class="flex items-center gap-2">
-                        <button @click="activeTab = 'sertifikat'"
-                                :class="activeTab === 'sertifikat' ? 'bg-[#2563EB] text-white font-semibold' : 'bg-white text-[#6B7280] hover:bg-gray-100'"
-                                class="rounded-lg px-3.5 py-1.5 text-xs transition border border-[#E5E7EB]">
-                            Dokumen 1 • Sertifikat
-                        </button>
-                        <button @click="activeTab = 'foto'"
-                                :class="activeTab === 'foto' ? 'bg-[#2563EB] text-white font-semibold' : 'bg-white text-[#6B7280] hover:bg-gray-100'"
-                                class="rounded-lg px-3.5 py-1.5 text-xs transition border border-[#E5E7EB]">
-                            Dokumen 2 • Foto kegiatan
-                        </button>
-                    </div>
-
-                    <div class="relative flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 text-center">
-                        <div x-show="activeTab === 'sertifikat'" class="w-full flex flex-col items-center">
-                            <div class="w-full max-w-md rounded-lg border-2 border-[#D97706] bg-white p-6 shadow-sm flex flex-col items-center text-center gap-2">
-                                <span class="text-[10px] font-bold tracking-widest text-[#1E3A8A] uppercase">FORUM INOVASI TEKNOLOGI</span>
-                                <h4 class="text-sm font-black tracking-wider text-[#1E3A8A] uppercase">SERTIFIKAT PENGHARGAAN</h4>
-                                <span class="text-[10px] text-[#6B7280] mt-2">Diberikan kepada</span>
-                                <span class="text-base font-bold text-[#111827] border-b border-[#E5E7EB] pb-0.5 px-4">{{ config('mahasiswa.nama') }}</span>
-                                <p class="text-[10px] text-[#4B5563] mt-1 max-w-[280px]">
-                                    sebagai <span class="font-semibold text-[#111827]" x-text="activeItem?.capaian || 'Peserta'"></span> pada <span class="font-semibold text-[#111827]" x-text="activeItem?.name"></span> tingkat <span class="font-semibold text-[#111827]" x-text="activeItem?.tingkat || 'Nasional'"></span>
-                                </p>
-                                <div class="mt-4 flex w-full justify-between items-end text-[9px] text-[#6B7280]">
-                                    <span x-text="activeItem?.date"></span>
-                                    <span class="border-t border-[#9CA3AF] pt-0.5 px-2">Penyelenggara</span>
+                <div class="lg:col-span-7">
+                    <section class="rounded-xl border border-[#E5E7EB] bg-white p-4">
+                        <h4 class="mb-3 text-xs font-bold text-[#111827]">Dokumen pendukung</h4>
+                        <div x-show="activeItem?.documents?.length" class="flex flex-col divide-y divide-[#F3F4F6]">
+                            <template x-for="(document, index) in activeItem?.documents || []" :key="document.id || index">
+                                <div class="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                                    <div class="min-w-0">
+                                        <p class="text-[11px] text-[#6B7280]" x-text="document.type || 'Dokumen pendukung'"></p>
+                                        <p class="break-all text-xs font-semibold text-[#111827]" x-text="document.name || 'Dokumen ' + (index + 1)"></p>
+                                    </div>
+                                    <a x-show="document.url" :href="document.url" target="_blank" rel="noopener noreferrer"
+                                       class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-[#2277FF] px-3 text-xs font-semibold text-white transition hover:bg-blue-600">
+                                        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 3h7v7m-1-6l-9 9"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/></svg>
+                                        Buka tautan
+                                    </a>
+                                    <span x-show="!document.url" class="text-xs text-[#9CA3AF]">Tautan belum tersedia</span>
                                 </div>
-                            </div>
-                            <span class="mt-3 text-[11px] text-[#9CA3AF]">Pratinjau contoh. File asli akan tampil di sini setelah diunggah.</span>
+                            </template>
                         </div>
-
-                        <div x-show="activeTab === 'foto'" class="w-full flex flex-col items-center justify-center min-h-[220px]">
-                            <svg class="size-12 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="mt-2 text-xs font-semibold text-[#4B5563]">Dokumentasi Foto Kegiatan</span>
-                            <span class="text-[11px] text-[#9CA3AF]">Foto saat kegiatan berlangsung</span>
-                        </div>
-                    </div>
+                        <p x-show="!activeItem?.documents?.length" class="text-xs text-[#6B7280]">
+                            Belum ada tautan dokumen pada data kegiatan ini.
+                        </p>
+                    </section>
                 </div>
 
                 <div class="lg:col-span-5 flex flex-col justify-between gap-4">
                     <div class="rounded-xl border border-[#E5E7EB] bg-white p-4">
-                        <h4 class="text-xs font-bold text-[#111827] mb-3">Detail prestasi</h4>
+                        <h4 class="mb-3 text-xs font-bold text-[#111827]">Informasi kegiatan</h4>
                         <div class="flex flex-col gap-2 text-xs">
                             <div class="flex justify-between"><span class="text-[#6B7280]">Capaian</span><span class="font-semibold text-[#111827]" x-text="activeItem?.capaian || 'Juara 2'"></span></div>
                             <div class="flex justify-between"><span class="text-[#6B7280]">Tingkat</span><span class="font-semibold text-[#111827]" x-text="activeItem?.tingkat || 'Nasional'"></span></div>
@@ -455,19 +450,6 @@
                         </div>
                     </div>
 
-                    <div class="rounded-xl border border-[#E5E7EB] bg-white p-4 flex flex-col gap-3">
-                        <h4 class="text-xs font-bold text-[#111827]">Dokumen</h4>
-                        <div class="flex flex-col gap-0.5">
-                            <span class="text-[11px] text-[#6B7280]">Sertifikat</span>
-                            <span class="text-xs font-semibold text-[#111827] break-all" x-text="activeItem?.file_name || 'sertifikat-kegiatan.pdf'"></span>
-                            <span class="text-[10px] text-[#9CA3AF]" x-text="activeItem?.file_size || '1.2 MB'"></span>
-                        </div>
-
-                        <button @click="downloadFile(activeItem)" class="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#2277FF] text-xs font-bold text-white hover:bg-blue-600 transition shadow-xs">
-                            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            <span>Unduh Sertifikat</span>
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -487,8 +469,9 @@
 
 <script>
 document.addEventListener('alpine:init', () => {
-    Alpine.data('kegiatanApp', (initialData) => ({
+    Alpine.data('kegiatanApp', (initialData, categoryOptions) => ({
         items: initialData,
+        categoryOptions,
         searchQuery: '',
         selectedCategory: '',
 
@@ -504,7 +487,6 @@ document.addEventListener('alpine:init', () => {
 
         isModalOpen: false,
         activeItem: null,
-        activeTab: 'sertifikat',
 
         init() {
             this.$watch('searchQuery', () => { this.page = 1; });
@@ -515,17 +497,11 @@ document.addEventListener('alpine:init', () => {
 
         openModal(item) {
             this.activeItem = item;
-            this.activeTab = 'sertifikat';
             this.isModalOpen = true;
         },
 
         closeModal() {
             this.isModalOpen = false;
-        },
-
-        downloadFile(item) {
-            if (!item) return;
-            alert(`Mengunduh berkas:\n"${item.file_name || 'sertifikat.pdf'}"`);
         },
 
         formatDateStr(dateStr) {

@@ -47,4 +47,9 @@ class EnrollmentTingkatKelas extends Model
             'id_enrollment_tingkat_kelas'
         );
     }
+
+    public function enrollmentKelasMataKuliah(): HasMany
+    {
+        return $this->hasMany(EnrollmentKelasMataKuliah::class, 'id_enrollment_tingkat_kelas', 'id_enrollment_tingkat_kelas');
+    }
 }
