@@ -35,14 +35,14 @@ class MahasiswaPrestasiDriveLinkTest extends TestCase
     public function test_prestasi_form_lists_dummy_and_session_submitted_activities(): void
     {
         $this->withSession(['pengajuan.items' => [[
-                'id' => 101,
-                'title' => 'Pengajuan Lomba dari sesi',
-                'category' => 'Lomba',
-                'status' => 'Diajukan',
-                'submitted_at' => now()->toIso8601String(),
-                'data' => ['organizer' => 'Penyelenggara sesi'],
-                'documents' => [],
-            ]]])
+            'id' => 101,
+            'title' => 'Pengajuan Lomba dari sesi',
+            'category' => 'Lomba',
+            'status' => 'Diajukan',
+            'submitted_at' => now()->toIso8601String(),
+            'data' => ['organizer' => 'Penyelenggara sesi'],
+            'documents' => [],
+        ]]])
             ->get(route('mahasiswa.prestasi.tambah'))
             ->assertOk()
             ->assertSee('Kompetisi Robotics &amp; Automation • Lomba', false)

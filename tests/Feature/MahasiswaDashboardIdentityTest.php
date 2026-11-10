@@ -65,7 +65,7 @@ class MahasiswaDashboardIdentityTest extends TestCase
 
         $this->actingAs(User::findOrFail($userId))
             ->post(route('logout'))
-            ->assertRedirect(route('login'));
+            ->assertRedirect(route('home'));
 
         $this->assertGuest();
     }

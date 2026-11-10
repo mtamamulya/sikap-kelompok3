@@ -246,6 +246,7 @@ class MahasiswaController extends Controller
                 'nama' => $activity['title'] ?? 'Pengajuan',
                 'penyelenggara' => $activity['penyelenggara'] ?? '',
             ]);
+
         return view('mahasiswa.mahasiswa.prestasi-tambah', [
             'nama' => config('mahasiswa.nama'),
             'profil' => ['nim' => config('mahasiswa.nim'), 'prodi' => config('mahasiswa.prodi')],
