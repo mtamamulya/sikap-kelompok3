@@ -59,6 +59,27 @@
                    x-on:input="nilai[f.nama] = $event.target.value" class="{{ $inputClass }}">
         </template>
 
+        {{-- Tanggal --}}
+        <template x-if="f.tipe === 'tanggal'">
+            <input :id="`d-${f.nama}`" :name="`detail[${f.nama}]`" type="date" :required="f.wajib"
+                   :value="nilai[f.nama] || ''" x-on:input="nilai[f.nama] = $event.target.value" class="{{ $inputClass }}">
+        </template>
+
+        {{-- Rupiah: titik ribuan otomatis. Backend nanti membuang titiknya sebelum disimpan. --}}
+        <template x-if="f.tipe === 'rupiah'">
+            <input :id="`d-${f.nama}`" :name="`detail[${f.nama}]`" type="text" inputmode="numeric" placeholder="Rp"
+                   :value="nilai[f.nama] || ''"
+                   x-on:input="$event.target.value = nilai[f.nama] = $event.target.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')"
+                   class="{{ $inputClass }}">
+        </template>
+
+        {{-- Terisi otomatis dari isian lain (misalnya Ranah dari Skim). Tidak bisa diketik, tetap ikut terkirim. --}}
+        <template x-if="f.tipe === 'turunan'">
+            <input :id="`d-${f.nama}`" :name="`detail[${f.nama}]`" type="text" readonly
+                   :value="(f.peta && f.peta[nilai[f.dari]]) || ''" :placeholder="f.placeholder || ''"
+                   class="{{ $inputClass }} bg-gray-50 text-gray-500">
+        </template>
+
         <p x-show="f.catatan" x-cloak x-text="f.catatan" class="text-[13px] text-gray-500"></p>
     </div>
 </template>
