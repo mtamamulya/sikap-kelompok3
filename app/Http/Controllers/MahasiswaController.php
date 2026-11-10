@@ -251,7 +251,6 @@ class MahasiswaController extends Controller
             'nama' => config('mahasiswa.nama'),
             'profil' => ['nim' => config('mahasiswa.nim'), 'prodi' => config('mahasiswa.prodi')],
             'tingkatList' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'],
-            'capaianList' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'],
             'jenisList' => ['Akademik', 'Nonakademik'],
             'jenisDokList' => ['Sertifikat', 'Dokumentasi kegiatan'],
             'daftarMahasiswa' => ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', config('mahasiswa.nama'), 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'],
@@ -313,7 +312,6 @@ class MahasiswaController extends Controller
     private function validasiPrestasi(Request $request): array
     {
         $tingkat = ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'];
-        $capaian = ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'];
         $jenisDok = ['Sertifikat', 'Dokumentasi kegiatan'];
 
         $validator = Validator::make($request->all(), [
@@ -324,7 +322,7 @@ class MahasiswaController extends Controller
             'lokasi' => ['required', 'string', 'max:150'],
             'dosen' => ['nullable', 'string', 'max:100'],
             'tingkat' => ['required', Rule::in($tingkat)],
-            'capaian' => ['required', Rule::in($capaian)],
+            'capaian' => ['required', 'string', 'max:100'],
             'jenis' => ['required', Rule::in(['Akademik', 'Nonakademik'])],
             'kategori' => ['nullable', 'string', 'max:100'],
             'tanggal_mulai' => ['required', 'date'],

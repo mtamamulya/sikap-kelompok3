@@ -29,7 +29,20 @@ class MahasiswaPrestasiDriveLinkTest extends TestCase
             ->assertOk()
             ->assertSee('Google Drive atau OneDrive')
             ->assertSee('Tambah')
+            ->assertSee('id="capaian" name="capaian"', false)
+            ->assertDontSee('<select id="capaian"', false)
             ->assertDontSee('type="file"', false);
+    }
+
+    public function test_prestasi_accepts_a_custom_capaian(): void
+    {
+        $this->post(route('mahasiswa.prestasi.simpan'), array_merge(
+            $this->dataPrestasi([
+                ['url' => 'https://drive.google.com/file/d/example/view', 'jenis' => 'Sertifikat'],
+            ]),
+            ['capaian' => 'Best Paper']
+        ))->assertRedirect(route('mahasiswa.prestasi'))
+            ->assertSessionHasNoErrors();
     }
 
     public function test_prestasi_form_lists_dummy_and_session_submitted_activities(): void
