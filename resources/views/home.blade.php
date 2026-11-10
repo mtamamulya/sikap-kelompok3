@@ -249,7 +249,14 @@
         </div>
     </section>
 
- {{-- Dosen --}}
+{{-- Dosen --}}
+    @php
+        // Hitung total data dosen yang tampil
+        $kartuDosen = isset($dosen) && $dosen !== null
+            ? array_map(fn ($d) => ['nama' => $d['nama'], 'foto' => $d['foto']], $dosen)
+            : array_map(fn ($l) => ['nama' => $l[0], 'foto' => $A . $l[1]], $lecturers);
+        $totalDosen = count($kartuDosen);
+    @endphp
     <section id="dosen" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] bg-[#0043AD] px-5 py-8 text-white md:py-10">
         <div class="mx-auto max-w-[1000px]">
             <h2 class="text-2xl font-extrabold leading-tight md:text-4xl">
@@ -261,22 +268,18 @@
             </p>
 
             <div class="relative mt-6 md:mt-8">
-                <button type="button" aria-label="Sebelumnya" data-scroll="-300" class="absolute -left-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
-                    <x-icon name="chevron-left" />
-                </button>
-                <button type="button" aria-label="Berikutnya" data-scroll="300" class="absolute -right-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
-                    <x-icon name="chevron-right" />
-                </button>
+                {{-- Tombol scroll kanan-kiri HANYA tampil jika jumlah dosen > 5 --}}
+                @if ($totalDosen > 5)
+                    <button type="button" aria-label="Sebelumnya" data-scroll="-300" class="absolute -left-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
+                        <x-icon name="chevron-left" />
+                    </button>
+                    <button type="button" aria-label="Berikutnya" data-scroll="300" class="absolute -right-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
+                        <x-icon name="chevron-right" />
+                    </button>
+                @endif
 
-                {{-- snap-x dihapus --}}
-                <div id="dosen-scroller" class="flex gap-3.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    @php
-                        // Mode database: dosen aktif dari database (foto hasil unggahan admin; tanpa foto -> inisial).
-                        // Mode json ($dosen = null): data sementara $lecturers di atas.
-                        $kartuDosen = isset($dosen) && $dosen !== null
-                            ? array_map(fn ($d) => ['nama' => $d['nama'], 'foto' => $d['foto']], $dosen)
-                            : array_map(fn ($l) => ['nama' => $l[0], 'foto' => $A . $l[1]], $lecturers);
-                    @endphp
+                {{-- Kontainer card: diberi justify-center jika dosen <= 5 --}}
+                <div id="dosen-scroller" data-count="{{ $totalDosen }}" class="flex gap-3.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden {{ $totalDosen <= 5 ? 'justify-center' : '' }}">
                     @forelse ($kartuDosen as $d)
                         <div class="relative h-[240px] w-[170px] shrink-0 overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1 md:h-[260px] md:w-[185px]">
                             @if ($d['foto'])
@@ -288,7 +291,8 @@
                             <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $d['nama'] }}</div>
                         </div>
                     @empty
-                        <p class="py-8 text-sm font-medium text-white/80">Belum ada data dosen.</p>
+                        {{-- Pesan kosongan dibuat full-width dan rata tengah --}}
+                        <p class="w-full py-8 text-center text-sm font-medium text-white/80">Belum ada data dosen.</p>
                     @endforelse
                 </div>
             </div>
@@ -546,28 +550,51 @@
 
 @push('scripts')
 <script>
-    // Slideshow hero: ganti slide tiap 5 detik (fade ease-out)
     (function () {
-        var INTERVAL = 5000;
-        var q = function (s) { return document.querySelectorAll(s); };
-        var imgs = q('[data-slide]'), caps = q('[data-caption]'), dots = q('[data-dot]');
-        var n = imgs.length, cur = 0, timer = null;
-        if (n < 2) return;
+        const scroller = document.getElementById('dosen-scroller');
+        if (!scroller) return;
 
-        function show(i) {
-            cur = (i + n) % n;
-            [imgs, caps, dots].forEach(function (list) {
-                list.forEach(function (el, k) { el.dataset.active = (k === cur) ? 'true' : 'false'; });
+        const totalDosen = Number(scroller.dataset.count || 0);
+
+        // Jika jumlah dosen <= 5, matikan slideshow otomatis dan handler tombol
+        if (totalDosen <= 5) return;
+
+        // Tombol panah manual
+        document.querySelectorAll('[data-scroll]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                scroller.scrollBy({ left: Number(btn.dataset.scroll), behavior: 'smooth' });
             });
-        }
-        function start() {
-            clearInterval(timer);
-            timer = setInterval(function () { show(cur + 1); }, INTERVAL);
-        }
-        dots.forEach(function (d) {
-            d.addEventListener('click', function () { show(parseInt(d.dataset.dot, 10)); start(); });
         });
-        start();
+
+        // Auto-roll bolak-balik
+        let isHovered = false;
+        let direction = 1; // 1 = geser ke kanan, -1 = geser ke kiri
+        const speed = 0.8;  // Kecepatan gulir
+
+        function autoRoll() {
+            if (!isHovered) {
+                scroller.scrollLeft += speed * direction;
+
+                // Jika sudah sampai paling kanan, balik arah ke kiri
+                if (Math.ceil(scroller.scrollLeft + scroller.clientWidth) >= scroller.scrollWidth - 1) {
+                    direction = -1;
+                } 
+                // Jika sudah sampai paling kiri, balik arah ke kanan
+                else if (scroller.scrollLeft <= 0) {
+                    direction = 1;
+                }
+            }
+            requestAnimationFrame(autoRoll);
+        }
+
+        requestAnimationFrame(autoRoll);
+
+        // Pause saat kursor berada di atas foto atau disentuh di HP
+        const container = scroller.parentElement;
+        container.addEventListener('mouseenter', () => isHovered = true);
+        container.addEventListener('mouseleave', () => isHovered = false);
+        container.addEventListener('touchstart', () => isHovered = true, { passive: true });
+        container.addEventListener('touchend', () => isHovered = false);
     })();
 </script>
 @endpush

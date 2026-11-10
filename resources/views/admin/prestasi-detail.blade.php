@@ -3,6 +3,38 @@
 @section('title', 'Detail Prestasi')
 
 @section('content')
+@php
+    // Controller mengirim daftar bukti berbentuk ['id' => ..., 'link' => ...].
+    // Tampilkan hanya URL HTTP(S) atau berkas publik yang dikelola controller.
+    $tautanBukti = collect($prestasi['bukti'] ?? [])->map(function ($bukti) {
+        $path = $bukti['link'] ?? null;
+        if (!is_string($path) || $path === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'bukti-prestasi/') && !str_contains($path, '..')) {
+            $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        } elseif (preg_match('~^https?://~i', $path)) {
+            $url = $path;
+        } else {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo(parse_url($url, PHP_URL_PATH) ?: '', PATHINFO_EXTENSION));
+        return [
+            'url' => $url,
+            'is_image' => in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true),
+        ];
+    })->filter()->values();
+
+    $gambarBukti = $tautanBukti->first(fn ($bukti) => $bukti['is_image']);
+    $pdfBukti = $tautanBukti->first(
+        fn ($bukti) => strtolower(
+            pathinfo(parse_url($bukti['url'], PHP_URL_PATH) ?: '', PATHINFO_EXTENSION)
+        ) === 'pdf'
+    );
+@endphp
+
 <main class="flex flex-col gap-8 px-4 py-8 sm:px-6">
     {{-- Header & Kembali --}}
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -23,29 +55,57 @@
         {{-- Kolom Kiri: Sertifikat/Foto & Anggota Tim --}}
         <div class="flex flex-1 flex-col gap-6 rounded-lg bg-white p-6 shadow-sm">
             <div class="aspect-[16/9] w-full overflow-hidden rounded-xl bg-[#F3F4F6]">
-                <img src="{{ asset('images/slides/PBL.jpeg') }}" alt="{{ $prestasi['nama'] }}" class="h-full w-full object-cover">
+                @if ($gambarBukti)
+                    <img
+                        src="{{ $gambarBukti['url'] }}"
+                        alt="Bukti prestasi: {{ $prestasi['nama'] }}"
+                        class="h-full w-full object-contain"
+                    >
+                @elseif ($pdfBukti)
+                    <iframe
+                        src="{{ $pdfBukti['url'] }}"
+                        title="Pratinjau PDF Bukti Prestasi"
+                        class="h-full w-full border-0"
+                    ></iframe>
+                @else
+                    <div class="flex h-full items-center justify-center p-6 text-center text-sm text-[#6B7280]">
+                        Belum ada pratinjau bukti yang tersedia.
+                    </div>
+                @endif
             </div>
+            @if ($tautanBukti->isNotEmpty())
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($tautanBukti as $bukti)
+                        <a href="{{ $bukti['url'] }}" target="_blank" rel="noopener noreferrer"
+                           class="rounded-lg border border-[#AAC8F8] bg-[#F9FAFB] px-3 py-2 text-sm font-medium text-[#2277FF] hover:bg-[#EEF5FF]">
+                            Lihat Bukti {{ $loop->iteration }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
 
             <div class="flex flex-col gap-3">
                 <h2 class="text-xl font-bold text-[#1C2024]">Deskripsi Pencapaian</h2>
                 <p class="text-justify text-base leading-7 text-[#55555C]">
-                    Pencapaian ini diraih oleh perwakilan dari Program Studi Teknologi Rekayasa Komputer (TRK) Politeknik Negeri Semarang. Kegiatan ini diselenggarakan sebagai bentuk kompetisi dan apresiasi inovasi teknologi di tingkat nasional.
+                    {{ $prestasi['catatan'] ?: 'Belum ada deskripsi tambahan untuk prestasi ini.' }}
                 </p>
             </div>
 
             <hr class="border-[#0A0A0A]/[0.06]">
 
             <div class="flex flex-col gap-3">
-                <h2 class="text-xl font-bold text-[#1C2024]">Anggota Tim / Peraih Prestasi</h2>
+                <h2 class="text-xl font-bold text-[#1C2024]">Anggota Kegiatan Terkait</h2>
                 <ul class="flex flex-col gap-2">
-                    @foreach ($prestasi['anggota'] as $idx => $anggota)
+                    @forelse ($prestasi['anggota'] as $idx => $anggota)
                         <li class="flex items-center gap-3 rounded-lg border border-[#E8E8EC] bg-[#FAFAFA] p-3">
                             <span class="flex size-7 items-center justify-center rounded-full bg-[#2277FF]/10 text-xs font-bold text-[#2277FF]">
                                 {{ $idx + 1 }}
                             </span>
                             <span class="text-base font-medium text-[#1C2024]">{{ $anggota }}</span>
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="text-sm text-[#6B7280]">Belum ada anggota kegiatan yang tercatat.</li>
+                    @endforelse
                 </ul>
             </div>
         </div>
@@ -58,29 +118,41 @@
 
                 <div class="flex flex-col gap-4">
                     <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Kategori</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Kategori Kegiatan</span>
                         <p class="text-base font-medium text-[#1C2024]">{{ $prestasi['kategori'] }}</p>
                     </div>
                     <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Tipe Peraih</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Tipe Pemilik Kegiatan</span>
                         <p class="mt-1">
-                            <span class="inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold {{ $prestasi['tipe'] === 'Dosen' ? 'border-[#D8C8F5] bg-[#EADFFB] text-[#6A3FC7]' : 'border-[#B7E0E0] bg-[#D9F1F1] text-[#0E7C7B]' }}">
+                            <span class="inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold {{ $prestasi['tipe'] === 'Dosen' ? 'border-[#D8C8F5] bg-[#EADFFB] text-[#6A3FC7]' : ($prestasi['tipe'] === 'Mahasiswa' ? 'border-[#B7E0E0] bg-[#D9F1F1] text-[#0E7C7B]' : 'border-[#E5E7EB] bg-[#F9FAFB] text-[#6B7280]') }}">
                                 {{ $prestasi['tipe'] }}
                             </span>
                         </p>
                     </div>
                     <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Diunggah Oleh</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Pemilik/Pengaju Kegiatan</span>
                         <p class="text-base font-medium text-[#1C2024]">{{ $prestasi['pengunggah'] }}</p>
                     </div>
+                    @if (($prestasi['semester'] ?? '-') !== '-')
+                        <div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Semester</span>
+                            <p class="text-base font-medium text-[#1C2024]">{{ $prestasi['semester'] }}</p>
+                        </div>
+                    @endif
                     <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Semester</span>
-                        <p class="text-base font-medium text-[#1C2024]">{{ $prestasi['semester'] }}</p>
-                    </div>
-                    <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Tanggal Diraih</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Tanggal Selesai Kegiatan</span>
                         <p class="text-base font-medium text-[#1C2024]">{{ $prestasi['tanggal'] }}</p>
                     </div>
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Jenis Prestasi</span>
+                        <p class="text-base font-medium text-[#1C2024]">{{ ucfirst($prestasi['jenis_prestasi'] ?? '-') }}</p>
+                    </div>
+                    @if (!empty($prestasi['bidang_lomba']))
+                        <div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-[#A8A8A8]">Bidang Lomba</span>
+                            <p class="text-base font-medium text-[#1C2024]">{{ $prestasi['bidang_lomba'] }}</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
