@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(FormIsianKategoriSeeder::class);
-
         // 1. Buat 4 Role Utama
         $roles = [
             ['id_role' => 1, 'nama_role' => 'admin'],

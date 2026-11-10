@@ -285,7 +285,28 @@ class PengajuanController extends Controller
     public function activityOptions(): Collection
     {
         return $this->all()
-            ->map(fn (array $item) => ['id' => $item['id'], 'title' => $item['title']])
+            ->map(function (array $item) {
+                $data = $item['data'] ?? [];
+                $date = $data['start_date'] ?? Carbon::parse($item['submitted_at'])->toDateString();
+
+                return [
+                    'id' => $item['id'],
+                    'title' => $item['title'],
+                    'name' => $item['title'],
+                    'category' => $item['category'],
+                    'type' => $item['category'],
+                    'date' => Carbon::parse($date)->locale('id')->translatedFormat('d M Y'),
+                    'raw_date' => $date,
+                    'status' => $item['status'],
+                    'note' => $data['description'] ?? null,
+                    'capaian' => $data['role'] ?? 'Peserta',
+                    'tingkat' => $data['level'] ?? $data['scope'] ?? '—',
+                    'penyelenggara' => $data['organizer'] ?? '—',
+                    'file_name' => $item['documents'][0]['name'] ?? null,
+                    'members' => $data['members'] ?? [],
+                    'documents' => $item['documents'] ?? [],
+                ];
+            })
             ->values();
     }
 

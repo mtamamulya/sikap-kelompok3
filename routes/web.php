@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenDashboardController;
+use App\Http\Controllers\DosenPengajaranController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Route;
 
 // Ganti redirect otomatis ini dengan Landing Page TRK
 Route::view('/', 'home')->name('home');
-Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
 Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');
@@ -39,14 +38,18 @@ Route::view('/pengabdian/create', 'dosen.pengabdian.create')->name('pengabdian.c
 Route::view('/pengabdian/{id}', 'dosen.pengabdian.show')->whereNumber('id')->name('pengabdian.show');
 Route::view('/pengabdian/{id}/edit', 'dosen.pengabdian.edit')->whereNumber('id')->name('pengabdian.edit');
 
-Route::view('/pengajaran', 'dosen.pengajaran.index')->name('pengajaran.index');
-Route::view('/pengajaran/create', 'dosen.pengajaran.create')->name('pengajaran.create');
-Route::view('/pengajaran/{id}', 'dosen.pengajaran.show')->whereNumber('id')->name('pengajaran.show');
-Route::view('/pengajaran/{id}/edit', 'dosen.pengajaran.edit')->whereNumber('id')->name('pengajaran.edit');
+// KODE BARU (Terhubung ke PengajaranController):
+Route::get('/pengajaran', [DosenPengajaranController::class, 'index'])->name('pengajaran.index');
+Route::get('/pengajaran/create', [DosenPengajaranController::class, 'create'])->name('pengajaran.create');
+Route::post('/pengajaran', [DosenPengajaranController::class, 'store'])->name('pengajaran.store');
+// Detail & edit: harus di bawah /pengajaran/create supaya "create" tidak dianggap sebagai {id}
+Route::get('/pengajaran/{id}', [DosenPengajaranController::class, 'show'])->whereNumber('id')->name('pengajaran.show');
+Route::get('/pengajaran/{id}/edit', [DosenPengajaranController::class, 'edit'])->whereNumber('id')->name('pengajaran.edit');
+Route::put('/pengajaran/{id}', [DosenPengajaranController::class, 'update'])->whereNumber('id')->name('pengajaran.update');
 
 Route::redirect('/kegiatan', '/mahasiswa/kegiatan');
 Route::redirect('/kegiatan/create', '/mahasiswa/kegiatan/create');
-Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan.index')->name('kegiatan.index');
+Route::get('/mahasiswa/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
 Route::view('/mahasiswa/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
 
 // Mengirimkan semua variabel dummy yang dibutuhkan kegiatan.blade.php
