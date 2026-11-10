@@ -107,6 +107,7 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     Route::get('/dosen/{id}', [DosenController::class, 'show'])->name('admin.dosen.show');
     Route::get('/dosen/{id}/edit', [DosenController::class, 'edit'])->name('admin.dosen.edit');
     Route::put('/dosen/{id}', [DosenController::class, 'update'])->name('admin.dosen.update');
+    Route::patch('/dosen/{id}/status', [DosenController::class, 'toggleStatus'])->name('admin.dosen.status');
 
     // Data Mahasiswa
     Route::get('/mahasiswa', [LandingMahasiswaController::class, 'index'])->name('admin.mahasiswa');

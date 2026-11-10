@@ -258,9 +258,40 @@ class MahasiswaDbStore extends MahasiswaStore
         })->values()->all();
     }
 
+    /**
+     * Mengambil daftar kegiatan yang diikuti oleh mahasiswa untuk halaman detail.
+     */
     public function kegiatan(string $id): ?array
     {
-        // Mengembalikan array kosong agar tampilan Blade memunculkan tulisan "Belum ada kegiatan"
-        return []; 
+        if (! ctype_digit($id)) {
+            return [];
+        }
+
+        // Cari id_user dari id_mahasiswa
+        $idUser = \App\Models\Mahasiswa::query()->whereKey((int) $id)->value('id_user');
+        if (! $idUser) {
+            return [];
+        }
+
+        // Query kegiatan yang dibuat mahasiswa atau di mana mahasiswa menjadi anggota
+        $rows = \Illuminate\Support\Facades\DB::table('kegiatan as k')
+            ->leftJoin('anggota_kegiatan as a', fn ($j) => $j->on('a.id_kegiatan', '=', 'k.id_kegiatan')->where('a.id_user', '=', $idUser))
+            ->leftJoin('kategori as kt', 'kt.id_kategori', '=', 'k.id_kategori')
+            ->where(fn ($q) => $q->where('k.id_user', $idUser)->orWhereNotNull('a.id_anggota_kegiatan'))
+            ->orderByDesc('k.tanggal_mulai')
+            ->orderByDesc('k.id_kegiatan')
+            ->get(['k.nama_kegiatan', 'k.tanggal_mulai', 'kt.nama_kategori', 'a.peran']);
+
+        $kegiatan = [];
+        foreach ($rows as $r) {
+            $kegiatan[] = [
+                'title' => $r->nama_kegiatan,
+                'type'  => $r->nama_kategori ?? '-',
+                'role'  => $r->peran ?? 'Pembuat',
+                'year'  => $r->tanggal_mulai ? substr((string) $r->tanggal_mulai, 0, 4) : '-',
+            ];
+        }
+
+        return $kegiatan;
     }
 }

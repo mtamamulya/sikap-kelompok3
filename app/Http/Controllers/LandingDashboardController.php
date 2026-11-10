@@ -51,7 +51,8 @@ class LandingDashboardController extends Controller
         $kegiatanPerTahun = empty($kegiatanRaw) ? [date('Y') => 0] : $kegiatanRaw;
 
         // 6. Data Tabel 5 Pengajuan Terbaru
-        $pengajuanTerbaru = Kegiatan::with(['dosen', 'mahasiswa', 'statusTerkini'])
+        // 6. Data Tabel 5 Pengajuan Terbaru
+        $pengajuanTerbaru = Kegiatan::with(['user.dosen', 'user.mahasiswa', 'statusTerkini'])
             ->whereHas('statusTerkini', function($q) {
                 $q->where('status', 'Diajukan');
             })
@@ -59,16 +60,18 @@ class LandingDashboardController extends Controller
             ->limit(5)
             ->get();
 
-        Carbon::setLocale('id'); // Teks hari/bulan ke Bahasa Indonesia
+        Carbon::setLocale('id');
         $rows = $pengajuanTerbaru->map(function ($item) {
-            // Pengaju bisa berasal dari dosen ataupun mahasiswa
-            $pengaju = $item->dosen->nama ?? $item->mahasiswa->nama ?? 'Tanpa Nama';
+            // Ambil nama dari dosen, mahasiswa, atau fallback ke nama user/email jika profil fisik belum lengkap
+            $pengaju = $item->user->dosen->nama 
+                ?? $item->user->mahasiswa->nama 
+                ?? $item->user->nama 
+                ?? 'Tanpa Nama';
             
-            // Nama kegiatan dari database (terkadang 'nama_kegiatan' atau 'nama')
             $namaKegiatan = $item->nama_kegiatan ?? $item->nama ?? 'Tanpa Judul';
 
             return [
-                'id'       => $item->id_kegiatan ?? $item->id, // Disertakan ID agar bisa diklik ke detail
+                'id'       => $item->id_kegiatan ?? $item->id,
                 'kegiatan' => $namaKegiatan,
                 'dosen'    => $pengaju,
                 'tanggal'  => Carbon::parse($item->created_at)->diffForHumans(),

@@ -6,6 +6,7 @@ use App\Models\Dosen;
 use App\Models\HistoriPangkatGolongan;
 use App\Models\Role;
 use App\Models\User;
+use App\Support\LinkFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -83,6 +84,7 @@ class DosenDbStore extends DosenStore
                 'email' => $data['email'],
                 'password' => $data['password'],   // teks biasa: di-hash oleh cast 'hashed' pada model User
                 'status' => $data['status'] === 'aktif',
+                'foto_profil' => $data['foto'] ?? null,
             ])->save();
 
             $d = new Dosen;
@@ -150,14 +152,18 @@ class DosenDbStore extends DosenStore
         return $ok ? $this->find($id) : null;
     }
 
-    
+    /**
+     * Aktivitas dosen untuk 4 tab halaman detail.
+     * Mengambil kegiatan langsung dari tabel `kegiatan`, `kategori`, dan `anggota_kegiatan`
+     * tanpa melalukan join ke tabel `kegiatan_dosen` dan `skim` yang sudah dihapus.
+     */
     public function aktivitas(string $id): ?array
     {
         $tab = [
             'penelitian' => ['label' => 'Penelitian', 'items' => []],
             'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
             'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
-            'kegiatan' => ['label' => 'Kegiatan', 'items' => []],
+            'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
         ];
 
         $idUser = ctype_digit($id) ? Dosen::query()->whereKey((int) $id)->value('id_user') : null;
@@ -165,30 +171,24 @@ class DosenDbStore extends DosenStore
             return $tab;
         }
 
-        // QUERY BARU: Menghapus JOIN ke kegiatan_dosen dan skim yang sudah dibuang Kel. 3
+        // Query kegiatan tanpa join ke kegiatan_dosen dan skim
         $rows = DB::table('kegiatan as k')
             ->leftJoin('anggota_kegiatan as a', fn ($j) => $j->on('a.id_kegiatan', '=', 'k.id_kegiatan')->where('a.id_user', '=', $idUser))
             ->leftJoin('kategori as kt', 'kt.id_kategori', '=', 'k.id_kategori')
-            ->leftJoin('jenis_kegiatan as jk', 'kt.id_jenis_kegiatan', '=', 'jk.id_jenis_kegiatan')
             ->where(fn ($q) => $q->where('k.id_user', $idUser)->orWhereNotNull('a.id_anggota_kegiatan'))
             ->orderByDesc('k.tanggal_mulai')->orderByDesc('k.id_kegiatan')
-            ->get(['k.nama_kegiatan', 'k.tanggal_mulai', 'kt.nama_kategori', 'jk.nama_jenis_kegiatan as ranah', 'a.peran']);
+            ->get(['k.nama_kegiatan', 'k.tanggal_mulai', 'kt.nama_kategori', 'a.peran']);
 
         foreach ($rows as $r) {
-            // Kita deteksi tab tujuan dari nama_kategori (karena jenis_kegiatan sekarang mutlak 'Kegiatan Dosen')
-            $namaKategori = strtolower((string) $r->nama_kategori);
-            
-            $kunci = (str_contains($namaKategori, 'penelitian')) ? 'penelitian' : 
-                     ((str_contains($namaKategori, 'pengabdian')) ? 'pengabdian' : 'kegiatan');
-
-            $tab[$kunci]['items'][] = [
+            $tab['kegiatan']['items'][] = [
                 'title' => $r->nama_kegiatan,
-                'year' => substr((string) $r->tanggal_mulai, 0, 4),
-                'type' => $r->nama_kategori ?? '-',
-                'role' => $r->peran,
+                'year'  => $r->tanggal_mulai ? substr((string) $r->tanggal_mulai, 0, 4) : '-',
+                'type'  => $r->nama_kategori ?? '-',
+                'role'  => $r->peran ?? 'Pembuat',
             ];
         }
 
+        // Query pengajaran dari enrollment kelas & mata kuliah
         $pengajaran = DB::table('enrollment_kelas_mata_kuliah as ekm')
             ->join('enrollment_mata_kuliah as emk', 'emk.id_enrollment_mk', '=', 'ekm.id_enrollment_mk')
             ->join('mata_kuliah as mk', 'mk.id_mk', '=', 'emk.id_mk')
@@ -203,13 +203,42 @@ class DosenDbStore extends DosenStore
         foreach ($pengajaran as $r) {
             $tab['pengajaran']['items'][] = [
                 'title' => $r->nama_mk,
-                'year' => $r->tahun_akademik,
-                'type' => 'Tingkat '.$r->tingkat.' Kelas '.$r->jenis_kelas.' · '.($r->sks_teori + $r->sks_praktik).' SKS',
-                'role' => 'Pengampu',
+                'year'  => $r->tahun_akademik,
+                'type'  => 'Tingkat '.$r->tingkat.' Kelas '.$r->jenis_kelas.' · '.($r->sks_teori + $r->sks_praktik).' SKS',
+                'role'  => 'Pengampu',
             ];
         }
 
         return $tab;
+    }
+
+    /** Aktifkan / nonaktifkan dosen lewat users.status. Dosen aktif tampil di landing page. */
+    public function toggleStatus(string $id): ?array
+    {
+        $dosen = ctype_digit($id) ? Dosen::query()->find((int) $id) : null;
+        $user = $dosen ? User::query()->find($dosen->id_user) : null;
+        if (! $user) {
+            return null;
+        }
+
+        $user->status = ! $user->status;
+        $user->save();
+
+        return $this->find($id);
+    }
+
+    /** Dosen AKTIF untuk landing page: id, nama, jabatan (pangkat terbaru), dan URL foto (null bila belum ada). */
+    public function publik(): ?array
+    {
+        return $this->query()
+            ->whereHas('user', fn ($q) => $q->where('status', true))
+            ->orderBy('id_dosen')->get()
+            ->map(fn (Dosen $d) => [
+                'id' => (string) $d->id_dosen,
+                'nama' => $d->nama,
+                'jabatan' => $d->historiPangkatGolongan->first()?->pangkat,
+                'foto' => LinkFile::url($d->user?->foto_profil),
+            ])->all();
     }
 
     /** Pilihan pangkat = isi enum histori_pangkat_golongan.pangkat (bila tidak terbaca, pakai daftar bawaan). */

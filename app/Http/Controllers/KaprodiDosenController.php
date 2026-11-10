@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Repositories\DosenStore;
 use Carbon\Carbon;
-    use Illuminate\Support\Facades\DB; // Pastikan import DB di bagian atas file
+use Illuminate\Support\Facades\DB; // Pastikan import DB di bagian atas file
+use Illuminate\Support\Facades\Storage; // Pastikan Storage di-import
 
 
 /** Data dosen untuk kaprodi: HANYA BACA (tanpa tambah / ubah / hapus). Data sama dengan admin. */
@@ -35,11 +36,11 @@ class KaprodiDosenController extends Controller
         abort_unless($row, 404);
 
         $dosen = [
-            'id' => $row['id'],
-            'nama' => $row['nama'],
-            'nip' => $row['nip'],
+            'id'     => $row['id'],
+            'nama'   => $row['nama'],
+            'nip'    => $row['nip'],
             'status' => $row['status'],
-            'foto' => null,   // URL foto dosen; null = tampil inisial
+            'foto'   => ! empty($row['foto']) ? Storage::disk('public')->url($row['foto']) : null,
         ];
 
         $info = [
@@ -61,9 +62,9 @@ class KaprodiDosenController extends Controller
         }
 
         return view('kaprodi.dosen-detail', [
-            'dosen' => $dosen,
-            'info' => $info,
-            'riwayat' => $riwayat,
+            'dosen'     => $dosen,
+            'info'      => $info,
+            'riwayat'   => $riwayat,
             'aktivitas' => $this->aktivitas($row),
         ]);
     }

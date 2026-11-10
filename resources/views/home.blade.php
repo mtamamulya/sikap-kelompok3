@@ -270,14 +270,26 @@
 
                 {{-- snap-x dihapus --}}
                 <div id="dosen-scroller" class="flex gap-3.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    @foreach ($lecturers as [$name, $img])
-                        {{-- snap-start dihapus --}}
+                    @php
+                        // Mode database: dosen aktif dari database (foto hasil unggahan admin; tanpa foto -> inisial).
+                        // Mode json ($dosen = null): data sementara $lecturers di atas.
+                        $kartuDosen = isset($dosen) && $dosen !== null
+                            ? array_map(fn ($d) => ['nama' => $d['nama'], 'foto' => $d['foto']], $dosen)
+                            : array_map(fn ($l) => ['nama' => $l[0], 'foto' => $A . $l[1]], $lecturers);
+                    @endphp
+                    @forelse ($kartuDosen as $d)
                         <div class="relative h-[240px] w-[170px] shrink-0 overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1 md:h-[260px] md:w-[185px]">
-                            <img src="{{ $A . $img }}" alt="{{ $name }}" class="h-full w-full object-cover">
+                            @if ($d['foto'])
+                                <img src="{{ $d['foto'] }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
+                            @else
+                                <div class="flex h-full w-full items-center justify-center text-6xl font-extrabold text-white/90" style="background: linear-gradient(160deg, #1F6FEB, #0B3A8C);" aria-hidden="true">{{ mb_strtoupper(mb_substr(preg_replace('/^(Prof\.|Dr\.|Ir\.|\s)+/u', '', $d['nama']), 0, 1)) }}</div>
+                            @endif
                             <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,254,254,0)_45%,#000_100%)]"></div>
-                            <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $name }}</div>
+                            <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $d['nama'] }}</div>
                         </div>
-                    @endforeach
+                    @empty
+                        <p class="py-8 text-sm font-medium text-white/80">Belum ada data dosen.</p>
+                    @endforelse
                 </div>
             </div>
         </div>

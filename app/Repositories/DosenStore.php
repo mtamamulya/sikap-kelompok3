@@ -27,6 +27,18 @@ class DosenStore
 
     private const PATH = 'admin/dosen.json';
 
+    /** Dosen AKTIF untuk landing page (id, nama, jabatan, foto). null = landing memakai data contohnya sendiri (versi database menimpanya). */
+    public function publik(): ?array
+    {
+        return null;
+    }
+
+    /** Aktivitas dosen untuk tab halaman detail. null = pakai data contoh (versi database menimpanya). */
+    public function aktivitas(string $id): ?array
+    {
+        return null;
+    }
+
     /** Pilihan pangkat untuk dropdown/validasi. Versi database menimpanya dengan isi enum tabel. */
     public function opsiPangkat(): array
     {
@@ -137,6 +149,7 @@ class DosenStore
             'role' => $data['role'],
             'status_akun' => 'aktif',   // akun baru otomatis aktif
             'password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
+            'foto' => $data['foto'] ?? null,   // path di disk 'public' (opsional)
             'riwayat' => [['pangkat' => $data['pangkat'], 'golongan' => $data['golongan'], 'sk' => $data['sk'], 'tanggal' => $data['tanggal']]],
         ];
 
@@ -150,6 +163,31 @@ class DosenStore
     public function exists(string $field, string $value): bool
     {
         return $this->usedByOther($field, $value, '');
+    }
+
+    /** Aktifkan / nonaktifkan dosen (status dan status_akun ikut berubah). Mengembalikan baris terbaru, atau null bila tidak ada. */
+    public function toggleStatus(string $id): ?array
+    {
+        $rows = $this->all();
+        $found = null;
+
+        foreach ($rows as &$row) {
+            if ($row['id'] !== $id) {
+                continue;
+            }
+
+            $baru = $row['status'] === 'aktif' ? 'nonaktif' : 'aktif';
+            $row['status'] = $baru;
+            $row['status_akun'] = $baru;
+            $found = $row;
+        }
+        unset($row);
+
+        if ($found) {
+            $this->save($rows);
+        }
+
+        return $found;
     }
 
     private function save(array $rows): void

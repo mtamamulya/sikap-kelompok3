@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Prestasi;
+use App\Repositories\DosenStore;
 
 class HomeController extends Controller
 {
+    public function __construct(private DosenStore $dosenStore) {}
+
     public function index()
     {
         $prestasi = Prestasi::query()
@@ -44,6 +47,9 @@ class HomeController extends Controller
         ];
         // dd($prestasi);
 
-        return view('home', compact('prestasi', 'stats'));
+        // Dosen AKTIF dari database (mode database). Mode json: null, jadi view memakai data sementaranya.
+        $dosen = $this->dosenStore->publik();
+
+        return view('home', compact('prestasi', 'stats', 'dosen'));
     }
 }

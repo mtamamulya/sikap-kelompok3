@@ -1,7 +1,8 @@
 {{--
     resources/views/admin/dosen.blade.php
     Daftar dosen: cari, filter pangkat & status, paginasi (sudah berfungsi).
-    Aksi: lihat (ke halaman detail) dan hapus (modal konfirmasi -> DELETE lewat form + CSRF; aktif bila route admin.dosen.destroy dibuat).
+    Aksi: lihat (ke halaman detail) dan saklar aktif/nonaktif (modal konfirmasi -> PATCH lewat form + CSRF; route admin.dosen.status).
+    Dosen tidak dihapus, hanya dinonaktifkan. Dosen aktif tampil di landing page, yang nonaktif tidak.
     Tombol Tambah Dosen menjadi link bila route admin.dosen.create dibuat.
     Tabel memakai DataTables 2.x (sorting & paginasi ditangani library). Tidak lagi memakai public/js/tabel-urut.js.
 --}}
@@ -104,9 +105,9 @@
     #tabel-wrap .dt-paging .dt-paging-button.next:hover:not(.disabled) { background-color: #BBD2F6 !important; }
 
     /* ---------- Modal konfirmasi hapus ---------- */
-    #modalHapus { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }  /* margin:auto + inset:0 = tepat di tengah (Tailwind reset menimpa margin bawaan dialog) */
-    #modalHapus::backdrop { background: rgb(10 10 10 / .45); }
-    #modalHapus[open] { animation: modalMasuk .15s ease-out; }
+    #modalStatus { position: fixed; inset: 0; margin: auto; height: fit-content; width: 380px; max-width: calc(100vw - 32px); padding: 0; border: 0; background: transparent; overflow: visible; }  /* margin:auto + inset:0 = tepat di tengah (Tailwind reset menimpa margin bawaan dialog) */
+    #modalStatus::backdrop { background: rgb(10 10 10 / .45); }
+    #modalStatus[open] { animation: modalMasuk .15s ease-out; }
     @keyframes modalMasuk { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
     .modal-kartu { padding: 24px; border-radius: 12px; background: #fff; text-align: center; box-shadow: 0 20px 50px rgb(0 0 0 / .2); }
     .modal-ikon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin: 0 auto 16px; border-radius: 9999px; background: #FFD9D9; color: #E5484D; }
@@ -118,9 +119,20 @@
     .modal-btn { flex: 1; height: 40px; border: 1px solid transparent; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
     .modal-btn-batal { background: #fff; border-color: #E8E8EC; color: #2E2E2E; }
     .modal-btn-batal:hover { background: #F9F9FB; }
-    .modal-btn-hapus { background: #E5484D; color: #fff; }
-    .modal-btn-hapus:hover { background: #D13A3F; }
-    .modal-btn-hapus:disabled { opacity: .7; cursor: not-allowed; }
+    .modal-btn-ya { background: #E5484D; color: #fff; }
+    .modal-btn-ya:hover { background: #D13A3F; }
+    .modal-btn-ya:disabled { opacity: .7; cursor: not-allowed; }
+    /* Varian "aktifkan" (biru/hijau); bawaan = "nonaktifkan" (merah) */
+    #modalStatus[data-mode="aktif"] .modal-ikon { background: #DDF3D0; color: #3A8A1E; }
+    #modalStatus[data-mode="aktif"] .modal-btn-ya { background: #2277FF; }
+    #modalStatus[data-mode="aktif"] .modal-btn-ya:hover { background: #1A66E0; }
+
+    /* ---------- Saklar aktif / nonaktif ---------- */
+    .sw { position: relative; flex-shrink: 0; width: 40px; height: 22px; padding: 0; border: 0; border-radius: 9999px; background: #C9CCD3; cursor: pointer; transition: background .15s; }
+    .sw::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 9999px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .25); transition: transform .15s; }
+    .sw[aria-checked="true"] { background: #2277FF; }
+    .sw[aria-checked="true"]::after { transform: translateX(18px); }
+    .sw:focus-visible { outline: 2px solid #2277FF; outline-offset: 2px; }
 </style>
 
 <main class="p-4 pb-10 sm:p-6">
@@ -183,18 +195,18 @@
     </section>
 </main>
 
-{{-- Modal konfirmasi hapus (dibuka lewat JS: tombol Hapus di tabel) --}}
-<dialog id="modalHapus" aria-labelledby="modalHapusJudul" aria-describedby="modalHapusTeks">
+{{-- Modal konfirmasi aktifkan / nonaktifkan (dibuka lewat JS: saklar di tabel) --}}
+<dialog id="modalStatus" data-mode="nonaktif" aria-labelledby="modalStatusJudul" aria-describedby="modalStatusTeks">
     <div class="modal-kartu">
         <div class="modal-ikon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v3" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 6a7.75 7.75 0 1 0 10 0" /><path d="M12 4l0 8" /></svg>
         </div>
-        <h2 id="modalHapusJudul" class="modal-judul">Hapus dosen?</h2>
-        <p id="modalHapusTeks" class="modal-teks"><strong id="modalHapusNama"></strong> akan dihapus permanen.</p>
-        <p id="modalHapusError" class="modal-error" hidden></p>
+        <h2 id="modalStatusJudul" class="modal-judul">Nonaktifkan dosen?</h2>
+        <p id="modalStatusTeks" class="modal-teks"><strong id="modalStatusNama"></strong> <span id="modalStatusSuffix"></span></p>
+        <p id="modalStatusError" class="modal-error" hidden></p>
         <div class="modal-aksi">
-            <button type="button" id="modalHapusBatal" class="modal-btn modal-btn-batal">Batal</button>
-            <button type="button" id="modalHapusYa" class="modal-btn modal-btn-hapus">Hapus</button>
+            <button type="button" id="modalStatusBatal" class="modal-btn modal-btn-batal">Batal</button>
+            <button type="button" id="modalStatusYa" class="modal-btn modal-btn-ya">Nonaktifkan</button>
         </div>
     </div>
 </dialog>
@@ -208,7 +220,7 @@
 (function () {
     var data = @json($dosen);
     var URL_DETAIL = @js(route('admin.dosen.show', ['id' => '__ID__']));
-    var URL_DELETE = @js(\Illuminate\Support\Facades\Route::has('admin.dosen.destroy') ? route('admin.dosen.destroy', ['id' => '__ID__']) : null);
+    var URL_STATUS = @js(\Illuminate\Support\Facades\Route::has('admin.dosen.status') ? route('admin.dosen.status', ['id' => '__ID__']) : null);
     var CSRF = @json(csrf_token());
 
     var $ = function (id) { return document.getElementById(id); };
@@ -225,7 +237,6 @@
         return '<svg width="' + w + '" height="' + w + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
     }
     var I_EYE   = svg(16, 1.5, '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />');
-    var I_TRASH = svg(16, 1.5, '<path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v3" />');
 
     var TXT = DataTable.render.text(); // otomatis escape HTML
     function pangkat(r) { return (r.jabatan || '') + ', ' + (r.golongan || ''); }
@@ -262,9 +273,9 @@
                 data: null, orderable: false, searchable: false,
                 render: function (d, type, r) {
                     var id = esc(r.id);
-                    return '<div class="flex gap-2">' +
+                    return '<div class="flex items-center gap-3">' +
                         '<button type="button" title="Lihat detail" aria-label="Lihat detail" data-act="view" data-id="' + id + '" class="flex size-8 cursor-pointer items-center justify-center rounded-md bg-[#D4E3FF] text-[#1F73FF] hover:bg-[#C2D8FF]">' + I_EYE + '</button>' +
-                        '<button type="button" title="Hapus" aria-label="Hapus" data-act="delete" data-id="' + id + '" class="flex size-8 cursor-pointer items-center justify-center rounded-md bg-[#FFD9D9] text-[#E5484D] hover:bg-[#FFC9C9]">' + I_TRASH + '</button>' +
+                        '<button type="button" role="switch" class="sw" aria-checked="' + (r.status === 'aktif' ? 'true' : 'false') + '" title="' + (r.status === 'aktif' ? 'Nonaktifkan dosen' : 'Aktifkan dosen') + '" aria-label="' + (r.status === 'aktif' ? 'Nonaktifkan dosen' : 'Aktifkan dosen') + '" data-act="status" data-id="' + id + '"></button>' +
                     '</div>';
                 }
             }
@@ -300,15 +311,15 @@
     $('fPangkat').addEventListener('change', function (e) { filter.pangkat = e.target.value; table.draw(); });
     $('fStatus').addEventListener('change', function (e) { filter.status = e.target.value; table.draw(); });
 
-    /* ---------- Hapus: modal konfirmasi, lalu DELETE lewat form + CSRF (halaman dimuat ulang -> kembali ke halaman 1) ---------- */
-    var modal = $('modalHapus'), btnYa = $('modalHapusYa'), pesanError = $('modalHapusError');
-    var idHapus = null;
+    /* ---------- Aktifkan / nonaktifkan: modal konfirmasi, lalu PATCH lewat form + CSRF (halaman dimuat ulang) ---------- */
+    var modal = $('modalStatus'), btnYa = $('modalStatusYa'), pesanError = $('modalStatusError');
+    var idStatus = null;
 
-    function kirimHapus(id) {
+    function kirimStatus(id) {
         var f = document.createElement('form');
         f.method = 'POST';
-        f.action = URL_DELETE.replace('__ID__', encodeURIComponent(id));
-        f.innerHTML = '<input type="hidden" name="_token" value="' + CSRF + '"><input type="hidden" name="_method" value="DELETE">';
+        f.action = URL_STATUS.replace('__ID__', encodeURIComponent(id));
+        f.innerHTML = '<input type="hidden" name="_token" value="' + CSRF + '"><input type="hidden" name="_method" value="PATCH">';
         document.body.appendChild(f);
         f.submit();
     }
@@ -321,31 +332,39 @@
             window.location.href = URL_DETAIL.replace('__ID__', encodeURIComponent(b.dataset.id));
             return;
         }
-        if (b.dataset.act === 'delete') {
-            idHapus = b.dataset.id;
+        if (b.dataset.act === 'status') {
+            idStatus = b.dataset.id;
+            var nonaktifkan = !!r && r.status === 'aktif';
+            var nama = r ? r.nama : '';
             if (typeof modal.showModal !== 'function') {            // cadangan untuk browser lama
-                if (URL_DELETE && confirm('Hapus dosen "' + (r ? r.nama : '') + '"?')) kirimHapus(idHapus);
+                if (URL_STATUS && confirm((nonaktifkan ? 'Nonaktifkan' : 'Aktifkan') + ' dosen "' + nama + '"?')) kirimStatus(idStatus);
                 return;
             }
-            $('modalHapusNama').textContent = '"' + (r ? r.nama : '') + '"';
+            modal.dataset.mode = nonaktifkan ? 'nonaktif' : 'aktif';
+            $('modalStatusJudul').textContent = nonaktifkan ? 'Nonaktifkan dosen?' : 'Aktifkan dosen?';
+            $('modalStatusNama').textContent = '"' + nama + '"';
+            $('modalStatusSuffix').textContent = nonaktifkan
+                ? 'tidak akan tampil lagi di halaman depan. Data dosen tetap tersimpan.'
+                : 'akan tampil di halaman depan.';
+            btnYa.textContent = nonaktifkan ? 'Nonaktifkan' : 'Aktifkan';
             pesanError.hidden = true;
             modal.showModal();                                      // fokus awal di tombol Batal; Esc menutup modal
         }
     });
 
-    $('modalHapusBatal').addEventListener('click', function () { modal.close(); });
+    $('modalStatusBatal').addEventListener('click', function () { modal.close(); });
     modal.addEventListener('click', function (e) { if (e.target === modal) modal.close(); });   // klik area gelap = batal
-    modal.addEventListener('close', function () { idHapus = null; btnYa.disabled = false; btnYa.textContent = 'Hapus'; });
+    modal.addEventListener('close', function () { idStatus = null; btnYa.disabled = false; });
     btnYa.addEventListener('click', function () {
-        if (!idHapus) return;
-        if (!URL_DELETE) {                                          // route hapus belum dibuat di backend
-            pesanError.textContent = 'Fitur hapus belum tersedia: route admin.dosen.destroy belum dibuat.';
+        if (!idStatus) return;
+        if (!URL_STATUS) {                                          // route belum dibuat di backend
+            pesanError.textContent = 'Fitur ini belum tersedia: route admin.dosen.status belum dibuat.';
             pesanError.hidden = false;
             return;
         }
         btnYa.disabled = true;                                      // cegah klik ganda
-        btnYa.textContent = 'Menghapus...';
-        kirimHapus(idHapus);
+        btnYa.textContent = 'Memproses...';
+        kirimStatus(idStatus);
     });
 })();
 </script>

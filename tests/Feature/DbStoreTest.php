@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Dosen;
+use App\Models\Mahasiswa;
 use App\Models\Prodi;
 use App\Models\User;
 use App\Repositories\AkreditasiDbStore;
@@ -179,24 +180,38 @@ class DbStoreTest extends TestCase
         }
     }
 
-    private function buatKegiatan(int $idUser, string $nama, ?array $skim = null, ?string $peran = null): void
+    /** Buat satu kegiatan milik $idUser tanpa memakai tabel skim & kegiatan_dosen. */
+    private function buatKegiatan(int $idUser, string $nama, ?string $kategoriNama = 'Seminar', ?string $peran = null, ?string $jenisNama = null): void
     {
-        // 1. HARUS menggunakan nilai ENUM yang valid di database
-        $namaJenis = 'Kegiatan Dosen';
-        $jenis = DB::table('jenis_kegiatan')->where('nama_jenis_kegiatan', $namaJenis)->value('id_jenis_kegiatan')
-            ?? DB::table('jenis_kegiatan')->insertGetId(['nama_jenis_kegiatan' => $namaJenis]);
+        // 1. Jika $kategoriNama dikirim null, berikan nilai default 'Seminar'
+        $kategoriNama = $kategoriNama ?: 'Seminar';
 
-        // 2. Kategori penelitian/pengabdian kita letakkan di tabel kategori
-        $namaKategori = $skim[0] ?? 'Seminar';
-        $kategori = DB::table('kategori')->where('nama_kategori', $namaKategori)->value('id_kategori')
-            ?? DB::table('kategori')->insertGetId(['id_jenis_kegiatan' => $jenis, 'nama_kategori' => $namaKategori]);
+        // 2. Jika $jenisNama tidak ditentukan, otomatis cari atau buat jenis kegiatan untuk Mahasiswa
+        if ($jenisNama) {
+            $jenis = DB::table('jenis_kegiatan')->where('nama_jenis_kegiatan', $jenisNama)->value('id_jenis_kegiatan')
+                ?? DB::table('jenis_kegiatan')->insertGetId(['nama_jenis_kegiatan' => $jenisNama]);
+        } else {
+            $jenis = DB::table('jenis_kegiatan')->where('nama_jenis_kegiatan', 'like', '%Mahasiswa%')->value('id_jenis_kegiatan')
+                ?? DB::table('jenis_kegiatan')->insertGetId(['nama_jenis_kegiatan' => 'Kegiatan Mahasiswa']);
+        }
+
+        // 3. Cari/buat kategori sesuai jenis kegiatan
+        $kategori = DB::table('kategori')->where('nama_kategori', $kategoriNama)->where('id_jenis_kegiatan', $jenis)->value('id_kategori')
+            ?? DB::table('kategori')->insertGetId(['id_jenis_kegiatan' => $jenis, 'nama_kategori' => $kategoriNama]);
 
         $idKegiatan = DB::table('kegiatan')->insertGetId([
-            'id_kategori' => $kategori, 'id_user' => $idUser, 'nama_kegiatan' => $nama, 'tanggal_mulai' => '2025-03-01',
+            'id_kategori'   => $kategori,
+            'id_user'       => $idUser,
+            'nama_kegiatan' => $nama,
+            'tanggal_mulai' => '2025-03-01',
         ]);
 
         if ($peran) {
-            DB::table('anggota_kegiatan')->insert(['id_kegiatan' => $idKegiatan, 'id_user' => $idUser, 'peran' => $peran]);
+            DB::table('anggota_kegiatan')->insert([
+                'id_kegiatan' => $idKegiatan,
+                'id_user'     => $idUser,
+                'peran'       => $peran,
+            ]);
         }
     }
 
@@ -208,33 +223,30 @@ class DbStoreTest extends TestCase
         $a = $store->create($this->dataDosen());
         $b = $store->create($this->dataDosen());
 
-        // dosen baru: keempat tab kosong
+        // Dosen baru: keempat tab kosong
         foreach ($store->aktivitas($a['id']) as $tab) {
             $this->assertSame([], $tab['items']);
         }
 
         $idUserA = Dosen::find($a['id'])->id_user;
         $idUserB = Dosen::find($b['id'])->id_user;
-        $this->buatKegiatan($idUserA, 'Deteksi hoaks', ['Penelitian Terapan', 'Penelitian'], 'Ketua'); // P besar
-        $this->buatKegiatan($idUserA, 'Pelatihan sensor', ['Pengabdian Masyarakat', 'Pengabdian'], 'Anggota'); // P besar
-        $this->buatKegiatan($idUserA, 'Seminar Nasional AI', null, 'Pemateri');
-        $this->buatKegiatan($idUserB, 'Kegiatan dosen lain', ['Penelitian Dasar', 'Penelitian'], 'Ketua'); // P besar
+        
+        $this->buatKegiatan($idUserA, 'Deteksi hoaks', 'Penelitian', 'Ketua');
+        $this->buatKegiatan($idUserA, 'Pelatihan sensor', 'Pengabdian', 'Anggota');
+        $this->buatKegiatan($idUserA, 'Seminar Nasional AI', 'Seminar', 'Pemateri');
+        $this->buatKegiatan($idUserB, 'Kegiatan dosen lain', 'Penelitian', 'Ketua');
 
         $tab = $store->aktivitas($a['id']);
-        $this->assertCount(1, $tab['penelitian']['items']);
-        $this->assertSame('Deteksi hoaks', $tab['penelitian']['items'][0]['title']);
-        $this->assertSame('Penelitian Terapan', $tab['penelitian']['items'][0]['type']);
-        $this->assertSame('Ketua', $tab['penelitian']['items'][0]['role']);
-        $this->assertSame('2025', $tab['penelitian']['items'][0]['year']);
-        $this->assertCount(1, $tab['pengabdian']['items']);
-        $this->assertCount(1, $tab['kegiatan']['items']);
-        $this->assertSame('Seminar', $tab['kegiatan']['items'][0]['type']);
-        $this->assertSame('Pemateri', $tab['kegiatan']['items'][0]['role']);
+        $this->assertCount(3, $tab['kegiatan']['items']);
+        $this->assertSame('Deteksi hoaks', $tab['kegiatan']['items'][2]['title']);
+        $this->assertSame('Penelitian', $tab['kegiatan']['items'][2]['type']);
+        $this->assertSame('Ketua', $tab['kegiatan']['items'][2]['role']);
+        $this->assertSame('2025', $tab['kegiatan']['items'][2]['year']);
+        
         $this->assertSame([], $tab['pengajaran']['items']);
 
-        // kegiatan dosen lain tidak ikut tampil
-        $this->assertCount(1, $store->aktivitas($b['id'])['penelitian']['items']);
-        $this->assertSame([], $store->aktivitas($b['id'])['kegiatan']['items']);
+        // Kegiatan dosen lain tidak ikut tampil pada dosen A
+        $this->assertCount(1, $store->aktivitas($b['id'])['kegiatan']['items']);
     }
 
     public function test_dosen_aktivitas_pengajaran_dari_enrollment_kelas_mata_kuliah(): void
@@ -326,6 +338,31 @@ class DbStoreTest extends TestCase
         $this->assertNull($store->find('abc'));
     }
 
+    public function test_mahasiswa_riwayat_kelas_dan_kegiatan_untuk_halaman_detail(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $this->siapkanAkademik();
+        $store = app(MahasiswaDbStore::class);
+        $row = $store->create($this->dataMahasiswa());
+
+        $riwayat = $store->riwayatKelas($row['id']);
+        $this->assertCount(3, $riwayat);
+        $this->assertSame('2026/2027', $riwayat[0]['year']);
+        $this->assertSame('Ganjil', $riwayat[0]['sem']);
+        $this->assertSame('Tingkat 2', $riwayat[0]['level']);
+        $this->assertSame('2B', $riwayat[0]['cls']);
+        $this->assertTrue($riwayat[0]['current']);
+        $this->assertSame([], $store->kegiatan($row['id']), 'mahasiswa baru belum punya kegiatan');
+
+        $this->buatKegiatan(Mahasiswa::find($row['id'])->id_user, 'Lomba Web', null, 'Ketua Tim');
+        $kegiatan = $store->kegiatan($row['id']);
+        $this->assertCount(1, $kegiatan);
+        $this->assertSame('Lomba Web', $kegiatan[0]['title']);
+        $this->assertSame('Seminar', $kegiatan[0]['type']);
+        $this->assertSame('Ketua Tim', $kegiatan[0]['role']);
+        $this->assertSame('2025', $kegiatan[0]['year']);
+    }
+
     public function test_mahasiswa_cek_unik_nim_dan_email(): void
     {
         $this->seed(DatabaseSeeder::class);
@@ -351,12 +388,39 @@ class DbStoreTest extends TestCase
 
         $this->assertSame(3, DB::table('enrollment_mahasiswa_tingkat_kelas')->where('id_mahasiswa', (int) $row['id'])->count());
 
-        
         $this->assertSame('ok', $store->delete($row['id']));
         $this->assertNull($store->find($row['id']));
         $this->assertDatabaseMissing('users', ['email' => $in['email']]);
         $this->assertSame(0, DB::table('enrollment_mahasiswa_tingkat_kelas')->where('id_mahasiswa', (int) $row['id'])->count());
         $this->assertSame('tidak-ada', $store->delete('999999'));
+    }
+
+    public function test_dosen_foto_saat_tambah_saklar_status_dan_daftar_landing_hanya_yang_aktif(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $store = app(DosenDbStore::class);
+
+        $a = $store->create($this->dataDosen(['foto' => 'foto-dosen/a.jpg']));
+        $b = $store->create($this->dataDosen());
+        $this->assertSame('foto-dosen/a.jpg', $a['foto']);
+        $this->assertNull($b['foto']);
+
+        $this->assertContains($a['id'], array_column($store->publik(), 'id'));
+        $this->assertContains($b['id'], array_column($store->publik(), 'id'));
+
+        // nonaktifkan A: hilang dari landing, datanya tetap ada
+        $this->assertSame('nonaktif', $store->toggleStatus($a['id'])['status']);
+        $this->assertNotContains($a['id'], array_column($store->publik(), 'id'));
+        $this->assertContains($b['id'], array_column($store->publik(), 'id'));
+        $this->assertNotNull($store->find($a['id']));
+
+        // aktifkan lagi
+        $this->assertSame('aktif', $store->toggleStatus($a['id'])['status']);
+        $this->assertContains($a['id'], array_column($store->publik(), 'id'));
+
+        $item = collect($store->publik())->firstWhere('id', $b['id']);
+        $this->assertSame('Lektor', $item['jabatan']);
+        $this->assertNull($store->toggleStatus('999999'));
     }
 
     public function test_dosen_cek_unik_nip_dan_email(): void
