@@ -7,22 +7,23 @@ use App\Http\Controllers\DosenPengajaranController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
+use App\Http\Controllers\PrestasiController;
 use Illuminate\Support\Facades\Route;
 
-// Ganti redirect otomatis ini dengan Landing Page TRK
 Route::view('/', 'home')->name('home');
 Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
 Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');
 
-Route::get('/dosen/kegiatan', [KegiatanController::class, 'index'])->name('dosen.kegiatan.index');
+Route::view('/dosen/kegiatan', 'dosen.kegiatan.index')->name('dosen.kegiatan.index');
 Route::view('/dosen/kegiatan/create', 'dosen.kegiatan.create')->name('dosen.kegiatan.create');
 Route::get('/dosen/kegiatan/{id}', [KegiatanController::class, 'show'])->whereNumber('id')->name('dosen.kegiatan.show');
 Route::view('/dosen/kegiatan/{id}/edit', 'dosen.kegiatan.edit')->whereNumber('id')->name('dosen.kegiatan.edit');
 
-Route::view('/prestasi', 'dosen.prestasi.index')->name('prestasi.index');
-Route::view('/prestasi/create', 'dosen.prestasi.create')->name('prestasi.create');
+Route::get('/prestasi', [PrestasiController::class, 'dosenIndex'])->name('prestasi.index');
+Route::get('/prestasi/create', [PrestasiController::class, 'create'])->name('prestasi.create');
+Route::post('/prestasi', [PrestasiController::class, 'store'])->middleware('auth')->name('prestasi.store');
 Route::view('/prestasi/{id}', 'dosen.prestasi.show')->whereNumber('id')->name('prestasi.show');
 Route::view('/prestasi/{id}/edit', 'dosen.prestasi.edit')->whereNumber('id')->name('prestasi.edit');
 Route::view('/verifikasi/{id}', 'pengajuan.show', ['asal' => 'dosen'])->whereNumber('id')->name('verifikasi.show');
@@ -40,11 +41,9 @@ Route::view('/pengabdian/create', 'dosen.pengabdian.create')->name('pengabdian.c
 Route::view('/pengabdian/{id}', 'dosen.pengabdian.show')->whereNumber('id')->name('pengabdian.show');
 Route::view('/pengabdian/{id}/edit', 'dosen.pengabdian.edit')->whereNumber('id')->name('pengabdian.edit');
 
-// KODE BARU (Terhubung ke PengajaranController):
 Route::get('/pengajaran', [DosenPengajaranController::class, 'index'])->name('pengajaran.index');
 Route::get('/pengajaran/create', [DosenPengajaranController::class, 'create'])->name('pengajaran.create');
 Route::post('/pengajaran', [DosenPengajaranController::class, 'store'])->name('pengajaran.store');
-// Detail & edit: harus di bawah /pengajaran/create supaya "create" tidak dianggap sebagai {id}
 Route::get('/pengajaran/{id}', [DosenPengajaranController::class, 'show'])->whereNumber('id')->name('pengajaran.show');
 Route::get('/pengajaran/{id}/edit', [DosenPengajaranController::class, 'edit'])->whereNumber('id')->name('pengajaran.edit');
 Route::put('/pengajaran/{id}', [DosenPengajaranController::class, 'update'])->whereNumber('id')->name('pengajaran.update');
@@ -54,7 +53,6 @@ Route::redirect('/kegiatan/create', '/mahasiswa/kegiatan/create');
 Route::view('/mahasiswa/kegiatan', 'mahasiswa.kegiatan.index')->name('kegiatan.index');
 Route::view('/mahasiswa/kegiatan/create', 'dosen.kegiatan.create')->name('kegiatan.create');
 
-// Mengirimkan semua variabel dummy yang dibutuhkan kegiatan.blade.php
 Route::view('/mahasiswa/kegiatan/{id}/edit', 'kegiatan', [
     'allActivities' => [],
     'categories' => [],
@@ -94,7 +92,6 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/prestasi', [MahasiswaController::class, 'prestasi'])
         ->name('prestasi');
 
-    // Letakkan route statis sebelum route parameter prestasi.
     Route::get('/prestasi/tambah', [MahasiswaController::class, 'prestasiTambah'])
         ->name('prestasi.tambah');
     Route::post('/prestasi', [MahasiswaController::class, 'prestasiSimpan'])
@@ -122,3 +119,14 @@ Route::get('/pengajuan/{id}', fn ($id) => redirect()->route('pengajuan.show', $i
 Route::get('/kegiatan/{id}/edit', fn ($id) => redirect()->route('kegiatan.edit', $id))->whereNumber('id');
 Route::get('/kegiatan/{id}', fn ($id) => redirect()->route('kegiatan.show', $id))->whereNumber('id');
 require __DIR__.'/admin-kaprodi.php';
+
+Route::prefix('api/v1')->group(function () {
+    Route::get('/kegiatan', [KegiatanController::class, 'index']);
+    Route::get('/kegiatan/{id}', [KegiatanController::class, 'show']);
+    
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/kegiatan', [KegiatanController::class, 'store']);
+        Route::put('/kegiatan/{id}', [KegiatanController::class, 'update']);
+        Route::delete('/kegiatan/{id}', [KegiatanController::class, 'destroy']);
+    });
+});

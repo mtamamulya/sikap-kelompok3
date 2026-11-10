@@ -4,30 +4,6 @@
 
 @section('content')
 
-@php
-    // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
-    $prestasi = [
-        ['nama' => 'Juara 1 Lomba Karya Tulis Ilmiah Nasional 2026', 'penghargaan' => 'Best Poster', 'tingkat' => 'Nasional',      'penyelenggara' => 'Institut Teknologi Sepuluh Nopember'],
-        ['nama' => 'Juara 1 Lomba Karya Tulis Ilmiah Internasional', 'penghargaan' => 'Best Desain', 'tingkat' => 'Internasional', 'penyelenggara' => 'PT. KAI'],
-        ['nama' => 'Juara 1 Poster',          'penghargaan' => 'Juara 1',   'tingkat' => 'Provinsi',      'penyelenggara' => 'Freeport'],
-        ['nama' => 'Juara 2 Design Graphic',  'penghargaan' => 'Juara 2',   'tingkat' => 'Kabupaten/kota', 'penyelenggara' => 'Institut Teknologi Sepuluh Nopember'],
-        ['nama' => 'Lomba Karate',            'penghargaan' => 'Harapan 3', 'tingkat' => 'Provinsi',      'penyelenggara' => 'PT. KAI'],
-        ['nama' => 'Lomba LKTIN',             'penghargaan' => 'Juara 3',   'tingkat' => 'Internasional', 'penyelenggara' => 'Freeport'],
-        ['nama' => 'Lomba LKTIN',             'penghargaan' => 'Harapan 2', 'tingkat' => 'Kabupaten/kota', 'penyelenggara' => 'Institut Teknologi Sepuluh Nopember'],
-        ['nama' => 'Lomba LKTIN',             'penghargaan' => 'Harapan 1', 'tingkat' => 'Provinsi',      'penyelenggara' => 'PT. KAI'],
-        ['nama' => 'Lomba LKTIN',             'penghargaan' => 'Juara 1',   'tingkat' => 'Nasional',      'penyelenggara' => 'Freeport'],
-        ['nama' => 'Lomba LKTIN',             'penghargaan' => 'Juara 2',   'tingkat' => 'Nasional',      'penyelenggara' => 'Institut Teknologi Sepuluh Nopember'],
-    ];
-
-    // id tetap (1, 2, 3, ...) supaya tautan ke Detail / Edit tidak berubah saat tabel dicari, difilter, atau diurutkan.
-    foreach ($prestasi as $n => &$d) { $d['id'] = $n + 1; }
-    unset($d);
-
-    $daftarTingkat = ['Internal', 'Kabupaten/kota', 'Provinsi', 'Nasional', 'Internasional'];
-
-    $selectClass = 'h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white pr-9 pl-3.5 text-[15px] text-gray-900';
-@endphp
-
     {{-- Judul halaman + tombol tambah --}}
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div class="flex flex-col gap-1.5">
@@ -40,8 +16,7 @@
         </a>
     </div>
 
-    {{-- Pencarian, filter, urut kolom, dan pagination berjalan di browser (Alpine.js + quick sort pada data tiruan).
-         Kalau backend sudah ada, pencarian / filter / urutan bisa diganti parameter ?q=...&urut=... dan pagination dari Laravel. --}}
+    {{-- Pencarian, filter, pengurutan, dan pagination berjalan di browser pada data dari database. --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
              x-data="prestasi(@js($prestasi))">
  
@@ -108,7 +83,11 @@
             </table>
 
             <p x-show="terfilter.length === 0" x-cloak class="px-4 py-10 text-center text-sm text-gray-500">
-                Tidak ada prestasi yang cocok dengan pencarian atau filter ini.
+                @if (count($prestasi) === 0)
+                    Belum ada prestasi tersimpan untuk akun ini. Prestasi yang berhasil disimpan akan muncul di sini.
+                @else
+                    Tidak ada prestasi yang cocok dengan pencarian atau filter ini.
+                @endif
             </p>
         </div>
 

@@ -2,117 +2,216 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kategori;
 use App\Models\Kegiatan;
+use App\Models\Dokumen;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class KegiatanController extends Controller
 {
     public function index(Request $request)
     {
-        $kegiatan = Kegiatan::untukUser($request->user())
-            ->with(['kategori.jenisKegiatan', 'statusTerkini', 'detail.isianKategori', 'prestasi', 'dokumen'])
-            ->withCount('anggota')->orderByDesc('tanggal_mulai')->orderByDesc('id_kegiatan')->get();
-        $counts = $kegiatan->countBy(fn ($k) => mb_strtolower($k->kategori?->nama_kategori ?? ''));
-        $categoryCounts = [
-            'LOMBA' => $counts->get('lomba', 0),
-            'VOLUNTEER' => $counts->get('volunteer', 0),
-            'KKL' => $counts->get('kkl', 0) + $counts->get('kuliah kerja lapangan', 0),
-            'MAGANG' => $counts->get('magang', 0),
-            'PENGABDIAN' => $counts->get('pengabdian', 0),
-            'PENELITIAN' => $counts->get('penelitian', 0),
-        ];
+        $user = Auth::user() ?? $request->user();
 
-        // Semester ganjil dimulai Agustus, semester genap Februari.
-        $year = $request->user()?->mahasiswa?->tahun_masuk
-            ?? (now()->month >= 8 ? now()->year : now()->year - 1);
-        $start = Carbon::create($year, 8, 1)->startOfDay();
-        $semesterCount = max(6, (int) floor($start->diffInMonths(now(), false) / 6) + 1);
-        $semesters = collect(range(1, $semesterCount))->map(function ($number) use ($start, $kegiatan) {
-            $from = $start->copy()->addMonths(($number - 1) * 6);
-            $until = $from->copy()->addMonths(6);
+        $kegiatan = Kegiatan::with(['dokumen.jenisDokumen', 'kategori'])
+            ->when($user, function ($query) use ($user) {
+                return $query->untukUser($user);
+            })
+            ->latest('created_at')
+            ->get();
 
-            return ['label' => 'Sem '.$number, 'value' => $kegiatan->filter(fn ($k) => $k->tanggal_mulai && $k->tanggal_mulai->gte($from) && $k->tanggal_mulai->lt($until))->count()];
-        });
-
-        return view($request->routeIs('dosen.*') ? 'dosen.kegiatan.index' : 'kegiatan', [
-            'categoryCounts' => $categoryCounts,
-            'categories' => Kategori::orderBy('nama_kategori')->pluck('nama_kategori')->unique()->values(),
-            'semesters' => $semesters,
-            'chartMax' => max(20, (int) (ceil($semesters->max('value') / 4) * 4)),
-            'allActivities' => $kegiatan->map(fn ($k) => [
-                'id' => $k->getKey(),
-                'name' => $k->nama_kegiatan,
-                'type' => $k->kategori?->nama_kategori ?? '—',
-                'date' => $k->tanggal_mulai?->locale('id')->translatedFormat('d M Y') ?? '—',
-                'raw_date' => $k->tanggal_mulai?->toDateString(),
-                'status' => ucfirst($k->statusTerkini?->status ?? 'Belum diajukan'),
-                'note' => $k->statusTerkini?->catatan_revisi,
-                'capaian' => $k->nilaiIsian('posisi_dalam_kegiatan') ?? '—',
-                'tingkat' => ucfirst($k->nilaiIsian('tingkat_kejuaraan') ?? '—'),
-                'jenis' => $k->prestasi->first()?->jenis_prestasi ?? '—',
-                'bentuk' => $k->anggota_count > 1 ? 'Tim' : 'Individu',
-                'penyelenggara' => $k->nilaiIsian('penyelenggara') ?? '—',
-                'detail_url' => route($request->routeIs('dosen.*') ? 'dosen.kegiatan.show' : 'kegiatan.show', $k->getKey()),
-                'documents' => $k->dokumen->map(fn ($d) => [
-                    'name' => $d->nama_file,
-                    'type' => $d->tipe_dokumen,
-                    'url' => $this->documentUrl($d->link_dokumen),
-                ]),
-            ]),
-        ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar kegiatan berhasil diambil.',
+            'data'    => $kegiatan
+        ], 200);
     }
 
-    public function show(Request $request, int $id)
+    public function store(Request $request)
     {
-        $kegiatan = Kegiatan::untukUser($request->user())->with([
-            'kategori.jenisKegiatan', 'detail.isianKategori', 'statusTerkini', 'dokumen.jenisDokumen',
-            'anggota.user.mahasiswa', 'anggota.user.dosen', 'anggota.user.role',
-        ])->findOrFail($id);
-
-        return view($request->routeIs('dosen.*') ? 'dosen.kegiatan.show' : 'kegiatan.show', [
-            'id' => $kegiatan->getKey(),
-            'catatan' => $kegiatan->statusTerkini?->catatan_revisi,
-            'k' => [
-                'nama' => $kegiatan->nama_kegiatan,
-                'kategori' => $kegiatan->kategori?->nama_kategori ?? '—',
-                'jenis' => $kegiatan->kategori?->jenisKegiatan?->nama_jenis_kegiatan ?? '—',
-                'penyelenggara' => $kegiatan->nilaiIsian('penyelenggara') ?? '—',
-                'tahun' => $kegiatan->tanggal_mulai?->year ?? '—',
-                'mulai' => $kegiatan->tanggal_mulai?->locale('id')->translatedFormat('j F Y') ?? '—',
-                'selesai' => $kegiatan->tanggal_selesai?->locale('id')->translatedFormat('j F Y') ?? '—',
-                'status' => ucfirst($kegiatan->statusTerkini?->status ?? 'Belum diajukan'),
-            ],
-            'anggota' => $kegiatan->anggota->map(fn ($a) => [
-                'nama' => $a->user?->mahasiswa?->nama ?? $a->user?->dosen?->nama ?? $a->user?->email ?? '—',
-                'status' => $a->user?->role?->nama_role ?? '—',
-            ]),
-            'dokumen' => $kegiatan->dokumen->map(fn ($d) => [
-                'file' => $d->nama_file, 'nama' => $d->nama_file,
-                'url' => $this->documentUrl($d->link_dokumen),
-                'jenis' => $d->jenisDokumen?->nama_jenis_dokumen ?? $d->tipe_dokumen,
-                'keterangan' => null, 'tautan' => $this->documentUrl($d->link_dokumen),
-            ]),
+        $validatedData = $request->validate([
+            'id_user'                    => 'nullable|exists:users,id_user',
+            'id_kategori'                => 'required|exists:kategori,id_kategori',
+            'id_kegiatan_sebelumnya'     => 'nullable|exists:kegiatan,id_kegiatan',
+            'nama_kegiatan'              => 'required|string|max:255',
+            'lokasi'                     => 'nullable|string|max:255',
+            'deskripsi'                  => 'nullable|string',
+            'nomor_sk'                   => 'nullable|string|max:100',
+            'tanggal_sk'                 => 'nullable|date',
+            'tanggal_mulai'              => 'nullable|date',
+            'tanggal_selesai'            => 'nullable|date|after_or_equal:tanggal_mulai',
+            'dokumen'                    => 'required|array|min:1',
+            'dokumen.*.id_jenis_dokumen' => 'required|exists:jenis_dokumen,id_jenis_dokumen',
+            'dokumen.*.link_dokumen'     => 'required|url',
+            'dokumen.*.id_detail_kegiatan' => 'nullable|exists:detail_kegiatan,id_detail_kegiatan',
+            'dokumen.*.is_lampiran'        => 'nullable|boolean',
+        ], [
+            'dokumen.required'           => 'Dokumen pendukung wajib diisi minimal 1 data.',
+            'dokumen.*.link_dokumen.url' => 'Format tautan dokumen harus berupa URL valid (http/https).',
         ]);
+
+        $userId = Auth::id() ?? $request->id_user;
+
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User tidak terautentikasi dan id_user tidak diberikan.'
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $kegiatan = Kegiatan::create([
+                'id_user'                => $userId,
+                'id_kategori'            => $validatedData['id_kategori'],
+                'id_kegiatan_sebelumnya' => $validatedData['id_kegiatan_sebelumnya'] ?? null,
+                'nama_kegiatan'          => $validatedData['nama_kegiatan'],
+                'lokasi'                 => $validatedData['lokasi'] ?? null,
+                'deskripsi'              => $validatedData['deskripsi'] ?? null,
+                'nomor_sk'               => $validatedData['nomor_sk'] ?? null,
+                'tanggal_sk'             => $validatedData['tanggal_sk'] ?? null,
+                'tanggal_mulai'          => $validatedData['tanggal_mulai'] ?? null,
+                'tanggal_selesai'        => $validatedData['tanggal_selesai'] ?? null,
+            ]);
+
+            foreach ($validatedData['dokumen'] as $doc) {
+                Dokumen::create([
+                    'id_kegiatan'        => $kegiatan->id_kegiatan,
+                    'id_jenis_dokumen'   => $doc['id_jenis_dokumen'],
+                    'link_dokumen'       => $doc['link_dokumen'],
+                    'id_detail_kegiatan' => $doc['id_detail_kegiatan'] ?? null,
+                    'is_lampiran'        => $doc['is_lampiran'] ?? false,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kegiatan dan dokumen pendukung berhasil disimpan!',
+                'data'    => $kegiatan->load(['dokumen.jenisDokumen', 'kategori'])
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
-    private function documentUrl(?string $link): ?string
+    public function show($id)
     {
-        if (! $link || $link === '#') {
-            return null;
-        }
-        if (preg_match('~^https?://~i', $link)) {
-            return $link;
-        }
-        if (str_starts_with($link, '/') && ! str_starts_with($link, '//')) {
-            return $link;
-        }
-        if (parse_url($link, PHP_URL_SCHEME) !== null || str_starts_with($link, '//')) {
-            return null;
+        $kegiatan = Kegiatan::with(['dokumen.jenisDokumen', 'kategori', 'statusTerkini'])->find($id);
+
+        if (!$kegiatan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kegiatan tidak ditemukan.'
+            ], 404);
         }
 
-        return Storage::disk('public')->url($link);
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail kegiatan berhasil diambil.',
+            'data'    => $kegiatan
+        ], 200);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $kegiatan = Kegiatan::find($id);
+
+        if (!$kegiatan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kegiatan tidak ditemukan.'
+            ], 404);
+        }
+
+        $validatedData = $request->validate([
+            'id_kategori'                => 'sometimes|required|exists:kategori,id_kategori',
+            'nama_kegiatan'              => 'sometimes|required|string|max:255',
+            'lokasi'                     => 'nullable|string|max:255',
+            'deskripsi'                  => 'nullable|string',
+            'nomor_sk'                   => 'nullable|string|max:100',
+            'tanggal_sk'                 => 'nullable|date',
+            'tanggal_mulai'              => 'nullable|date',
+            'tanggal_selesai'            => 'nullable|date|after_or_equal:tanggal_mulai',
+            'dokumen'                    => 'nullable|array',
+            'dokumen.*.id_jenis_dokumen' => 'required_with:dokumen|exists:jenis_dokumen,id_jenis_dokumen',
+            'dokumen.*.link_dokumen'     => 'required_with:dokumen|url',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $kegiatan->update($validatedData);
+
+            if (isset($validatedData['dokumen'])) {
+                Dokumen::where('id_kegiatan', $kegiatan->id_kegiatan)->delete();
+                foreach ($validatedData['dokumen'] as $doc) {
+                    Dokumen::create([
+                        'id_kegiatan'      => $kegiatan->id_kegiatan,
+                        'id_jenis_dokumen' => $doc['id_jenis_dokumen'],
+                        'link_dokumen'     => $doc['link_dokumen'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kegiatan berhasil diperbarui!',
+                'data'    => $kegiatan->load(['dokumen.jenisDokumen', 'kategori'])
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $kegiatan = Kegiatan::find($id);
+
+        if (!$kegiatan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kegiatan tidak ditemukan.'
+            ], 404);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            Dokumen::where('id_kegiatan', $kegiatan->id_kegiatan)->delete();
+            $kegiatan->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kegiatan dan dokumen pendukung berhasil dihapus.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

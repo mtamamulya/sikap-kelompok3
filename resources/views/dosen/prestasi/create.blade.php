@@ -3,23 +3,6 @@
 @section('title', 'Tambah Prestasi')
 
 @php
-    // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
-    // Kegiatan yang pernah diikuti (untuk "Dari kegiatan sebelumnya")
-    $kegiatanLama = [
-        'KMIPN VIII 2026 · Lomba'        => ['nama' => 'KMIPN VIII 2026',      'penyelenggara' => 'Kemendikbudristek',          'mulai' => '2026-09-12', 'selesai' => '2026-09-14'],
-        'Seminar nasional AI · Seminar'  => ['nama' => 'Seminar nasional AI',  'penyelenggara' => 'Politeknik Negeri Semarang', 'mulai' => '2026-09-12', 'selesai' => '2026-09-12'],
-        'Lomba karya ilmiah · Lomba'     => ['nama' => 'Lomba karya ilmiah',   'penyelenggara' => 'Universitas Diponegoro',     'mulai' => '2026-07-15', 'selesai' => '2026-07-16'],
-    ];
-    $daftarKategori = ['Teknologi', 'IoT', 'Jaringan', 'Olahraga', 'Seni'];
-    $kandidat = [
-        'Kuwat Santoso , S.T., M.Kom.' => 'Dosen',
-        'Wiktasari'                    => 'Dosen',
-        'Ivan Sigit Santoso'           => 'Mahasiswa',
-        'Anisa Aulia Nurusyifa'        => 'Mahasiswa',
-        'Mukhlis Pratama Mulya'        => 'Mahasiswa',
-    ];
-    $pengaju = 'Kuwat Santoso , S.T., M.Kom.'; // akun yang login
-
     $inputClass   = 'h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-[15px] text-gray-900 placeholder:text-gray-400';
     $selectClass  = 'h-11 w-full appearance-none rounded-lg border border-gray-200 bg-white pr-10 pl-3.5 text-[15px] text-gray-900';
     $labelClass   = 'text-[15px] font-medium';
@@ -38,12 +21,27 @@
         <p class="text-2xl text-gray-400">Dashboard / Prestasi / Tambah</p>
     </div>
 
-    <form x-data="formPrestasi(@js($kegiatanLama), @js($kandidat), @js($pengaju))" x-on:submit.prevent="simpan()"
-          method="POST" action="#" enctype="multipart/form-data"
+    <form x-data="formPrestasi(@js($kegiatanLama), @js($kandidat), @js($pengaju), @js(old()))"
+          method="POST" action="{{ route('prestasi.store') }}"
           class="flex flex-col gap-5 rounded-lg bg-white p-4.5 shadow-sm">
         @csrf
 
         <p class="text-sm text-gray-500"><span class="text-red-500">*</span> Wajib diisi. Kolom bertanda opsional boleh dikosongkan.</p>
+        @if ($errors->any())
+            <div role="alert" class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <p class="font-semibold">Data belum tersimpan. Periksa kembali isian berikut:</p>
+                <ul class="mt-1 list-inside list-disc">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @unless ($pengaju)
+            <p role="status" class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                Masuk menggunakan akun dengan role dosen untuk menyimpan prestasi.
+            </p>
+        @endunless
 
         {{-- 1. SUMBER KEGIATAN --}}
         <section class="{{ $sectionClass }}" aria-labelledby="h-sumber">
@@ -68,18 +66,18 @@
 
             {{-- Hanya muncul kalau memilih "Dari kegiatan sebelumnya" --}}
             <div x-show="sumber === 'kegiatan'" x-cloak class="flex flex-col gap-2">
-                <label for="kegiatan-lama" class="{{ $labelClass }}">Kegiatan sebelumnya</label>
+                <label for="kegiatan-lama" class="{{ $labelClass }}">Kegiatan sebelumnya {!! $wajib !!}</label>
                 <div class="relative">
-                    <svg class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
-                    <input id="kegiatan-lama" name="kegiatan_sebelumnya" type="text" list="daftar-kegiatan" x-model="pilihKegiatan"
-                           placeholder="Cari dan pilih kegiatan" class="{{ $inputClass }} pl-10">
-                    <datalist id="daftar-kegiatan">
-                        @foreach ($kegiatanLama as $label => $k)
-                            <option value="{{ $label }}"></option>
+                    <select id="kegiatan-lama" name="kegiatan_sebelumnya" x-model="pilihKegiatan"
+                            :required="sumber === 'kegiatan'" :disabled="sumber !== 'kegiatan'" class="{{ $selectClass }}">
+                        <option value="">Pilih kegiatan sebelumnya</option>
+                        @foreach ($kegiatanLama as $id => $k)
+                            <option value="{{ $id }}">{{ $k['label'] }}</option>
                         @endforeach
-                    </datalist>
+                    </select>
+                    {!! $chevron !!}
                 </div>
-                <p class="{{ $hintClass }}">Nama kegiatan, penyelenggara, dan tanggal akan terisi otomatis dan masih bisa kamu ubah sesuai sertifikat.</p>
+                <p class="{{ $hintClass }}">Kegiatan tersimpan akan ditautkan. Pilihan berlabel “contoh” hanya mengisi data awal dan tidak ditautkan sebagai kegiatan nyata.</p>
             </div>
         </section>
 
@@ -96,13 +94,13 @@
             <div class="grid grid-cols-1 gap-4.5 md:grid-cols-2">
                 <div class="flex flex-col gap-2 md:col-span-2">
                     <label for="nama" class="{{ $labelClass }}">Nama prestasi {!! $wajib !!}</label>
-                    <input id="nama" name="nama_prestasi" type="text" required x-model="nama"
+                    <input id="nama" name="nama_prestasi" type="text" required x-model="nama" value="{{ old('nama_prestasi') }}"
                            placeholder="Juara 1 Lomba Karya Tulis Ilmiah Nasional 2026" class="{{ $inputClass }}">
                 </div>
 
                 <div class="flex flex-col gap-2 md:col-span-2">
                     <label for="penyelenggara" class="{{ $labelClass }}">Penyelenggara {!! $wajib !!}</label>
-                    <input id="penyelenggara" name="penyelenggara" type="text" required x-model="penyelenggara"
+                    <input id="penyelenggara" name="penyelenggara" type="text" required x-model="penyelenggara" value="{{ old('penyelenggara') }}"
                            placeholder="Nama institusi penyelenggara" class="{{ $inputClass }}">
                 </div>
 
@@ -112,7 +110,7 @@
                         <select id="tingkat" name="tingkat" required class="{{ $selectClass }}">
                             <option value="">Pilih tingkat prestasi</option>
                             @foreach (['Internal', 'Kabupaten/kota', 'Provinsi', 'Nasional', 'Internasional'] as $t)
-                                <option>{{ $t }}</option>
+                                <option value="{{ $t }}" @selected(old('tingkat') === $t)>{{ $t }}</option>
                             @endforeach
                         </select>
                         {!! $chevron !!}
@@ -123,8 +121,8 @@
                     <div class="relative">
                         <select id="jenis" name="jenis" required class="{{ $selectClass }}">
                             <option value="">Pilih jenis prestasi</option>
-                            <option>Akademik</option>
-                            <option>Nonakademik</option>
+                            <option value="Akademik" @selected(old('jenis') === 'Akademik')>Akademik</option>
+                            <option value="Nonakademik" @selected(old('jenis') === 'Nonakademik')>Nonakademik</option>
                         </select>
                         {!! $chevron !!}
                     </div>
@@ -132,29 +130,24 @@
 
                 <div class="flex flex-col gap-2">
                     <label for="mulai" class="{{ $labelClass }}">Tanggal mulai {!! $wajib !!}</label>
-                    <input id="mulai" name="tanggal_mulai" type="date" required x-model="mulai" class="{{ $inputClass }}">
+                    <input id="mulai" name="tanggal_mulai" type="date" required x-model="mulai" value="{{ old('tanggal_mulai') }}" class="{{ $inputClass }}">
                 </div>
                 <div class="flex flex-col gap-2">
                     <label for="selesai" class="{{ $labelClass }}">Tanggal selesai {!! $wajib !!}</label>
-                    <input id="selesai" name="tanggal_selesai" type="date" required x-model="selesai" :min="mulai" class="{{ $inputClass }}">
+                    <input id="selesai" name="tanggal_selesai" type="date" required x-model="selesai" value="{{ old('tanggal_selesai') }}" :min="mulai" class="{{ $inputClass }}">
                 </div>
 
                 <div class="flex flex-col gap-2">
                     <label for="capaian" class="{{ $labelClass }}">Capaian / peringkat {!! $wajib !!}</label>
-                    <input id="capaian" name="capaian" type="text" required
+                    <input id="capaian" name="capaian" type="text" required value="{{ old('capaian') }}"
                            placeholder="Contoh: Juara 1" class="{{ $inputClass }}">
                     <p class="{{ $hintClass }}">Contoh: Juara 1, Harapan 2, Finalis, Peserta terbaik.</p>
                 </div>
 
                 <div class="flex flex-col gap-2">
                     <label for="kategori" class="{{ $labelClass }}">Kategori / bidang <span class="font-normal text-gray-500">(opsional)</span></label>
-                    <input id="kategori" name="kategori" type="text" list="daftar-kategori"
+                    <input id="kategori" name="kategori" type="text" value="{{ old('kategori') }}"
                            placeholder="Pilih atau tulis kategori" class="{{ $inputClass }}">
-                    <datalist id="daftar-kategori">
-                        @foreach ($daftarKategori as $k)
-                            <option value="{{ $k }}"></option>
-                        @endforeach
-                    </datalist>
                     <p class="{{ $hintClass }}">Contoh: teknologi, IoT, jaringan, olahraga, seni.</p>
                 </div>
 
@@ -195,14 +188,15 @@
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_11rem_11rem_auto]">
                 <div class="relative sm:col-span-2 lg:col-span-1">
                     <label for="cari" class="sr-only">Cari dosen atau mahasiswa</label>
-                    <svg class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
-                    <input id="cari" type="text" list="daftar-kandidat" x-model="cari" x-on:keydown.enter.prevent="tambah()"
-                           placeholder="Cari dosen atau mahasiswa..." class="{{ $inputClass }} pl-10">
-                    <datalist id="daftar-kandidat">
-                        @foreach ($kandidat as $nama => $status)
-                            <option value="{{ $nama }}">{{ $status }}</option>
+                    <select id="cari" x-model="cari" class="{{ $selectClass }}">
+                        <option value="">Pilih dosen atau mahasiswa</option>
+                        @foreach ($kandidat as $id => $calon)
+                            @if ($id !== ($pengaju['id_user'] ?? null))
+                                <option value="{{ $id }}">{{ $calon['nama'] }} ({{ $calon['status'] }})</option>
+                            @endif
                         @endforeach
-                    </datalist>
+                    </select>
+                    {!! $chevron !!}
                 </div>
 
                 <div class="relative">
@@ -216,7 +210,7 @@
                 </div>
                 <div class="relative">
                     <label for="status-anggota" class="sr-only">Status</label>
-                    <select id="status-anggota" x-model="status" class="{{ $selectClass }}">
+                    <select id="status-anggota" x-model="status" disabled class="{{ $selectClass }}">
                         <option value="">Pilih status</option>
                         <option>Dosen</option>
                         <option>Mahasiswa</option>
@@ -246,15 +240,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template x-for="(a, i) in anggota" :key="a.nama">
+                        <template x-for="(a, i) in anggota" :key="a.id_user">
                             <tr class="border-t border-gray-300">
                                 <td class="px-2.5 py-2.5">
                                     <span x-text="a.nama"></span>
                                     <template x-if="bentuk === 'Tim'">
                                         <span>
-                                            <input type="hidden" :name="`anggota[${i}][nama]`" :value="a.nama">
+                                            <input type="hidden" :name="`anggota[${i}][id_user]`" :value="a.id_user">
                                             <input type="hidden" :name="`anggota[${i}][peran]`" :value="a.peran">
-                                            <input type="hidden" :name="`anggota[${i}][status]`" :value="a.status">
                                         </span>
                                     </template>
                                 </td>
@@ -337,8 +330,8 @@
             <div class="flex flex-wrap items-center justify-end gap-3">
                 <a href="{{ route('prestasi.index') }}"
                    class="flex h-11 items-center rounded-md bg-red-500 px-6 text-base text-white hover:bg-red-600">Batal</a>
-                <button type="submit"
-                        class="h-11 cursor-pointer rounded-md bg-brand px-6 text-base text-white hover:bg-blue-700">Simpan prestasi</button>
+                <button type="submit" @disabled(!$pengaju)
+                        class="h-11 rounded-md bg-brand px-6 text-base text-white enabled:cursor-pointer enabled:hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">Simpan prestasi</button>
             </div>
         </div>
     </form>
@@ -348,13 +341,16 @@
 @push('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('formPrestasi', (kegiatanLama, kandidat, pengaju) => ({
-            sumber: '',
-            bentuk: '',
-            nama: '', penyelenggara: '', mulai: '', selesai: '', deskripsi: '',
+        Alpine.data('formPrestasi', (kegiatanLama, kandidat, pengaju, old) => ({
+            sumber: old.sumber || '',
+            bentuk: old.bentuk || '',
+            nama: old.nama_prestasi || '',
+            penyelenggara: old.penyelenggara || '',
+            mulai: old.tanggal_mulai || '',
+            selesai: old.tanggal_selesai || '',
+            deskripsi: old.deskripsi || '',
 
-            // Pilih kegiatan lama => isi nama, penyelenggara, dan tanggal (masih bisa diubah)
-            pilihKegiatan: '',
+            pilihKegiatan: old.kegiatan_sebelumnya || '',
             init() {
                 this.$watch('pilihKegiatan', v => {
                     const k = kegiatanLama[v];
@@ -362,48 +358,57 @@
                     this.nama = k.nama; this.penyelenggara = k.penyelenggara;
                     this.mulai = k.mulai; this.selesai = k.selesai;
                 });
-                // status anggota terisi otomatis kalau nama ada di daftar
-                this.$watch('cari', v => {
-                    const nama = Object.keys(kandidat).find(n => n.toLowerCase() === v.trim().toLowerCase());
-                    if (nama) this.status = kandidat[nama];
+                this.$watch('cari', id => {
+                    this.status = kandidat[id]?.status || '';
                 });
             },
 
-            // Anggota. Pengaju (akun yang login) selalu jadi Ketua dan terkunci.
-            anggota: [
-                { nama: pengaju, peran: 'Ketua', status: 'Dosen', kunci: true },
-            ],
+            anggota: pengaju
+                ? [
+                    { ...pengaju, peran: 'Ketua', kunci: true },
+                    ...(old.anggota || [])
+                        .filter(a => Number(a.id_user) !== Number(pengaju.id_user))
+                        .map(a => ({
+                            id_user: Number(a.id_user),
+                            nama: kandidat[a.id_user]?.nama || '',
+                            status: kandidat[a.id_user]?.status || '',
+                            peran: a.peran,
+                            kunci: false,
+                        })),
+                ]
+                : [],
             cari: '', peran: '', status: '', errorAnggota: '',
             tambah() {
-                const nama = this.cari.trim();
-                if (!nama || !this.peran || !this.status) {
+                const calon = kandidat[this.cari];
+                if (!calon || !this.peran) {
                     this.errorAnggota = 'Isi nama, peran, dan status sebelum menambahkan anggota.';
                     return;
                 }
-                if (this.anggota.some(a => a.nama.toLowerCase() === nama.toLowerCase())) {
+                if (this.anggota.some(a => Number(a.id_user) === Number(this.cari))) {
                     this.errorAnggota = 'Anggota ini sudah ada di daftar.';
                     return;
                 }
-                this.anggota.push({ nama, peran: this.peran, status: this.status, kunci: false });
+                this.anggota.push({
+                    id_user: Number(this.cari),
+                    nama: calon.nama,
+                    peran: this.peran,
+                    status: calon.status,
+                    kunci: false,
+                });
                 this.cari = ''; this.peran = ''; this.status = ''; this.errorAnggota = '';
             },
             hapus(i) { this.anggota.splice(i, 1); },
 
-            // Dokumen. Dokumen 1 selalu ada, sisanya bisa ditambah / dihapus.
-            nextId: 2,
-            dokumen: [
-                { id: 1, jenis: '', tautan: '' },
-            ],
+            nextId: old.dokumen ? old.dokumen.length + 1 : 2,
+            dokumen: (old.dokumen || [{ jenis: '', tautan: '' }]).map((d, i) => ({
+                id: i + 1,
+                jenis: d.jenis || '',
+                tautan: d.tautan || '',
+            })),
             tambahDokumen() {
                 this.dokumen.push({ id: this.nextId++, jenis: '', tautan: '' });
             },
             hapusDokumen(i) { this.dokumen.splice(i, 1); },
-// Simpan (simulasi).
-            tersimpan: false,
-            simpan() {
-                this.tersimpan = true;
-                this.$dispatch('tampil-alert', { tipe: 'sukses', judul: 'Data berhasil disimpan', pesan: 'Simulasi: data belum masuk database.' });
-            },
         }));
     });
 </script>
