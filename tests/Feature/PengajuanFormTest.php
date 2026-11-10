@@ -2,12 +2,35 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class PengajuanFormTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $id = DB::table('users')->insertGetId([
+            'id_role' => 4,
+            'email' => 'pengajuan-student@test.local',
+            'password' => bcrypt('password'),
+            'status' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->actingAs(User::findOrFail($id));
+    }
 
     public function test_new_forms_do_not_prefill_team_members(): void
     {

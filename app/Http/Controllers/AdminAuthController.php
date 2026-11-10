@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
@@ -14,22 +17,33 @@ class AdminAuthController extends Controller
      */
     public function login(Request $request): RedirectResponse
     {
+        $email = Str::lower(trim((string) $request->input('email')));
+        $rateLimitKey = 'login:'.hash('sha256', $email.'|'.$request->ip());
+
         // 1. Validasi Input
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'email', 'max:150'],
             'password' => ['required'],
         ], [
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'password.required' => 'Sandi wajib diisi.',
         ]);
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Terlalu banyak percobaan masuk. Coba lagi dalam '.RateLimiter::availableIn($rateLimitKey).' detik.']);
+        }
+
+        $credentials['email'] = $email;
         $credentials['status'] = true;
 
         // 2. Coba Auth via Database
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            RateLimiter::clear($rateLimitKey);
 
             $user = Auth::user();
+            $this->recordLogin($request, $email, (int) $user->getKey(), true);
 
             // Sesi kompatibilitas untuk middleware lama
             if ($user->id_role == 1) {
@@ -48,9 +62,25 @@ class AdminAuthController extends Controller
             };
         }
 
+        RateLimiter::hit($rateLimitKey, 60);
+        $userId = DB::table('users')->where('email', $email)->value('id_user');
+        $this->recordLogin($request, $email, $userId ? (int) $userId : null, false);
+
         // 4. Jika Gagal
         return back()->withInput($request->only('email'))
             ->withErrors(['email' => 'Email atau sandi yang Anda masukkan salah.']);
+    }
+
+    private function recordLogin(Request $request, string $email, ?int $userId, bool $successful): void
+    {
+        DB::table('login_logs')->insert([
+            'id_user' => $userId,
+            'email' => $email,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'successful' => $successful,
+            'created_at' => now(),
+        ]);
     }
 
     /**

@@ -6,15 +6,16 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Menjaga semua halaman /admin/*: hanya yang sudah login sebagai admin (simulasi session). */
+/** Menjaga semua halaman admin untuk akun ber-role admin yang aktif login. */
 class AdminOnly
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->session()->has('admin')) {
-            return redirect()->route('login')
-                ->withErrors(['email' => 'Silakan masuk sebagai admin terlebih dahulu.']);
+        if (! $request->user()) {
+            return redirect()->guest(route('login'));
         }
+
+        abort_unless((int) $request->user()->id_role === 1, 403);
 
         return $next($request);
     }

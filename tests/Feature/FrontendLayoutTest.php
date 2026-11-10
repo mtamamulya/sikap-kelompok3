@@ -11,6 +11,26 @@ class FrontendLayoutTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function studentUser(): User
+    {
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $id = DB::table('users')->insertGetId([
+            'id_role' => 4,
+            'email' => 'student-layout@test.local',
+            'password' => bcrypt('password'),
+            'status' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return User::findOrFail($id);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -19,6 +39,8 @@ class FrontendLayoutTest extends TestCase
 
     public function test_existing_student_and_lecturer_pages_render_directly_without_login(): void
     {
+        $this->actingAs($this->studentUser());
+
         $this->get('/mahasiswa/dashboard')
             ->assertOk()
             ->assertViewIs('mahasiswa.dashboard.dashboard')
@@ -67,7 +89,18 @@ class FrontendLayoutTest extends TestCase
         }
     }
 
-    public function test_existing_database_activity_data_and_owner_scope_are_preserved_in_both_layouts(): void
+    public function test_local_root_opens_public_program_landing_and_service_cards_open_login(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertViewIs('home')
+            ->assertSee('Teknologi Rekayasa Komputer')
+            ->assertSee('href="'.route('login').'"', false)
+            ->assertSee('Mahasiswa')
+            ->assertSee('Dosen');
+    }
+
+    public function test_lecturer_pages_keep_their_owner_scope_and_students_cannot_access_them(): void
     {
         $role = DB::table('roles')->insertGetId(['nama_role' => 'dosen'], 'id_role');
         $kind = DB::table('jenis_kegiatan')->insertGetId(['nama_jenis_kegiatan' => 'Kegiatan Dosen'], 'id_jenis_kegiatan');
@@ -81,12 +114,8 @@ class FrontendLayoutTest extends TestCase
 
         $this->actingAs(User::findOrFail($ownerId));
 
-        $this->get('/mahasiswa/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain');
-        $this->get('/mahasiswa/kegiatan')->assertOk()
-            ->assertViewIs('mahasiswa.kegiatan.index')
-            ->assertSee('FKBSE 2025')
-            ->assertDontSee('Kegiatan Milik Saya')
-            ->assertDontSee('Kegiatan Milik Orang Lain');
+        $this->get('/mahasiswa/dashboard')->assertForbidden();
+        $this->get('/mahasiswa/kegiatan')->assertForbidden();
         $this->get('/dosen/dashboard')->assertOk()->assertSee('Kegiatan Milik Saya')->assertDontSee('Kegiatan Milik Orang Lain')->assertViewHas('stats', fn ($stats) => $stats[1]['value'] === 1 && $stats[3]['value'] === 1);
         $this->get('/dosen/kegiatan')->assertOk()
             ->assertOk()

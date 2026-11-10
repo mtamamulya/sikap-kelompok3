@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DosenRoutesTest extends TestCase
@@ -90,7 +92,23 @@ class DosenRoutesTest extends TestCase
             ->assertDontSee('VOLUNTEER')
             ->assertDontSee('MAGANG');
 
-        $this->get(route('kegiatan.index'))
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $studentId = DB::table('users')->insertGetId([
+            'id_role' => 4,
+            'email' => 'student@test.local',
+            'password' => bcrypt('password'),
+            'status' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], 'id_user');
+
+        $this->actingAs(User::findOrFail($studentId))
+            ->get(route('kegiatan.index'))
             ->assertOk()
             ->assertSee('class="frontend-shell mahasiswa-shell', false)
             ->assertSee('Kegiatan per semester');

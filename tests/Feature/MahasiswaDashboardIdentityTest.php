@@ -11,9 +11,29 @@ class MahasiswaDashboardIdentityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_dashboard_guest_uses_student_identity_instead_of_guest_or_staff_identity(): void
+    private function student(): User
     {
-        $this->get(route('mahasiswa.dashboard'))
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $id = DB::table('users')->insertGetId([
+            'id_role' => 4,
+            'email' => 'student-'.uniqid().'@test.local',
+            'password' => bcrypt('password'),
+            'status' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return User::findOrFail($id);
+    }
+
+    public function test_dashboard_uses_authenticated_student_identity(): void
+    {
+        $this->actingAs($this->student())->get(route('mahasiswa.dashboard'))
             ->assertOk()
             ->assertSee(config('mahasiswa.nama'))
             ->assertSee('NIM:')
@@ -24,7 +44,7 @@ class MahasiswaDashboardIdentityTest extends TestCase
 
     public function test_student_dashboard_uses_configured_semester(): void
     {
-        $this->get(route('mahasiswa.index'))
+        $this->actingAs($this->student())->get(route('mahasiswa.index'))
             ->assertOk()
             ->assertViewIs('mahasiswa.mahasiswa.dashboard-mhs')
             ->assertSee(config('mahasiswa.nama'))
@@ -33,7 +53,7 @@ class MahasiswaDashboardIdentityTest extends TestCase
 
     public function test_profile_and_header_show_the_logout_action(): void
     {
-        $this->get(route('mahasiswa.profil'))
+        $this->actingAs($this->student())->get(route('mahasiswa.profil'))
             ->assertOk()
             ->assertViewIs('mahasiswa.mahasiswa.profil')
             ->assertSee(config('mahasiswa.nama'))
