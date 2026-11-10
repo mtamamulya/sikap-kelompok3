@@ -7,7 +7,7 @@
             </svg>
         </button>
         <a href="{{ route('dosen.dashboard') }}" class="flex items-center gap-2">
-            <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-8 w-auto">
+            <img src="{{ asset('images/logo_trk remove.png') }}" alt="Logo TRK" class="h-8 w-auto">
             <span class="text-[10px] font-bold leading-tight text-brand">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
         </a>
     </div>
