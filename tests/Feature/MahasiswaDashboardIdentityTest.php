@@ -69,4 +69,57 @@ class MahasiswaDashboardIdentityTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_student_can_log_in_and_is_redirected_to_the_dashboard(): void
+    {
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('users')->insert([
+            'id_role' => 4,
+            'email' => 'mahasiswa-login@test.local',
+            'password' => bcrypt('password'),
+            'status' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->post(route('login.attempt'), [
+            'email' => 'mahasiswa-login@test.local',
+            'password' => 'password',
+        ])
+            ->assertRedirect(route('mahasiswa.dashboard'));
+
+        $this->assertAuthenticated();
+    }
+
+    public function test_inactive_student_cannot_log_in(): void
+    {
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('users')->insert([
+            'id_role' => 4,
+            'email' => 'mahasiswa-inactive@test.local',
+            'password' => bcrypt('password'),
+            'status' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->post(route('login.attempt'), [
+            'email' => 'mahasiswa-inactive@test.local',
+            'password' => 'password',
+        ])
+            ->assertRedirect()
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest();
+    }
 }

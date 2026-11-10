@@ -23,6 +23,7 @@ class AdminAuthController extends Controller
             'email.email' => 'Format email tidak valid.',
             'password.required' => 'Sandi wajib diisi.',
         ]);
+        $credentials['status'] = true;
 
         // 2. Coba Auth via Database
         if (Auth::attempt($credentials)) {

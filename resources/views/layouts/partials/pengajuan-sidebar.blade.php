@@ -15,9 +15,9 @@
     $activeItem = 'bg-white text-[#1f66e5] font-semibold shadow-sm hover:bg-white';
     $icon = 'size-5 shrink-0';
 @endphp
-<aside class="sticky top-0 hidden h-screen w-60 shrink-0 flex-col gap-7 overflow-y-auto bg-linear-to-b from-[#1f66e5] from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% px-3 py-6 text-white lg:flex">
+<aside class="fixed inset-y-0 left-0 z-30 hidden w-60 shrink-0 flex-col gap-7 overflow-y-auto bg-linear-to-b from-[#1f66e5] from-0% via-[#1550bd] via-50% to-[#0b2f7a] to-100% px-3 py-6 text-white lg:flex">
     <a href="{{ route('pengajuan.index') }}" aria-label="Teknologi Rekayasa Komputer, ke Pengajuan" class="flex items-center gap-2.5 px-1">
-        <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0" />
+        <img src="{{ asset('images/logo_trk remove.png') }}" alt="Logo TRK" class="h-10 w-auto shrink-0" />
         <span class="text-[13px] font-bold leading-[1.15] tracking-tight text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
     </a>
 
