@@ -1,6 +1,6 @@
 {{--
     resources/views/admin/prestasi.blade.php
-    Daftar prestasi dosen & mahasiswa: tab tipe, cari, filter semester & kategori, paginasi (berfungsi).
+    Daftar prestasi dosen & mahasiswa: tab pemilik kegiatan, pencarian, filter data yang tersedia, dan paginasi.
     Aksi: lihat, edit (link), hapus (modal konfirmasi -> DELETE lewat form + CSRF).
     Tabel memakai DataTables 2.x (sorting & paginasi ditangani library). Tidak lagi memakai public/js/tabel-urut.js.
 --}}
@@ -10,7 +10,13 @@
 
 @php
     $tabs = ['Semua', 'Dosen', 'Mahasiswa'];
-    $kategoriList = ['Lomba', 'Penghargaan'];
+    // Nilai filter berasal dari data Eloquent yang telah dipetakan oleh controller.
+    $kategoriList = collect($rows)->pluck('kategori')
+        ->filter(fn ($nilai) => is_string($nilai) && trim($nilai) !== '' && $nilai !== '-')
+        ->unique()->sort()->values()->all();
+    $semesterList = collect($rows)->pluck('semester')
+        ->filter(fn ($nilai) => is_string($nilai) && trim($nilai) !== '' && $nilai !== '-')
+        ->unique()->sort()->values()->all();
     $selectCls = 'h-10 w-full appearance-none rounded-lg border border-[#E8E8EC] bg-white px-4 pr-10 text-base text-[#2E2E2E] outline-none focus:border-[#2277FF] cursor-pointer';
     $chev = '<svg class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1C2024]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6 -6" /></svg>';
 @endphp
@@ -169,16 +175,17 @@
                 <input id="q" type="text" placeholder="Cari nama prestasi..." class="min-w-0 flex-1 bg-transparent text-base tracking-[-0.18px] outline-none placeholder:text-[#A8A8A8]">
             </div>
             <div class="relative w-full lg:w-[187px]">
-                <select id="fSemester" class="{{ $selectCls }}">
-                    <option value="">Semua Semester</option>
-                    <option value="Ganjil">Ganjil</option>
-                    <option value="Genap">Genap</option>
+                <select id="fSemester" class="{{ $selectCls }}" @disabled(empty($semesterList))>
+                    <option value="">{{ empty($semesterList) ? 'Semester belum tersedia' : 'Semua Semester' }}</option>
+                    @foreach ($semesterList as $s)
+                        <option value="{{ $s }}">{{ $s }}</option>
+                    @endforeach
                 </select>
                 {!! $chev !!}
             </div>
             <div class="relative w-full lg:w-[187px]">
-                <select id="fKategori" class="{{ $selectCls }}">
-                    <option value="">Semua Kategori</option>
+                <select id="fKategori" class="{{ $selectCls }}" @disabled(empty($kategoriList))>
+                    <option value="">{{ empty($kategoriList) ? 'Kategori belum tersedia' : 'Semua Kategori' }}</option>
                     @foreach ($kategoriList as $k)
                         <option value="{{ $k }}">{{ $k }}</option>
                     @endforeach
@@ -193,10 +200,10 @@
                 <thead>
                     <tr>
                         <th>Nama Prestasi</th>
-                        <th>Kategori</th>
-                        <th>Diunggah Oleh</th>
-                        <th>Tipe</th>
-                        <th>Tanggal</th>
+                        <th>Kategori Kegiatan</th>
+                        <th>Pemilik Kegiatan</th>
+                        <th>Tipe Pemilik</th>
+                        <th>Selesai Kegiatan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>

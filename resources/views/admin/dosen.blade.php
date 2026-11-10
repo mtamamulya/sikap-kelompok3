@@ -1,7 +1,7 @@
 {{--
     resources/views/admin/dosen.blade.php
     Daftar dosen: cari, filter pangkat & status, paginasi (sudah berfungsi).
-    Aksi: lihat (ke halaman detail) dan saklar aktif/nonaktif (modal konfirmasi -> PATCH lewat form + CSRF; route admin.dosen.status).
+    Aksi: lihat (ke halaman detail) dan tombol ubah status aktif/nonaktif (modal konfirmasi -> PATCH lewat form + CSRF; route admin.dosen.status).
     Dosen tidak dihapus, hanya dinonaktifkan. Dosen aktif tampil di landing page, yang nonaktif tidak.
     Tombol Tambah Dosen menjadi link bila route admin.dosen.create dibuat.
     Tabel memakai DataTables 2.x (sorting & paginasi ditangani library). Tidak lagi memakai public/js/tabel-urut.js.
@@ -127,12 +127,10 @@
     #modalStatus[data-mode="aktif"] .modal-btn-ya { background: #2277FF; }
     #modalStatus[data-mode="aktif"] .modal-btn-ya:hover { background: #1A66E0; }
 
-    /* ---------- Saklar aktif / nonaktif ---------- */
-    .sw { position: relative; flex-shrink: 0; width: 40px; height: 22px; padding: 0; border: 0; border-radius: 9999px; background: #C9CCD3; cursor: pointer; transition: background .15s; }
-    .sw::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 9999px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .25); transition: transform .15s; }
-    .sw[aria-checked="true"] { background: #2277FF; }
-    .sw[aria-checked="true"]::after { transform: translateX(18px); }
-    .sw:focus-visible { outline: 2px solid #2277FF; outline-offset: 2px; }
+    /* ---------- Tombol ubah status (aktif / nonaktif): kotak krem, ikon panah putar oranye ---------- */
+    .btn-status { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: #FBE5CB; color: #FFAA49; cursor: pointer; transition: background .15s; }
+    .btn-status:hover { background: #F8D9B5; }
+    .btn-status:focus-visible { outline: 2px solid #FFAA49; outline-offset: 2px; }
 </style>
 
 <main class="p-4 pb-10 sm:p-6">
@@ -195,7 +193,7 @@
     </section>
 </main>
 
-{{-- Modal konfirmasi aktifkan / nonaktifkan (dibuka lewat JS: saklar di tabel) --}}
+{{-- Modal konfirmasi aktifkan / nonaktifkan (dibuka lewat JS: tombol ubah status di tabel) --}}
 <dialog id="modalStatus" data-mode="nonaktif" aria-labelledby="modalStatusJudul" aria-describedby="modalStatusTeks">
     <div class="modal-kartu">
         <div class="modal-ikon">
@@ -237,6 +235,7 @@
         return '<svg width="' + w + '" height="' + w + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
     }
     var I_EYE   = svg(16, 1.5, '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />');
+    var I_SYNC  = svg(16, 1.5, '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />');
 
     var TXT = DataTable.render.text(); // otomatis escape HTML
     function pangkat(r) { return (r.jabatan || '') + ', ' + (r.golongan || ''); }
@@ -273,9 +272,9 @@
                 data: null, orderable: false, searchable: false,
                 render: function (d, type, r) {
                     var id = esc(r.id);
-                    return '<div class="flex items-center gap-3">' +
+                    return '<div class="flex gap-2">' +
                         '<button type="button" title="Lihat detail" aria-label="Lihat detail" data-act="view" data-id="' + id + '" class="flex size-8 cursor-pointer items-center justify-center rounded-md bg-[#D4E3FF] text-[#1F73FF] hover:bg-[#C2D8FF]">' + I_EYE + '</button>' +
-                        '<button type="button" role="switch" class="sw" aria-checked="' + (r.status === 'aktif' ? 'true' : 'false') + '" title="' + (r.status === 'aktif' ? 'Nonaktifkan dosen' : 'Aktifkan dosen') + '" aria-label="' + (r.status === 'aktif' ? 'Nonaktifkan dosen' : 'Aktifkan dosen') + '" data-act="status" data-id="' + id + '"></button>' +
+                        '<button type="button" title="' + (r.status === 'aktif' ? 'Nonaktifkan dosen' : 'Aktifkan dosen') + '" aria-label="' + (r.status === 'aktif' ? 'Nonaktifkan dosen' : 'Aktifkan dosen') + '" data-act="status" data-id="' + id + '" class="btn-status">' + I_SYNC + '</button>' +
                     '</div>';
                 }
             }

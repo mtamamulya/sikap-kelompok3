@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdminAuthController extends Controller
 {
@@ -24,8 +26,8 @@ class AdminAuthController extends Controller
             'password.required' => 'Sandi wajib diisi.',
         ]);
 
-        // 2. Coba Auth via Database
-        if (Auth::attempt($credentials)) {
+        // 2. Coba Auth via Database (hanya akun aktif: users.status = 1; dosen/mahasiswa yang dinonaktifkan ditolak)
+        if (Auth::attempt($credentials + ['status' => true])) {
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -47,7 +49,15 @@ class AdminAuthController extends Controller
             };
         }
 
-        // 4. Jika Gagal
+        // 4. Sandi benar tetapi akun dinonaktifkan: beri pesan yang jelas. Pesan ini hanya muncul bila sandi cocok,
+        //    jadi orang yang tidak tahu sandinya tidak bisa menebak status akun.
+        $akun = User::query()->where('email', $credentials['email'])->first();
+        if ($akun && ! $akun->status && Hash::check($credentials['password'], $akun->password)) {
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Akun Anda dinonaktifkan. Hubungi admin.']);
+        }
+
+        // 5. Jika Gagal
         return back()->withInput($request->only('email'))
             ->withErrors(['email' => 'Email atau sandi yang Anda masukkan salah.']);
     }

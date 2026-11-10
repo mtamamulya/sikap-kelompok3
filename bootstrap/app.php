@@ -13,7 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api/v1',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Akun yang dinonaktifkan langsung dikeluarkan, walau sesinya masih berlaku.
+        $middleware->web(append: [
+            \App\Http\Middleware\PastikanAkunAktif::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

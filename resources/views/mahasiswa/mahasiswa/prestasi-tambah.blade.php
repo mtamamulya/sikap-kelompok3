@@ -136,7 +136,7 @@
 
                     <div class="flex flex-col gap-1.5">
                         <label for="nama_lomba" class="{{ $label }}">Nama lomba {!! $wajib !!}</label>
-                        <input id="nama_lomba" name="nama_lomba" x-model="namaLomba" placeholder="Contoh: Techomfest 2026" class="{{ $in('nama_lomba') }}">
+                        <input id="nama_lomba" name="nama_lomba" x-model="namaLomba" placeholder="Contoh: Techcomfest 2026" class="{{ $in('nama_lomba') }}">
                         {!! $galat('nama_lomba') !!}
                     </div>
 

@@ -294,4 +294,25 @@ class MahasiswaDbStore extends MahasiswaStore
 
         return $kegiatan;
     }
+
+    /**
+     * Mengubah status aktif/nonaktif akun & profil mahasiswa.
+     */
+    public function toggleStatus(string $id): bool
+    {
+        $mahasiswa = \App\Models\Mahasiswa::with('user')->find($id);
+        if (! $mahasiswa || ! $mahasiswa->user) {
+            return false;
+        }
+
+        $statusBaru = ! $mahasiswa->user->status; // Toggle boolean status
+
+        // Update status login user
+        $mahasiswa->user->update(['status' => $statusBaru]);
+
+        // Update status akademik mahasiswa
+        $mahasiswa->update(['status' => $statusBaru ? 'Aktif' : 'Nonaktif']);
+
+        return true;
+    }
 }
