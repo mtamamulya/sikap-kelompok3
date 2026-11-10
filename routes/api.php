@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,24 +24,12 @@ Route::get('/ping', function () {
     ], 200);
 });
 
-// Autentikasi API (token Sanctum)
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('api.login');
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
-    Route::get('/me', [AuthController::class, 'me'])->name('api.me');
-});
-
 /*
 |--------------------------------------------------------------------------
 | Integrasi dengan Kelompok 1 (Endpoint Kontrak)
 |--------------------------------------------------------------------------
 */
-Route::prefix('integrasi')
-    ->middleware('auth:sanctum')
-    ->group(function () {
-        // TODO: Daftarkan endpoint API fitur di sini
-    });
+// TODO: Daftarkan endpoint API fitur di sini
 
 Route::get('/berita', [BeritaController::class, 'index']);
 require __DIR__.'/api-admin-kaprodi.php';
