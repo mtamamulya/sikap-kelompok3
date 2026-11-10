@@ -2,157 +2,258 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Dokumen;
 use App\Models\EnrollmentKelasMataKuliah;
-use App\Models\JenisDokumen;
-use App\Models\Pengajaran;
+use App\Models\EnrollmentMataKuliah;
+use App\Models\EnrollmentTingkatKelas;
+use App\Models\TahunAkademik;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
+/**
+ * Pengajaran dosen = kelas + mata kuliah yang diampu dosen pada satu tahun akademik
+ * (tabel enrollment_kelas_mata_kuliah). Dokumen pendukung (tabel pengajaran -> dokumen)
+ * belum dikerjakan: menunggu keputusan tim database soal dokumen.id_kegiatan.
+ */
 class DosenPengajaranController extends Controller
 {
-    /**
-     * Tampilkan halaman daftar pengajaran dosen.
-     */
-    public function index()
-    {
-        $pengajaran = Pengajaran::with(['enrollmentKelasMataKuliah', 'dokumen'])
-            ->latest()
-            ->get();
+    /** Relasi yang dibutuhkan untuk menampilkan satu baris pengajaran. */
+    private const RELASI = [
+        'dosen',
+        'enrollmentMataKuliah.mataKuliah',
+        'enrollmentMataKuliah.tahunAkademik',
+        'enrollmentTingkatKelas.prodi',
+        'enrollmentTingkatKelas.tingkat',
+        'enrollmentTingkatKelas.kelas',
+        'pengajaran.dokumen.jenisDokumen',
+    ];
 
-        return view('dosen.pengajaran.index', compact('pengajaran'));
+    public function index(Request $request)
+    {
+        $dosen = $request->user()?->dosen;
+
+        $pengajaran = $dosen
+            ? EnrollmentKelasMataKuliah::with(self::RELASI)
+                ->where('id_dosen', $dosen->id_dosen)
+                ->get()
+                ->map(fn (EnrollmentKelasMataKuliah $item) => $this->baris($item))
+                ->sortByDesc('tahun')
+                ->values()
+                ->all()
+            : [];
+
+        $kolom = collect($pengajaran);
+
+        return view('dosen.pengajaran.index', [
+            'pengajaran' => $pengajaran,
+            'daftarKelas' => $kolom->pluck('kelas')->unique()->sort()->values()->all(),
+            'daftarTahun' => $kolom->pluck('tahun')->unique()->sortDesc()->values()->all(),
+            'daftarSemester' => ['Ganjil', 'Genap'],
+        ]);
+    }
+
+    public function create(Request $request)
+    {
+        return view('dosen.pengajaran.create', [
+            'opsi' => $this->opsiForm(),
+            'dosenLogin' => $request->user()?->dosen?->nama ?? '-',
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $dosen = $this->dosenLogin($request);
+        $data = $this->validasi($request, (int) $dosen->id_dosen);
+
+        $item = EnrollmentKelasMataKuliah::create($data + ['id_dosen' => $dosen->id_dosen]);
+
+        return redirect()->route('pengajaran.show', $item->getKey())
+            ->with('sukses', 'Pengajaran berhasil disimpan.');
+    }
+
+    public function show(Request $request, int $id)
+    {
+        $item = $this->milikDosen($request, $id);
+
+        return view('dosen.pengajaran.show', [
+            'p' => $this->detail($item),
+            'dokumen' => $this->dokumen($item),
+        ]);
+    }
+
+    public function edit(Request $request, int $id)
+    {
+        $item = $this->milikDosen($request, $id);
+
+        return view('dosen.pengajaran.edit', [
+            'item' => $item,
+            'opsi' => $this->opsiForm(),
+            'dosenLogin' => $item->dosen->nama,
+            'dokumen' => $this->dokumen($item),
+        ]);
+    }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $item = $this->milikDosen($request, $id);
+        $data = $this->validasi($request, (int) $item->id_dosen, $item);
+
+        $item->update($data);
+
+        return redirect()->route('pengajaran.show', $item->getKey())
+            ->with('sukses', 'Perubahan pengajaran berhasil disimpan.');
+    }
+
+    // ---------------------------------------------------------------- helper
+
+    /** Dosen dari akun yang login. 403 kalau akun bukan dosen (atau belum login). */
+    private function dosenLogin(Request $request)
+    {
+        return $request->user()?->dosen ?? abort(403, 'Akun ini bukan akun dosen.');
+    }
+
+    /** Pengajaran milik dosen yang login. Milik dosen lain atau tidak ada = 404. */
+    private function milikDosen(Request $request, int $id): EnrollmentKelasMataKuliah
+    {
+        $dosen = $request->user()?->dosen;
+        abort_if($dosen === null, 404);
+
+        return EnrollmentKelasMataKuliah::with(self::RELASI)
+            ->where('id_dosen', $dosen->id_dosen)
+            ->findOrFail($id);
     }
 
     /**
-     * Tampilkan form tambah pengajaran.
+     * Validasi form tambah / edit.
+     * Aturan: rombel dan mata kuliah harus dari tahun akademik yang sama, dan satu mata kuliah
+     * pada satu rombel hanya boleh punya satu dosen pengampu (unique di tabel).
      */
-    public function create()
+    private function validasi(Request $request, int $idDosen, ?EnrollmentKelasMataKuliah $ubah = null): array
     {
-        $daftarTahunAkademik = ['2025/2026 Ganjil', '2025/2026 Genap', '2024/2025 Ganjil', '2024/2025 Genap'];
-        $daftarProdi = ['D3 Teknik Informatika', 'D4 Teknik Informatika', 'D3 Teknik Elektronika', 'D4 Teknik Telekomunikasi'];
-        $daftarKelas = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
-        $daftarMatkul = ['Kecerdasan Buatan', 'Jaringan Komputer', 'Sistem Basis Data', 'Internet of Things', 'Computer Vision', 'Sistem Operasi'];
-
-        $dosenLogin = Auth::user()->name ?? Auth::user()->nama ?? 'Kuwat Santoso';
-
-        return view('dosen.pengajaran.create', compact(
-            'daftarTahunAkademik',
-            'daftarProdi',
-            'daftarKelas',
-            'daftarMatkul',
-            'dosenLogin'
-        ));
-    }
-
-    /**
-     * Simpan data pengajaran dan dokumen pendukung ke database.
-     */
-    public function store(Request $request)
-    {
-        // 1. Validasi Data Form
-        $request->validate([
-            'tahun_akademik'  => 'required|string',
-            'program_studi'   => 'required|string',
-            'kelas'           => 'required|string',
-            'mata_kuliah'     => 'required|string',
-            'dokumen'         => 'required|array|min:1',
-            'dokumen.*.nama'   => 'required|string|max:255',
-            'dokumen.*.jenis'  => 'required|string',
-            'dokumen.*.tautan' => 'required|url',
+        $data = $request->validate([
+            'id_enrollment_tingkat_kelas' => ['required', 'integer', 'exists:enrollment_tingkat_kelas,id_enrollment_tingkat_kelas'],
+            'id_enrollment_mk' => ['required', 'integer', 'exists:enrollment_mata_kuliah,id_enrollment_mk'],
         ], [
-            'program_studi.required'  => 'Program studi wajib dipilih!',
-            'kelas.required'          => 'Kelas wajib dipilih!',
-            'mata_kuliah.required'    => 'Mata kuliah wajib dipilih!',
-            'dokumen.*.nama.required' => 'Nama dokumen wajib diisi!',
-            'dokumen.*.tautan.url'    => 'Tautan dokumen harus berupa URL valid!',
+            'id_enrollment_tingkat_kelas.required' => 'Kelas wajib dipilih.',
+            'id_enrollment_tingkat_kelas.exists' => 'Kelas yang dipilih tidak ditemukan.',
+            'id_enrollment_mk.required' => 'Mata kuliah wajib dipilih.',
+            'id_enrollment_mk.exists' => 'Mata kuliah yang dipilih tidak ditemukan.',
         ]);
 
-        DB::beginTransaction();
+        $rombel = EnrollmentTingkatKelas::findOrFail($data['id_enrollment_tingkat_kelas']);
+        $mataKuliah = EnrollmentMataKuliah::findOrFail($data['id_enrollment_mk']);
 
-        try {
-            // 2. Ambil atau buat data Enrollment Kelas Mata Kuliah
-            $enrollment = EnrollmentKelasMataKuliah::firstOrCreate([
-                'mata_kuliah' => $request->mata_kuliah,
-                'kelas'       => $request->kelas,
-                'prodi'       => $request->program_studi,
+        if ((int) $rombel->id_tahun_akademik !== (int) $mataKuliah->id_tahun_akademik) {
+            throw ValidationException::withMessages([
+                'id_enrollment_mk' => 'Mata kuliah ini tidak ditawarkan pada tahun akademik kelas yang dipilih.',
             ]);
-
-            // 3. Loop untuk simpan tiap dokumen pendukung
-            foreach ($request->dokumen as $dok) {
-                // Cari ID jenis dokumen berdasarkan pilihan di dropdown form
-                $jenisDok = JenisDokumen::where('nama_jenis_dokumen', $dok['jenis'])
-                    ->orWhere('id_jenis_dokumen', $dok['jenis'])
-                    ->value('id_jenis_dokumen') ?? 1;
-
-                // Simpan ke tabel `dokumen` (sesuai kolom $fillable model Dokumen timmu)
-                $dokumenBaru = Dokumen::create([
-                    'id_jenis_dokumen' => $jenisDok,
-                    'nama_file'        => $dok['nama'],
-                    'link_dokumen'      => $dok['tautan'],
-                    'tipe_dokumen'      => 'url',
-                    'is_lampiran'      => false,
-                ]);
-
-                // 4. Hubungkan ke junction table `pengajaran`
-                Pengajaran::create([
-                    'id_enrollment_kelas_mk' => $enrollment->id_enrollment_kelas_mk,
-                    'id_dokumen'             => $dokumenBaru->id_dokumen,
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()
-                ->route('pengajaran.index')
-                ->with('success', 'Data pengajaran berhasil disimpan!');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()
-                ->withInput()
-                ->with('error', 'Gagal menyimpan data pengajaran: ' . $e->getMessage());
         }
+
+        $sudahAda = EnrollmentKelasMataKuliah::query()
+            ->where('id_enrollment_tingkat_kelas', $rombel->getKey())
+            ->where('id_enrollment_mk', $mataKuliah->getKey())
+            ->when($ubah, fn ($q) => $q->whereKeyNot($ubah->getKey()))
+            ->first();
+
+        if ($sudahAda) {
+            throw ValidationException::withMessages([
+                'id_enrollment_mk' => (int) $sudahAda->id_dosen === $idDosen
+                    ? 'Anda sudah mengampu mata kuliah ini di kelas tersebut.'
+                    : 'Mata kuliah ini di kelas tersebut sudah diampu dosen lain.',
+            ]);
+        }
+
+        return $data;
     }
 
-    /**
-     * Tampilkan detail data pengajaran.
-     */
-    public function show($id)
+    /** Pilihan untuk form: tahun akademik, kelas (rombel), dan mata kuliah yang ditawarkan. */
+    private function opsiForm(): array
     {
-        $pengajaran = Pengajaran::with(['enrollmentKelasMataKuliah', 'dokumen'])->findOrFail($id);
-
-        return view('dosen.pengajaran.show', compact('pengajaran'));
+        return [
+            'tahun' => TahunAkademik::orderByDesc('status')->orderByDesc('id_tahun_akademik')->get()
+                ->map(fn (TahunAkademik $t) => [
+                    'id' => $t->id_tahun_akademik,
+                    'label' => $t->tahun_akademik,
+                    'semester' => $this->pecahTahun($t->tahun_akademik)['semester'],
+                ])->all(),
+            'rombel' => EnrollmentTingkatKelas::with(['prodi', 'tingkat', 'kelas'])->get()
+                ->map(fn (EnrollmentTingkatKelas $r) => [
+                    'id' => $r->id_enrollment_tingkat_kelas,
+                    'ta' => $r->id_tahun_akademik,
+                    'prodi' => $r->prodi->jenjang.' '.$r->prodi->nama_prodi,
+                    'kelas' => $r->tingkat->tingkat.$r->kelas->jenis_kelas,
+                ])->sortBy('kelas')->values()->all(),
+            'matkul' => EnrollmentMataKuliah::with('mataKuliah')->get()
+                ->map(fn (EnrollmentMataKuliah $m) => [
+                    'id' => $m->id_enrollment_mk,
+                    'ta' => $m->id_tahun_akademik,
+                    'label' => $m->mataKuliah->nama_mk.' ('.$m->mataKuliah->kode_mk.')',
+                ])->sortBy('label')->values()->all(),
+        ];
     }
 
-    /**
-     * Tampilkan form edit pengajaran.
-     */
-    public function edit($id)
+    /** Satu baris untuk tabel daftar pengajaran. */
+    private function baris(EnrollmentKelasMataKuliah $item): array
     {
-        $pengajaran = Pengajaran::with(['enrollmentKelasMataKuliah', 'dokumen'])->findOrFail($id);
+        $ta = $this->pecahTahun($item->enrollmentMataKuliah->tahunAkademik->tahun_akademik);
 
-        return view('dosen.pengajaran.edit', compact('pengajaran'));
+        return [
+            'id' => $item->getKey(),
+            'matkul' => $item->enrollmentMataKuliah->mataKuliah->nama_mk,
+            'kelas' => $this->namaKelas($item),
+            'tahun' => $ta['tahun'],
+            'semester' => $ta['semester'],
+        ];
     }
 
-    /**
-     * Update data pengajaran.
-     */
-    public function update(Request $request, $id)
+    /** Data halaman detail. */
+    private function detail(EnrollmentKelasMataKuliah $item): array
     {
-        // Fitur update bisa disesuaikan nanti saat tes edit
-        return redirect()->route('pengajaran.index')->with('success', 'Data berhasil diperbarui!');
+        $mk = $item->enrollmentMataKuliah->mataKuliah;
+        $ta = $item->enrollmentMataKuliah->tahunAkademik->tahun_akademik;
+        $pecah = $this->pecahTahun($ta);
+
+        return [
+            'tahun_akademik' => $pecah['tahun'].' '.$pecah['semester'],
+            'tahun' => $pecah['tahun'],
+            'semester' => $pecah['semester'],
+            'prodi' => $item->enrollmentTingkatKelas->prodi->nama_prodi,
+            'kelas' => 'Kelas '.$this->namaKelas($item),
+            'matkul' => $mk->nama_mk,
+            'dosen' => $item->dosen->nama.' (akun Anda)',
+            'kode' => $mk->kode_mk,
+            'sks' => $mk->sks_teori + $mk->sks_praktik,
+            'dosen_lengkap' => $item->dosen->nama,
+        ];
     }
 
-    /**
-     * Hapus data pengajaran.
-     */
-    public function destroy($id)
+    /** Dokumen pendukung (kosong sampai fitur dokumen dikerjakan). */
+    private function dokumen(EnrollmentKelasMataKuliah $item): array
     {
-        $pengajaran = Pengajaran::findOrFail($id);
-        $pengajaran->delete();
+        return $item->pengajaran
+            ->map(fn ($p) => [
+                'nama' => $p->dokumen->nama_file,
+                'jenis' => $p->dokumen->jenisDokumen?->nama_jenis_dokumen ?? '-',
+                'keterangan' => '',
+                'tautan' => $p->dokumen->link_dokumen,
+            ])->all();
+    }
 
-        return redirect()->route('pengajaran.index')->with('success', 'Data pengajaran berhasil dihapus!');
+    /** "2A" = tingkat 2 kelas A. */
+    private function namaKelas(EnrollmentKelasMataKuliah $item): string
+    {
+        return $item->enrollmentTingkatKelas->tingkat->tingkat.$item->enrollmentTingkatKelas->kelas->jenis_kelas;
+    }
+
+    /** "Ganjil 2025/2026" -> ['tahun' => '2025/2026', 'semester' => 'Ganjil']. */
+    private function pecahTahun(string $tahunAkademik): array
+    {
+        preg_match('~\d{4}\s*/\s*\d{4}~', $tahunAkademik, $tahun);
+        preg_match('~ganjil|genap~i', $tahunAkademik, $semester);
+
+        return [
+            'tahun' => isset($tahun[0]) ? preg_replace('~\s+~', '', $tahun[0]) : $tahunAkademik,
+            'semester' => isset($semester[0]) ? ucfirst(strtolower($semester[0])) : '-',
+        ];
     }
 }

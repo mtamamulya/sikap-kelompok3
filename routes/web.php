@@ -44,10 +44,10 @@ Route::view('/pengabdian/{id}/edit', 'dosen.pengabdian.edit')->whereNumber('id')
 Route::get('/pengajaran', [DosenPengajaranController::class, 'index'])->name('pengajaran.index');
 Route::get('/pengajaran/create', [DosenPengajaranController::class, 'create'])->name('pengajaran.create');
 Route::post('/pengajaran', [DosenPengajaranController::class, 'store'])->name('pengajaran.store');
+// Detail & edit: harus di bawah /pengajaran/create supaya "create" tidak dianggap sebagai {id}
 Route::get('/pengajaran/{id}', [DosenPengajaranController::class, 'show'])->whereNumber('id')->name('pengajaran.show');
 Route::get('/pengajaran/{id}/edit', [DosenPengajaranController::class, 'edit'])->whereNumber('id')->name('pengajaran.edit');
 Route::put('/pengajaran/{id}', [DosenPengajaranController::class, 'update'])->whereNumber('id')->name('pengajaran.update');
-Route::delete('/pengajaran/{id}', [DosenPengajaranController::class, 'destroy'])->whereNumber('id')->name('pengajaran.destroy');
 
 Route::redirect('/kegiatan', '/mahasiswa/kegiatan');
 Route::redirect('/kegiatan/create', '/mahasiswa/kegiatan/create');
