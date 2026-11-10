@@ -34,5 +34,4 @@ Route::get('/ping', function () {
 
 Route::get('/berita', [BeritaController::class, 'index']);
 
-Route::get('/prestasi', [PrestasiController::class, 'index']);
 require __DIR__.'/api-admin-kaprodi.php';
