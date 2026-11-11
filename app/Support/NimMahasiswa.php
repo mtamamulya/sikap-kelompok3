@@ -56,6 +56,9 @@ class NimMahasiswa
         if (! $p) {
             return 'Format NIM harus jenjang.prodi.tahun.kelas.absen, contoh 4.33.25.1.09.';
         }
+        if ($p['jenjang_kode'] !== '4') {
+            return 'Kode jenjang pada NIM harus 4 (D4 Teknologi Rekayasa Komputer).';
+        }
         if (! isset(self::JENJANG[$p['jenjang_kode']])) {
             return 'Kode jenjang pada NIM tidak dikenal (3 = D3, 4 = D4).';
         }

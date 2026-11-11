@@ -240,8 +240,8 @@ class LandingMahasiswaController extends Controller
     }
 
     /**
-     * Aturan NIM. Mode database: format jenjang.prodi.tahun.kelas.absen (mis. 4.33.25.1.09) dan tahun pada NIM
-     * harus sama dengan angkatan. Mode json (data simulasi): aturan lama (angka 8-12 digit).
+     * Aturan NIM: Memastikan format jenjang.prodi.tahun.kelas.absen (mis. 4.33.25.1.09)
+     * dan wajib diawali digit '4' (D4 TRK).
      */
     private function aturanNim(Request $request, string $exceptId): array
     {
@@ -250,10 +250,6 @@ class LandingMahasiswaController extends Controller
                 $fail($exceptId === '' ? 'NIM sudah terdaftar.' : 'NIM sudah dipakai mahasiswa lain.');
             }
         };
-
-        if (config('admin.data_source', 'json') !== 'database') {
-            return ['bail', 'required', 'regex:/^\d{8,12}$/', $unik];
-        }
 
         return ['bail', 'required', function ($attr, $value, $fail) use ($request) {
             $angkatan = $request->filled('angkatan') ? (int) $request->input('angkatan') : null;
