@@ -11,6 +11,9 @@ use Illuminate\Validation\Rule;
 
 class DosenController extends Controller
 {
+    /** Email akun dosen harus email institusi: nama@polines.ac.id (tepat domain ini, bukan subdomain atau domain lain). */
+    private const ATURAN_EMAIL = 'regex:/^[A-Za-z0-9._%+\-]+@polines\.ac\.id$/i';
+
     public function __construct(private DosenStore $store) {}
 
     /** Daftar dosen. (Hanya kolom yang dibutuhkan tabel — tidak mengirim hash sandi dll.) */
@@ -89,7 +92,7 @@ class DosenController extends Controller
                 }
             }],
             'status_dosen' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'email' => ['required', 'email', 'max:150', function ($attr, $value, $fail) {
+            'email' => ['required', 'email', 'max:150', self::ATURAN_EMAIL, function ($attr, $value, $fail) {
                 if ($this->store->exists('email', $value)) {
                     $fail('Email sudah dipakai akun lain.');
                 }
@@ -107,6 +110,7 @@ class DosenController extends Controller
             'nip.regex' => 'NIP harus berupa angka 8–20 digit.',
             'email.required' => 'Email akun wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.regex' => 'Email harus memakai email institusi @polines.ac.id.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'pangkat.required' => 'Pangkat wajib dipilih.',
@@ -118,6 +122,8 @@ class DosenController extends Controller
             'foto.mimes' => 'Foto harus JPG, PNG, atau WebP.',
             'foto.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
+
+        $data['email'] = strtolower($data['email']);
 
         // Foto profil (opsional). Bila penyimpanan gagal, file yang sudah diunggah dibersihkan lagi.
         $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('foto-dosen', 'public') : null;
@@ -187,7 +193,7 @@ class DosenController extends Controller
                 }
             }],
             'status_dosen' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'email' => ['required', 'email', 'max:150', function ($attr, $value, $fail) use ($id) {
+            'email' => ['required', 'email', 'max:150', self::ATURAN_EMAIL, function ($attr, $value, $fail) use ($id) {
                 if ($this->store->usedByOther('email', $value, $id)) {
                     $fail('Email sudah dipakai akun lain.');
                 }
@@ -207,6 +213,7 @@ class DosenController extends Controller
             'nip.regex' => 'NIP harus berupa angka 8–20 digit.',
             'email.required' => 'Email akun wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.regex' => 'Email harus memakai email institusi @polines.ac.id.',
             'password.min' => 'Password baru minimal 8 karakter.',
             'foto.image' => 'File harus berupa gambar.',
             'foto.mimes' => 'Foto harus JPG, PNG, atau WebP.',
@@ -217,6 +224,8 @@ class DosenController extends Controller
             'tanggal_sk.required_with' => 'Tanggal SK wajib diisi bila menambah riwayat.',
             'tanggal_sk.date' => 'Tanggal SK tidak valid.',
         ]);
+
+        $data['email'] = strtolower($data['email']);
 
         $riwayatBaru = ! empty($data['pangkat'])
             ? ['pangkat' => $data['pangkat'], 'golongan' => $data['golongan'], 'sk' => $data['nomor_sk'], 'tanggal' => $data['tanggal_sk']]

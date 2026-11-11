@@ -82,8 +82,8 @@
                 <div class="flex flex-col gap-4 md:flex-row md:items-start">
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
                         <label for="email" class="{{ $label }}">Email akun<span class="text-[#FF3F3F]"> *</span></label>
-                        <input id="email" name="email" type="email" required value="{{ old('email', $dosen['email']) }}" class="{{ $field }} h-[36px]">
-                        <p class="{{ $hint }}">Email harus unik dan dipakai untuk login.</p>
+                        <input id="email" name="email" type="email" placeholder="nama@polines.ac.id" pattern="[^@\s]+@polines\.ac\.id" title="Gunakan email institusi @polines.ac.id" required value="{{ old('email', $dosen['email']) }}" class="{{ $field }} h-[36px]">
+                        <p class="{{ $hint }}">Gunakan institusi (@polines.ac.id)</p>
                         @error('email') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
