@@ -9,11 +9,7 @@
         <p class="text-2xl text-gray-400">Dashboard / Pengajaran / Tambah</p>
     </div>
 
-    {{-- $opsi dan $dosenLogin dikirim oleh DosenPengajaranController@create. Isi form ada di _form.blade.php. --}}
-    @include('dosen.pengajaran._form', [
-        'aksi' => route('pengajaran.store'),
-        'metode' => 'POST',
-        'awal' => [],
-    ])
+    {{-- Panggil form tanpa passing variabel PHP apapun --}}
+    @include('dosen.pengajaran._form')
 
 @endsection
