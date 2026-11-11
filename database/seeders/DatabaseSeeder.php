@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
-            FormIsianKategoriSeeder::class,
             JenisDokumenSeeder::class,
+            
         ]);
 
         // 1. Buat 4 Role Utama

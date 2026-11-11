@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\JenisDokumen;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use Database\Seeders\JenisDokumenSeeder;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -10,6 +12,16 @@ use Tests\TestCase;
 class KaprodiJenisDokumenTest extends TestCase
 {
     use DatabaseMigrations;
+
+    private function masukSebagaiKaprodi(): User
+    {
+        DB::table('roles')->insertOrIgnore(['id_role' => 2, 'nama_role' => 'kaprodi']);
+
+        return User::firstOrCreate(
+            ['email' => 'kaprodi@trk.ac.id'],
+            ['id_role' => 2, 'password' => 'password', 'status' => true]
+        );
+    }
 
     public function test_guest_is_redirected_to_login(): void
     {
@@ -22,7 +34,8 @@ class KaprodiJenisDokumenTest extends TestCase
     {
         $this->seed(JenisDokumenSeeder::class);
 
-        $response = $this->withSession(['kaprodi' => ['nama' => 'Kaprodi']])
+        $response = $this->actingAs($this->masukSebagaiKaprodi())
+            ->withSession(['kaprodi' => ['nama' => 'Kaprodi']])
             ->get(route('kaprodi.kegiatan.jenis-dokumen'));
 
         $response->assertOk();
@@ -42,7 +55,8 @@ class KaprodiJenisDokumenTest extends TestCase
             'keterangan' => 'Surat rekomendasi resmi dari pimpinan jurusan',
         ]);
 
-        $response = $this->withSession(['kaprodi' => ['nama' => 'Kaprodi']])
+        $response = $this->actingAs($this->masukSebagaiKaprodi())
+            ->withSession(['kaprodi' => ['nama' => 'Kaprodi']])
             ->get(route('kaprodi.kegiatan.jenis-dokumen'));
 
         $response->assertOk();
@@ -53,4 +67,3 @@ class KaprodiJenisDokumenTest extends TestCase
         $this->assertSame('Surat rekomendasi resmi dari pimpinan jurusan', $rows[0]['description']);
     }
 }
-
