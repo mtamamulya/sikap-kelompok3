@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DosenController;
 use App\Http\Controllers\DosenDashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KegiatanController;
@@ -14,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 
 // Landing Page TRK
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 
 Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');

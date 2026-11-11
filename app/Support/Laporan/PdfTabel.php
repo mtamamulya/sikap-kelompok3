@@ -17,9 +17,13 @@ namespace App\Support\Laporan;
 class PdfTabel
 {
     private const LEBAR = 841.89;   // A4 landscape (pt)
+
     private const TINGGI = 595.28;
+
     private const MARGIN = 36.0;
+
     private const UKURAN = 8.5;     // ukuran font isi tabel
+
     private const PAD = 4.0;
 
     /** Lebar karakter Helvetica (ASCII 32-126) per 1000 em. */
@@ -43,11 +47,14 @@ class PdfTabel
 
     /** @var string[] */
     private array $halaman = [];
+
     private string $isi = '';
+
     private float $y = 0;
 
     /** @var array<int, array{id: int, width: int, height: int, data: string}> */
     private array $images = [];
+
     private int $imageCount = 0;
 
     public function __construct(
@@ -200,7 +207,7 @@ class PdfTabel
     private function tambahGambarPng(string $file): ?int
     {
         $info = @getimagesize($file);
-        if (!$info || $info[2] !== IMAGETYPE_PNG) {
+        if (! $info || $info[2] !== IMAGETYPE_PNG) {
             return null;
         }
         $content = file_get_contents($file);
@@ -339,7 +346,7 @@ class PdfTabel
 
             // Masukkan referensi gambar ke Resource halaman
             $xobjRes = '';
-            if (!empty($imageObjMap)) {
+            if (! empty($imageObjMap)) {
                 $xobjRes = ' /XObject << ';
                 foreach ($imageObjMap as $imgId => $objId) {
                     $xobjRes .= '/Im'.$imgId.' '.$objId.' 0 R ';

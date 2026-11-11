@@ -10,11 +10,11 @@ class JenisDokumenController extends Controller
 {
     public function index()
     {
-        $rows = JenisDokumen::all()->map(function($item) {
+        $rows = JenisDokumen::all()->map(function ($item) {
             return [
                 'id' => $item->id_jenis_dokumen,
                 'name' => $item->nama_jenis_dokumen,
-                'description' => $item->keterangan // Sekarang mengambil dari DB
+                'description' => $item->keterangan, // Sekarang mengambil dari DB
             ];
         })->toArray();
 
@@ -35,20 +35,20 @@ class JenisDokumenController extends Controller
         ]);
 
         return response()->json([
-            'ok' => true, 
+            'ok' => true,
             'row' => [
                 'id' => $jenisDokumen->id_jenis_dokumen,
                 'name' => $jenisDokumen->nama_jenis_dokumen,
-                'description' => $jenisDokumen->keterangan
-            ]
+                'description' => $jenisDokumen->keterangan,
+            ],
         ]);
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
         $data = $this->validasi($request);
-        $jenisDokumen = JenisDokumen::find($id); 
-        
+        $jenisDokumen = JenisDokumen::find($id);
+
         if (! $jenisDokumen) {
             return response()->json(['message' => 'Data tidak ditemukan.'], 404);
         }
@@ -63,19 +63,19 @@ class JenisDokumenController extends Controller
         ]);
 
         return response()->json([
-            'ok' => true, 
+            'ok' => true,
             'row' => [
                 'id' => $jenisDokumen->id_jenis_dokumen,
                 'name' => $jenisDokumen->nama_jenis_dokumen,
-                'description' => $jenisDokumen->keterangan
-            ]
+                'description' => $jenisDokumen->keterangan,
+            ],
         ]);
     }
 
     public function destroy(string $id): JsonResponse
     {
         $jenisDokumen = JenisDokumen::find($id);
-        
+
         if (! $jenisDokumen) {
             return response()->json(['message' => 'Data tidak ditemukan.'], 404);
         }

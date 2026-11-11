@@ -6,6 +6,7 @@ use App\Models\Mahasiswa;
 use App\Models\Role;
 use App\Models\User;
 use App\Support\LinkFile;
+use App\Support\SemesterAkademik;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -86,20 +87,20 @@ class MahasiswaDbStore extends MahasiswaStore
 
             // AMBIL BATAS TAHUN AKADEMIK AKTIF
             $taAktif = $this->penempatan->tahunAkademikAktif();
-            
+
             if ($taAktif) {
                 // Hitung skor kronologis tahun aktif (misal: Ganjil 2026 = 2026*2+1)
-                $aktifParsed = \App\Support\SemesterAkademik::parse($taAktif->tahun_akademik);
+                $aktifParsed = SemesterAkademik::parse($taAktif->tahun_akademik);
                 $aktifNilai = ($aktifParsed['tahun_awal'] * 2) + ($aktifParsed['jenis'] === 'ganjil' ? 1 : 2);
 
-                $semuaTa = \Illuminate\Support\Facades\DB::table('tahun_akademik')->get();
+                $semuaTa = DB::table('tahun_akademik')->get();
 
                 foreach ($semuaTa as $ta) {
-                    $taParsed = \App\Support\SemesterAkademik::parse($ta->tahun_akademik);
+                    $taParsed = SemesterAkademik::parse($ta->tahun_akademik);
                     if ($taParsed) {
                         // Hitung skor kronologis tahun yang sedang di-loop
                         $taNilai = ($taParsed['tahun_awal'] * 2) + ($taParsed['jenis'] === 'ganjil' ? 1 : 2);
-                        
+
                         // Hanya buatkan kelas jika tahun tersebut <= tahun aktif (secara waktu, bukan ID)
                         if ($taNilai <= $aktifNilai) {
                             $this->penempatan->tempatkan($m, $ta);
@@ -223,12 +224,12 @@ class MahasiswaDbStore extends MahasiswaStore
 
     public function riwayatKelas(string $id): ?array
     {
-        if (!ctype_digit($id)) {
+        if (! ctype_digit($id)) {
             return null;
         }
 
         // Ambil riwayat kelas asli dari database (Hapus orderByDesc id)
-        $rows = \Illuminate\Support\Facades\DB::table('enrollment_mahasiswa_tingkat_kelas as emt')
+        $rows = DB::table('enrollment_mahasiswa_tingkat_kelas as emt')
             ->join('enrollment_tingkat_kelas as etk', 'etk.id_enrollment_tingkat_kelas', '=', 'emt.id_enrollment_tingkat_kelas')
             ->join('tahun_akademik as ta', 'ta.id_tahun_akademik', '=', 'etk.id_tahun_akademik')
             ->join('tingkat as tg', 'tg.id_tingkat', '=', 'etk.id_tingkat')
@@ -243,18 +244,20 @@ class MahasiswaDbStore extends MahasiswaStore
 
         return $rows->map(function ($r) {
             $parts = explode(' ', $r->tahun_akademik);
+
             return [
                 'year' => $parts[1] ?? $r->tahun_akademik,
                 'sem' => $parts[0] ?? '-',
                 'prodi' => $r->nama_prodi,
-                'level' => 'Tingkat ' . $r->tingkat,
-                'cls' => $r->tingkat . $r->jenis_kelas,
+                'level' => 'Tingkat '.$r->tingkat,
+                'cls' => $r->tingkat.$r->jenis_kelas,
                 'current' => (bool) $r->status,
             ];
         })->sortByDesc(function ($item) {
             // Urutkan ulang di PHP: Tahun turun, lalu Genap (2) > Ganjil (1)
             $bobotSemester = $item['sem'] === 'Genap' ? 2 : 1;
-            return $item['year'] . '-' . $bobotSemester;
+
+            return $item['year'].'-'.$bobotSemester;
         })->values()->all();
     }
 
@@ -268,13 +271,13 @@ class MahasiswaDbStore extends MahasiswaStore
         }
 
         // Cari id_user dari id_mahasiswa
-        $idUser = \App\Models\Mahasiswa::query()->whereKey((int) $id)->value('id_user');
+        $idUser = Mahasiswa::query()->whereKey((int) $id)->value('id_user');
         if (! $idUser) {
             return [];
         }
 
         // Query kegiatan yang dibuat mahasiswa atau di mana mahasiswa menjadi anggota
-        $rows = \Illuminate\Support\Facades\DB::table('kegiatan as k')
+        $rows = DB::table('kegiatan as k')
             ->leftJoin('anggota_kegiatan as a', fn ($j) => $j->on('a.id_kegiatan', '=', 'k.id_kegiatan')->where('a.id_user', '=', $idUser))
             ->leftJoin('kategori as kt', 'kt.id_kategori', '=', 'k.id_kategori')
             ->where(fn ($q) => $q->where('k.id_user', $idUser)->orWhereNotNull('a.id_anggota_kegiatan'))
@@ -286,9 +289,9 @@ class MahasiswaDbStore extends MahasiswaStore
         foreach ($rows as $r) {
             $kegiatan[] = [
                 'title' => $r->nama_kegiatan,
-                'type'  => $r->nama_kategori ?? '-',
-                'role'  => $r->peran ?? 'Pembuat',
-                'year'  => $r->tanggal_mulai ? substr((string) $r->tanggal_mulai, 0, 4) : '-',
+                'type' => $r->nama_kategori ?? '-',
+                'role' => $r->peran ?? 'Pembuat',
+                'year' => $r->tanggal_mulai ? substr((string) $r->tanggal_mulai, 0, 4) : '-',
             ];
         }
 
@@ -300,7 +303,7 @@ class MahasiswaDbStore extends MahasiswaStore
      */
     public function toggleStatus(string $id): bool
     {
-        $mahasiswa = \App\Models\Mahasiswa::with('user')->find($id);
+        $mahasiswa = Mahasiswa::with('user')->find($id);
         if (! $mahasiswa || ! $mahasiswa->user) {
             return false;
         }

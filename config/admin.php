@@ -49,7 +49,7 @@ return [
                 ['label' => 'Data Kegiatan', 'route' => 'admin.kegiatan.index', 'url' => 'kegiatan'],
                 ['label' => 'Jenis Dokumen', 'route' => 'admin.kegiatan.jenis-dokumen', 'url' => 'kegiatan/jenis-dokumen'],
                 ['label' => 'Kategori Kegiatan', 'route' => 'admin.kegiatan.kategori-kegiatan', 'url' => 'kegiatan/kategori-kegiatan'],
-            ]
+            ],
         ],
 
         ['label' => 'Pengajuan', 'route' => 'admin.pengajuan', 'url' => 'pengajuan',

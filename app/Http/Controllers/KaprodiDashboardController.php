@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kegiatan;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
-use App\Models\Kegiatan;
-use Carbon\Carbon;
 
 class KaprodiDashboardController extends Controller
 {
@@ -21,12 +21,12 @@ class KaprodiDashboardController extends Controller
         $mahasiswaAktif = User::whereHas('mahasiswa')->where('status', true)->count();
 
         // 3. Hitung Jumlah Kegiatan (Resmi = Disetujui)
-        $jumlahKegiatan = Kegiatan::whereHas('statusTerkini', function($q) {
+        $jumlahKegiatan = Kegiatan::whereHas('statusTerkini', function ($q) {
             $q->where('status', 'Disetujui');
         })->count();
 
         // 4. Hitung Pengajuan (Menunggu Validasi = Diajukan)
-        $menungguValidasi = Kegiatan::whereHas('statusTerkini', function($q) {
+        $menungguValidasi = Kegiatan::whereHas('statusTerkini', function ($q) {
             $q->where('status', 'Diajukan');
         })->count();
 
@@ -39,9 +39,9 @@ class KaprodiDashboardController extends Controller
         ];
 
         // 5. Data Grafik Kegiatan Per Tahun (Hanya yang Disetujui)
-        $kegiatanRaw = Kegiatan::whereHas('statusTerkini', function($q) {
-                $q->where('status', 'Disetujui');
-            })
+        $kegiatanRaw = Kegiatan::whereHas('statusTerkini', function ($q) {
+            $q->where('status', 'Disetujui');
+        })
             ->selectRaw('YEAR(tanggal_mulai) as tahun, count(*) as jumlah')
             ->groupBy('tahun')
             ->orderBy('tahun', 'asc')
@@ -52,7 +52,7 @@ class KaprodiDashboardController extends Controller
 
         // 6. Data Tabel 5 Pengajuan Terbaru
         $pengajuanTerbaru = Kegiatan::with(['dosen', 'mahasiswa', 'statusTerkini'])
-            ->whereHas('statusTerkini', function($q) {
+            ->whereHas('statusTerkini', function ($q) {
                 $q->where('status', 'Diajukan');
             })
             ->latest('created_at')
@@ -65,11 +65,11 @@ class KaprodiDashboardController extends Controller
             $namaKegiatan = $item->nama_kegiatan ?? $item->nama ?? 'Tanpa Judul';
 
             return [
-                'id'       => $item->id_kegiatan ?? $item->id,
+                'id' => $item->id_kegiatan ?? $item->id,
                 'kegiatan' => $namaKegiatan,
-                'dosen'    => $pengaju,
-                'tanggal'  => Carbon::parse($item->created_at)->diffForHumans(),
-                'raw_date' => $item->created_at
+                'dosen' => $pengaju,
+                'tanggal' => Carbon::parse($item->created_at)->diffForHumans(),
+                'raw_date' => $item->created_at,
             ];
         })->toArray();
 

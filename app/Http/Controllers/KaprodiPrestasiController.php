@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Prestasi; // Wajib dipanggil agar bisa query ke DB
-use Illuminate\Http\Request;
 
 class KaprodiPrestasiController extends Controller
 {
@@ -41,7 +40,7 @@ class KaprodiPrestasiController extends Controller
             $namaPengunggah = $usr ? ($usr->nama ?? $usr->name ?? 'User Tidak Diketahui') : 'Sistem';
 
             // 2. Tentukan Tipe (Dosen / Mahasiswa)
-            $tipeUser = 'Mahasiswa'; 
+            $tipeUser = 'Mahasiswa';
             if ($usr) {
                 // CATATAN UNTUKMU: Sesuaikan kata 'role' di bawah dengan nama kolom peran di tabel usermu
                 // Misalnya: $usr->jenis_pengguna === 'Dosen'
@@ -55,11 +54,11 @@ class KaprodiPrestasiController extends Controller
             // 3. Tentukan Tanggal & Semester
             $tanggalMulai = $keg && $keg->tanggal_mulai ? $keg->tanggal_mulai : now();
             $bulanAngka = (int) $tanggalMulai->format('n');
-            
+
             // Format string: "21 Mei 2024"
             $namaBulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            $stringTanggal = $tanggalMulai->format('j') . ' ' . $namaBulan[$bulanAngka] . ' ' . $tanggalMulai->format('Y');
-            
+            $stringTanggal = $tanggalMulai->format('j').' '.$namaBulan[$bulanAngka].' '.$tanggalMulai->format('Y');
+
             // Logika Akademik: Agustus(8) s/d Januari(1) = Ganjil, sisanya Genap
             $semester = ($bulanAngka >= 8 || $bulanAngka <= 1) ? 'Ganjil' : 'Genap';
 

@@ -26,10 +26,10 @@ return new class extends Migration
     public function down(): void
     {
         if (DB::table('prestasi')->whereNull('id_kegiatan')->exists()) {
-            throw new \RuntimeException('Cannot restore required activities while standalone achievements exist.');
+            throw new RuntimeException('Cannot restore required activities while standalone achievements exist.');
         }
         if (DB::table('bukti_prestasi')->whereRaw('length(link) > 500')->exists()) {
-            throw new \RuntimeException('Cannot restore 500-character proof links while longer links exist.');
+            throw new RuntimeException('Cannot restore 500-character proof links while longer links exist.');
         }
 
         Schema::table('prestasi', function (Blueprint $table) {

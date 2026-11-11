@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB; // Pastikan import DB di bagian atas file
 use Illuminate\Support\Facades\Storage; // Pastikan Storage di-import
 
-
 /** Data dosen untuk kaprodi: HANYA BACA (tanpa tambah / ubah / hapus). Data sama dengan admin. */
 class KaprodiDosenController extends Controller
 {
@@ -36,11 +35,11 @@ class KaprodiDosenController extends Controller
         abort_unless($row, 404);
 
         $dosen = [
-            'id'     => $row['id'],
-            'nama'   => $row['nama'],
-            'nip'    => $row['nip'],
+            'id' => $row['id'],
+            'nama' => $row['nama'],
+            'nip' => $row['nip'],
             'status' => $row['status'],
-            'foto'   => ! empty($row['foto']) ? Storage::disk('public')->url($row['foto']) : null,
+            'foto' => ! empty($row['foto']) ? Storage::disk('public')->url($row['foto']) : null,
         ];
 
         $info = [
@@ -62,13 +61,12 @@ class KaprodiDosenController extends Controller
         }
 
         return view('kaprodi.dosen-detail', [
-            'dosen'     => $dosen,
-            'info'      => $info,
-            'riwayat'   => $riwayat,
+            'dosen' => $dosen,
+            'info' => $info,
+            'riwayat' => $riwayat,
             'aktivitas' => $this->aktivitas($row),
         ]);
     }
-
 
     /**
      * Aktivitas dosen (4 tab).
@@ -80,7 +78,7 @@ class KaprodiDosenController extends Controller
             'penelitian' => ['label' => 'Penelitian', 'items' => []],
             'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
             'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
-            'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
+            'kegiatan' => ['label' => 'Kegiatan',   'items' => []],
         ];
 
         if (isset($row['aktivitas'])) {
@@ -110,11 +108,15 @@ class KaprodiDosenController extends Controller
                 // Tentukan ranah tab berdasarkan nama_kategori (misal 'Penelitian', 'Pengabdian').
                 // Jika tidak spesifik, masukkan ke tab 'kegiatan' umum.
                 $kategoriNama = strtolower(trim($keg->nama_kategori ?? ''));
-                
+
                 $ranah = 'kegiatan'; // Default
-                if (str_contains($kategoriNama, 'penelitian')) $ranah = 'penelitian';
-                elseif (str_contains($kategoriNama, 'pengabdian')) $ranah = 'pengabdian';
-                elseif (str_contains($kategoriNama, 'pengajaran')) $ranah = 'pengajaran';
+                if (str_contains($kategoriNama, 'penelitian')) {
+                    $ranah = 'penelitian';
+                } elseif (str_contains($kategoriNama, 'pengabdian')) {
+                    $ranah = 'pengabdian';
+                } elseif (str_contains($kategoriNama, 'pengajaran')) {
+                    $ranah = 'pengajaran';
+                }
 
                 $tabs[$ranah]['items'][] = [
                     'judul' => $keg->nama_kegiatan,

@@ -49,7 +49,7 @@ class DataMasterSeeder extends Seeder
             ['tahun_akademik' => 'Ganjil 2026/2027', 'status' => 1], // Status 1 = Aktif saat ini
             ['tahun_akademik' => 'Genap 2026/2027', 'status' => 0],
         ];
-        
+
         foreach ($tahunAkademik as $ta) {
             DB::table('tahun_akademik')->updateOrInsert(
                 ['tahun_akademik' => $ta['tahun_akademik']],

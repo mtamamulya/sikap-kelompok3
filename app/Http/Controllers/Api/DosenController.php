@@ -238,7 +238,7 @@ class DosenController extends Controller
      * dosen dibuat, supaya dosen baru tidak menampilkan data palsu milik orang lain.
      */
     /**
-     * Aktivitas dosen (4 tab). Mode json: data contoh (kecuali dosen baru). 
+     * Aktivitas dosen (4 tab). Mode json: data contoh (kecuali dosen baru).
      * Mode database: kosong sampai query kegiatan dosen dibuat.
      */
     private function aktivitas(array $row): array
@@ -247,7 +247,7 @@ class DosenController extends Controller
             'penelitian' => ['label' => 'Penelitian', 'items' => []],
             'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
             'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
-            'kegiatan'   => ['label' => 'Kegiatan', 'items' => []],
+            'kegiatan' => ['label' => 'Kegiatan', 'items' => []],
         ];
 
         // 1. Mode Database (hindari array_map agar key asosiatif tidak hilang)

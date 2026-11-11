@@ -43,4 +43,3 @@ class JenisDokumenSeeder extends Seeder
         }
     }
 }
-

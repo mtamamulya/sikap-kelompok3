@@ -177,5 +177,4 @@ class MahasiswaStore
     {
         return null;
     }
-    
 }

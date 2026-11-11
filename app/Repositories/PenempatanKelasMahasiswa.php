@@ -42,16 +42,16 @@ class PenempatanKelasMahasiswa
         }
 
         $semester = SemesterAkademik::semester((int) $m->tahun_masuk, $term);
-        
+
         if ($semester < 1) {
             return 'belum-mulai';
         }
-        
+
         // JIKA SEMESTER MELEBIHI BATAS (LULUS)
         if ($semester > NimMahasiswa::maxSemester($nim['jenjang'])) {
             // Nonaktifkan akun loginnya secara otomatis
             DB::table('users')->where('id_user', $m->id_user)->update(['status' => false]);
-            
+
             return 'lulus';
         }
 
@@ -80,6 +80,7 @@ class PenempatanKelasMahasiswa
 
     /**
      * Tempatkan SEMUA mahasiswa aktif (users.status) pada satu tahun akademik.
+     *
      * @return array{dibuat: int, 'sudah-ada': int, lulus: int, 'belum-mulai': int, 'nim-tidak-valid': int}
      */
     public function buatUntukSemester(int $idTahunAkademik): array
@@ -123,6 +124,7 @@ class PenempatanKelasMahasiswa
 
     /**
      * Kelas SEMUA mahasiswa pada tahun akademik $ta (bawaan: aktif) dalam satu query, untuk daftar.
+     *
      * @return array<int, array> id_mahasiswa => bentuk yang sama dengan kelasSaatIni()
      */
     public function kelasSaatIniSemua(?object $ta = null): array

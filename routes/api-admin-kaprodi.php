@@ -8,9 +8,9 @@
  */
 
 use App\Http\Controllers\Api\AkreditasiController as ApiAkreditasi;
+use App\Http\Controllers\Api\DosenController as ApiDosenController;
 use App\Http\Controllers\Api\KurikulumController as ApiKurikulum;
 use App\Http\Controllers\Api\MataKuliahController as ApiMataKuliah;
-use App\Http\Controllers\Api\DosenController as ApiDosenController;
 use App\Http\Controllers\Api\PrestasiController as ApiPrestasiController;
 use Illuminate\Support\Facades\Route;
 

@@ -16,7 +16,9 @@ use Illuminate\Validation\Rule;
 class AdminKegiatanTambahController extends Controller
 {
     private const KATEGORI = ['Lomba', 'Seminar', 'Pelatihan', 'Magang', 'Kunjungan Industri'];
+
     private const JENIS_KEGIATAN = ['Kegiatan Dosen', 'Kegiatan Mahasiswa', 'Kegiatan Prodi'];
+
     private const JENIS_DOKUMEN = ['Surat tugas', 'Sertifikat', 'Proposal', 'Laporan', 'Lainnya'];
 
     public function __construct(private DosenStore $dosen, private MahasiswaStore $mahasiswa) {}

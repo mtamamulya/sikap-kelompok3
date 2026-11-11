@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Repositories\PenempatanKelasMahasiswa;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Repositories\PenempatanKelasMahasiswa;
 
 class RiwayatAkademikSeeder extends Seeder
 {
@@ -27,7 +27,7 @@ class RiwayatAkademikSeeder extends Seeder
             // 3. Eksekusi penempatan kelas seolah-olah kita berada di tahun akademik tersebut
             if ($ta) {
                 $hasil = $penempatan->buatUntukSemester((int) $ta->id_tahun_akademik);
-                
+
                 // Tampilkan log di terminal Laragon
                 $pesan = "Riwayat {$ta_nama}: {$hasil['dibuat']} dibuat, {$hasil['sudah-ada']} sudah ada, {$hasil['belum-mulai']} belum masuk.";
                 $this->command->info($pesan);

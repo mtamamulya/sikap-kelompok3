@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\JenisDokumen;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Database\Seeders\JenisDokumenSeeder;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class KaprodiJenisDokumenTest extends TestCase

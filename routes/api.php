@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
-use App\Http\Controllers\Api\PrestasiController;
 use App\Http\Controllers\DosenPengajaranController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

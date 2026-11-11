@@ -163,7 +163,7 @@ class DosenDbStore extends DosenStore
             'penelitian' => ['label' => 'Penelitian', 'items' => []],
             'pengabdian' => ['label' => 'Pengabdian', 'items' => []],
             'pengajaran' => ['label' => 'Pengajaran', 'items' => []],
-            'kegiatan'   => ['label' => 'Kegiatan',   'items' => []],
+            'kegiatan' => ['label' => 'Kegiatan',   'items' => []],
         ];
 
         $idUser = ctype_digit($id) ? Dosen::query()->whereKey((int) $id)->value('id_user') : null;
@@ -182,9 +182,9 @@ class DosenDbStore extends DosenStore
         foreach ($rows as $r) {
             $tab['kegiatan']['items'][] = [
                 'title' => $r->nama_kegiatan,
-                'year'  => $r->tanggal_mulai ? substr((string) $r->tanggal_mulai, 0, 4) : '-',
-                'type'  => $r->nama_kategori ?? '-',
-                'role'  => $r->peran ?? 'Pembuat',
+                'year' => $r->tanggal_mulai ? substr((string) $r->tanggal_mulai, 0, 4) : '-',
+                'type' => $r->nama_kategori ?? '-',
+                'role' => $r->peran ?? 'Pembuat',
             ];
         }
 
@@ -203,9 +203,9 @@ class DosenDbStore extends DosenStore
         foreach ($pengajaran as $r) {
             $tab['pengajaran']['items'][] = [
                 'title' => $r->nama_mk,
-                'year'  => $r->tahun_akademik,
-                'type'  => 'Tingkat '.$r->tingkat.' Kelas '.$r->jenis_kelas.' · '.($r->sks_teori + $r->sks_praktik).' SKS',
-                'role'  => 'Pengampu',
+                'year' => $r->tahun_akademik,
+                'type' => 'Tingkat '.$r->tingkat.' Kelas '.$r->jenis_kelas.' · '.($r->sks_teori + $r->sks_praktik).' SKS',
+                'role' => 'Pengampu',
             ];
         }
 

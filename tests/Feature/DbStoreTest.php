@@ -200,8 +200,8 @@ class DbStoreTest extends TestCase
             ?? DB::table('kategori')->insertGetId(['id_jenis_kegiatan' => $jenis, 'nama_kategori' => $kategoriNama]);
 
         $idKegiatan = DB::table('kegiatan')->insertGetId([
-            'id_kategori'   => $kategori,
-            'id_user'       => $idUser,
+            'id_kategori' => $kategori,
+            'id_user' => $idUser,
             'nama_kegiatan' => $nama,
             'tanggal_mulai' => '2025-03-01',
         ]);
@@ -209,8 +209,8 @@ class DbStoreTest extends TestCase
         if ($peran) {
             DB::table('anggota_kegiatan')->insert([
                 'id_kegiatan' => $idKegiatan,
-                'id_user'     => $idUser,
-                'peran'       => $peran,
+                'id_user' => $idUser,
+                'peran' => $peran,
             ]);
         }
     }
@@ -230,7 +230,7 @@ class DbStoreTest extends TestCase
 
         $idUserA = Dosen::find($a['id'])->id_user;
         $idUserB = Dosen::find($b['id'])->id_user;
-        
+
         $this->buatKegiatan($idUserA, 'Deteksi hoaks', 'Penelitian', 'Ketua');
         $this->buatKegiatan($idUserA, 'Pelatihan sensor', 'Pengabdian', 'Anggota');
         $this->buatKegiatan($idUserA, 'Seminar Nasional AI', 'Seminar', 'Pemateri');
@@ -242,7 +242,7 @@ class DbStoreTest extends TestCase
         $this->assertSame('Penelitian', $tab['kegiatan']['items'][2]['type']);
         $this->assertSame('Ketua', $tab['kegiatan']['items'][2]['role']);
         $this->assertSame('2025', $tab['kegiatan']['items'][2]['year']);
-        
+
         $this->assertSame([], $tab['pengajaran']['items']);
 
         // Kegiatan dosen lain tidak ikut tampil pada dosen A

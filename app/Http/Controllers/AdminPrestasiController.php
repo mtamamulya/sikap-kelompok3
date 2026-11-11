@@ -133,11 +133,11 @@ class AdminPrestasiController extends Controller
         if ($anggotaForm === []) {
             $anggotaForm = $kegiatan?->anggota
                 ?->map(fn ($a) => [
-                'nama' => $this->namaUser($a->user) ?? '',
-                'peran' => $a->peran ?? 'Anggota',
-            ])
-            ->values()
-            ->all() ?? [];
+                    'nama' => $this->namaUser($a->user) ?? '',
+                    'peran' => $a->peran ?? 'Anggota',
+                ])
+                ->values()
+                ->all() ?? [];
         }
         $dokumen = $item->buktiPrestasi->map(fn ($b) => [
             'id' => $b->id_bukti_prestasi,

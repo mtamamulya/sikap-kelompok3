@@ -44,7 +44,7 @@ class PrestasiController extends Controller
             'catatan' => $k->getAttribute('catatan'),
             'created_at' => $k->getAttribute('created_at'),
             'updated_at' => $k->getAttribute('updated_at'),
-            'capaian' => $k->capaian
+            'capaian' => $k->capaian,
         ];
     }
 }
