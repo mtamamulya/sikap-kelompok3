@@ -58,9 +58,7 @@ class DosenPengajaranController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data' => $this->opsiForm() + [
-                'dosen' => $request->user()?->dosen?->nama,
-            ],
+            'data' => $this->opsiForm() + ['dosen' => $request->user()?->dosen?->nama],
         ]);
     }
 
