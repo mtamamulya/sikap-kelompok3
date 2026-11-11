@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\PrestasiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,14 @@ Route::get('/ping', function () {
             'time' => now()->toIso8601String(),
         ],
     ], 200);
+});
+
+// Autentikasi API (token Sanctum)
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('api.login');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+    Route::get('/me', [AuthController::class, 'me'])->name('api.me');
 });
 
 // Endpoint untuk mengambil profil user yang sedang login (Dari rekan tim)
