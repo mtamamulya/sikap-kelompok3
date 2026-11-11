@@ -52,7 +52,7 @@
     {{-- Header --}}
     <header class="flex h-[104px] shrink-0 items-center justify-between overflow-hidden bg-white px-8 shadow-[0_3px_4px_rgba(0,0,0,0.14)]">
         <div class="flex items-center gap-4">
-            <img src="{{ asset('images/logo-trk.png') }}" alt="" class="size-16">
+            <img src="{{ asset('images/logo_trk remove.png') }}" alt="Logo TRK" class="size-16">
             <div class="whitespace-pre-line text-[22px] font-bold leading-[130%] text-[#003385]">TEKNOLOGI&#10;REKAYASA KOMPUTER</div>
         </div>
     </header>

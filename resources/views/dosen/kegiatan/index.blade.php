@@ -11,11 +11,13 @@
     // SEMENTARA: data contoh supaya tampilan terlihat. HAPUS blok ini sebelum push.
     $allActivities = collect([
         ['id'=>1, 'name'=>'KMIPN VIII 2026',                  'type'=>'Lomba',             'date'=>'13 Mei 2026', 'raw_date'=>'2026-05-13', 'status'=>'Diajukan',  'peran'=>'Ketua'],
-        ['id'=>2, 'name'=>'Seminar Nasional Kecerdasan Buatan','type'=>'Seminar',          'date'=>'02 Mar 2026', 'raw_date'=>'2026-03-02', 'status'=>'Disetujui', 'peran'=>'Anggota'],
-        ['id'=>3, 'name'=>'Kunjungan Industri ke PT Telkom',  'type'=>'Kunjungan Industri','date'=>'20 Jan 2026', 'raw_date'=>'2026-01-20', 'status'=>'Diajukan',  'peran'=>'Anggota'],
+        ['id'=>2, 'name'=>'Seminar Nasional Kecerdasan Buatan','type'=>'Seminar',          'date'=>'02 Mar 2026', 'raw_date'=>'2026-03-02', 'status'=>'Disetujui', 'peran'=>'Anggota', 'ketua'=>'Angga Wahyu Wibowo (dosen)'],
+        ['id'=>3, 'name'=>'Kunjungan Industri ke PT Telkom',  'type'=>'Kunjungan Industri','date'=>'20 Jan 2026', 'raw_date'=>'2026-01-20', 'status'=>'Diajukan',  'peran'=>'Anggota', 'ketua'=>'Mukhlis Pratama Mulya (mahasiswa)'],
         ['id'=>4, 'name'=>'Magang Dosen di Industri',         'type'=>'Magang',            'date'=>'08 Feb 2026', 'raw_date'=>'2026-02-08', 'status'=>'Direvisi',  'peran'=>'Ketua'],
         ['id'=>5, 'name'=>'Pelatihan Laravel untuk Mahasiswa','type'=>'Pelatihan',         'date'=>'15 Apr 2026', 'raw_date'=>'2026-04-15', 'status'=>'Disetujui', 'peran'=>'Ketua'],
-        ['id'=>6, 'name'=>'Workshop Cloud Computing',         'type'=>'Workshop',          'date'=>'11 Des 2025', 'raw_date'=>'2025-12-11', 'status'=>'Ditolak',   'peran'=>'Anggota'],
+        ['id'=>6, 'name'=>'Workshop Cloud Computing',         'type'=>'Workshop',          'date'=>'11 Des 2025', 'raw_date'=>'2025-12-11', 'status'=>'Ditolak',   'peran'=>'Anggota', 'ketua'=>'Wiktasari (dosen)'],
+        ['id'=>8, 'name'=>'Deteksi Hoaks dengan Machine Learning','type'=>'Penelitian',      'date'=>'05 Jan 2026', 'raw_date'=>'2026-01-05', 'status'=>'Diajukan',  'peran'=>'Ketua'],
+        ['id'=>9, 'name'=>'Pelatihan Literasi Digital Desa',  'type'=>'Pengabdian',        'date'=>'18 Feb 2026', 'raw_date'=>'2026-02-18', 'status'=>'Disetujui', 'peran'=>'Anggota', 'ketua'=>'Arif Setyawan (dosen)'],
         ['id'=>7, 'name'=>'Lomba Karya Ilmiah Nasional',      'type'=>'Lomba',             'date'=>'30 Nov 2025', 'raw_date'=>'2025-11-30', 'status'=>'Selesai',   'peran'=>'Ketua'],
     ]);
     $kegiatan = $allActivities->map(fn ($row) => [
@@ -26,6 +28,7 @@
         'tanggal'     => $row['date'],
         'tanggal_raw' => $row['raw_date'] ?? '',
         'peran'       => $row['peran'] ?? 'Ketua',
+        'ketua'       => $row['ketua'] ?? '',   // nama pengaju/ketua, dipakai untuk penanda "Diajak oleh ..." saat peran Anggota
         'status'      => $row['status'],
     ])->values();
 @endphp
@@ -101,7 +104,12 @@
                 <tbody>
                     <template x-for="(k, i) in tampil" :key="k.id + '-' + i">
                         <tr class="border-b border-gray-300 last:border-b-0 hover:bg-gray-50">
-                            <td class="truncate px-2.5 py-3" :title="k.nama" x-text="k.nama"></td>
+                            <td class="px-2.5 py-3" :title="k.nama">
+                                <span class="block truncate" x-text="k.nama"></span>
+                                {{-- Kegiatan orang lain yang men-tag dosen ini: tampilkan siapa yang mengajak --}}
+                                <span x-show="k.peran === 'Anggota' && k.ketua" x-cloak class="block truncate text-[13px] text-gray-500"
+                                      x-text="`Diajak oleh ${k.ketua}`"></span>
+                            </td>
                             <td class="truncate px-2.5 py-3" x-text="k.kategori"></td>
                             <td class="truncate px-2.5 py-3" x-text="k.jenis"></td>
                             <td class="px-2.5 py-3" x-text="k.tanggal"></td>

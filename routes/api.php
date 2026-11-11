@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\PrestasiController;
+use App\Http\Controllers\DosenPengajaranController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,18 +31,24 @@ Route::get('/ping', function () {
 // Autentikasi API (token Sanctum)
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('api.login');
 
+// Rute yang membutuhkan login
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
-    Route::get('/me', [AuthController::class, 'me'])->name('api.me');
-});
 
-// Endpoint untuk mengambil profil user yang sedang login (Dari rekan tim)
-Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-    return response()->json([
-        'success' => true,
-        'message' => 'Data profil user berhasil diambil',
-        'data' => $request->user(),
-    ], 200);
+    // Profil user yang sedang login (dari rekan tim)
+    Route::get('/me', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Data profil user berhasil diambil',
+            'data' => $request->user(),
+        ], 200);
+    });
+
+    // Pengajaran (Kelompok 3)
+    Route::get('pengajaran/opsi', [DosenPengajaranController::class, 'opsiFormApi'])->name('api.pengajaran.opsi');
+    Route::apiResource('pengajaran', DosenPengajaranController::class)
+        ->only(['index', 'store', 'show', 'update'])
+        ->names('api.pengajaran');
 });
 
 /*
@@ -55,8 +62,8 @@ Route::prefix('integrasi')
         // TODO: Daftarkan endpoint API fitur di sini
     });
 
-// Modul Publik
+// Rute Publik (Tidak perlu login)
 Route::get('/berita', [BeritaController::class, 'index']);
 
-// Import rute API tambahan (Dari kode kamu)
+// Import rute API tambahan
 require __DIR__.'/api-admin-kaprodi.php';

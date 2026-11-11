@@ -61,7 +61,7 @@
     {{-- ===================== SIDEBAR ===================== --}}
     <aside class="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto bg-white lg:flex">
 
-        {{-- Logo (ganti dengan <img src="{{ asset('images/logo-trk.png') }}"> bila sudah punya file logonya) --}}
+        {{-- Logo: public/images/logo_trk remove.png --}}
         <a href="{{ url('/') }}" class="flex items-center gap-2 px-5 pb-5 pt-6" aria-label="Teknologi Rekayasa Komputer">
             <span class="text-[34px] font-extrabold leading-none tracking-[-3px] text-[#B3262E]">TI</span>
             <span class="text-[11px] font-extrabold leading-[13px] text-[#111]">TEKNOLOGI<br>REKAYASA KOMPUTER</span>

@@ -1,24 +1,13 @@
 @php
     // Menu versi DOSEN. 'children' = submenu dropdown.
     // href '#' = halaman belum dibuat. Ganti dengan route('nama') kalau sudah ada.
+    // Penelitian dan Pengabdian sekarang kategori di menu Kegiatan (Ajukan Kegiatan > Kategori).
     $menu = [
         [
             'label'  => 'Dashboard',
             'href'   => route('dosen.dashboard'),
             'active' => request()->routeIs('dosen.dashboard', 'profil'),
             'icon'   => '<rect x="4" y="4" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="14" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="4" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="2.5" stroke="currentColor" stroke-width="1.5"/>',
-        ],
-        [
-            'label'  => 'Penelitian',
-            'href'   => route('penelitian.index'),
-            'active' => request()->routeIs('penelitian.*'),
-            'icon'   => '<rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/><path d="M8 17L8 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17L12 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 17L16 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-        ],
-        [
-            'label'  => 'Pengabdian',
-            'href'   => route('pengabdian.index'),
-            'active' => request()->routeIs('pengabdian.*'),
-            'icon'   => '<path d="M13.1494 14.2267L20.5747 11.9991C21.4207 11.7453 22 10.9667 22 10.0835V8.42871C22 7.32414 21.1046 6.42871 20 6.42871H4C2.89543 6.42871 2 7.32414 2 8.42871V10.0835C2 10.9667 2.57934 11.7453 3.42531 11.9991L10.8506 14.2267C11.6004 14.4516 12.3996 14.4516 13.1494 14.2267Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 9.85742L12 11.5717" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21.1663 11.5713V16.9998C21.1663 19.2089 19.3755 20.9998 17.1663 20.9998H6.83301C4.62387 20.9998 2.83301 19.2089 2.83301 16.9998V11.5713" stroke="currentColor" stroke-width="1.5"/><path d="M15.3337 6.42855V5C15.3337 3.89543 14.4382 3 13.3337 3H10.667C9.56242 3 8.66699 3.89543 8.66699 5V6.42855" stroke="currentColor" stroke-width="1.5"/>',
         ],
         [
             'label'  => 'Pengajaran',
@@ -65,8 +54,8 @@
              Kalau file belum ada, tampil kotak "TI" sementara. Tombol tutup hanya tampil di layar kecil. --}}
         <div class="flex items-center justify-between gap-2 px-1 pb-5">
             <a href="{{ route('dosen.dashboard') }}" class="flex items-center gap-2.5" aria-label="Teknologi Rekayasa Komputer, ke Dashboard">
-                @if (file_exists(public_path('images/logo-trk.png')))
-                    <img src="{{ asset('images/logo-trk.png') }}" alt="" class="h-10 w-auto shrink-0">
+                @if (file_exists(public_path('images/logo_trk remove.png')))
+                    <img src="{{ asset('images/logo_trk remove.png') }}" alt="" class="h-10 w-auto shrink-0">
                 @else
                     <span class="flex size-10 shrink-0 items-center justify-center rounded-md bg-red-700 text-base font-bold text-white" aria-hidden="true">TI</span>
                 @endif

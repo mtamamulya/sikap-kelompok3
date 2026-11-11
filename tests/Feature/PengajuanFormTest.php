@@ -2,12 +2,35 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class PengajuanFormTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        DB::table('roles')->insert([
+            'id_role' => 4,
+            'nama_role' => 'mahasiswa',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $id = DB::table('users')->insertGetId([
+            'id_role' => 4,
+            'email' => 'pengajuan-student@test.local',
+            'password' => bcrypt('password'),
+            'status' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->actingAs(User::findOrFail($id));
+    }
 
     public function test_new_forms_do_not_prefill_team_members(): void
     {
@@ -143,6 +166,53 @@ class PengajuanFormTest extends TestCase
             ->assertOk()
             ->assertSee('Dokumen 7')
             ->assertSee('https://example.com/dokumen-7');
+    }
+
+    public function test_new_submission_is_also_listed_as_an_activity(): void
+    {
+        $this->post(route('pengajuan.store'), [
+            'category' => 'Pengabdian',
+            'title' => 'Pengajuan yang menjadi kegiatan',
+            'organizer' => 'Program Studi',
+            'location' => 'Semarang',
+            'start_date' => '2026-10-30',
+            'end_date' => '2026-10-31',
+            'documents' => [[
+                'name' => 'Sertifikat Kegiatan',
+                'type' => 'Dokumentasi',
+                'url' => 'https://example.com/sertifikat',
+            ]],
+        ])->assertRedirect(route('pengajuan.show', 101));
+
+        $this->get(route('kegiatan.index'))
+            ->assertOk()
+            ->assertViewIs('mahasiswa.kegiatan.index')
+            ->assertSee('Pengajuan yang menjadi kegiatan')
+            ->assertSee('Buka tautan')
+            ->assertDontSee('Unduh Sertifikat')
+            ->assertViewHas('allActivities', fn ($activities) => $activities->contains(
+                fn ($activity) => $activity['name'] === 'Pengajuan yang menjadi kegiatan'
+                    && $activity['documents'][0]['url'] === 'https://example.com/sertifikat'
+            ));
+    }
+
+    public function test_activity_list_includes_activities_tagged_to_the_current_user(): void
+    {
+        $this->withSession(['pengajuan.items' => [[
+            'id' => 101,
+            'title' => 'Lomba yang ditag',
+            'category' => 'Lomba',
+            'status' => 'Diajukan',
+            'submitted_at' => now()->toIso8601String(),
+            'data' => ['members' => [['name' => 'Mahasiswa yang ditag', 'role' => 'Anggota']]],
+            'documents' => [],
+        ]]])
+            ->get(route('kegiatan.index'))
+            ->assertOk()
+            ->assertViewHas('allActivities', fn ($activities) => $activities->contains(
+                fn ($activity) => $activity['name'] === 'Lomba yang ditag'
+                    && $activity['members'][0]['name'] === 'Mahasiswa yang ditag'
+            ));
     }
 
     public function test_detail_page_does_not_show_surat_preview(): void

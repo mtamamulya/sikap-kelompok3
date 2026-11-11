@@ -5,28 +5,7 @@
 @section('content')
 
 @php
-    // DATA TIRUAN. Nanti diganti data dari controller / database oleh tim backend.
-    $pengajaran = [
-        ['matkul' => 'Kecerdasan Buatan',   'kelas' => '2A', 'tahun' => '2025/2026', 'semester' => 'Ganjil'],
-        ['matkul' => 'Jaringan Komputer',   'kelas' => '2C', 'tahun' => '2025/2026', 'semester' => 'Ganjil'],
-        ['matkul' => 'Sistem Basis Data',   'kelas' => '3A', 'tahun' => '2025/2026', 'semester' => 'Genap'],
-        ['matkul' => 'Internet of Things',  'kelas' => '1B', 'tahun' => '2024/2025', 'semester' => 'Genap'],
-        ['matkul' => 'Computer Vision',     'kelas' => '2C', 'tahun' => '2024/2025', 'semester' => 'Ganjil'],
-        ['matkul' => 'Sistem Operasi',      'kelas' => '2A', 'tahun' => '2024/2025', 'semester' => 'Ganjil'],
-        ['matkul' => 'Jaringan Komputer',   'kelas' => '2B', 'tahun' => '2024/2025', 'semester' => 'Ganjil'],
-        ['matkul' => 'Sistem Basis Data',   'kelas' => '3A', 'tahun' => '2023/2024', 'semester' => 'Genap'],
-        ['matkul' => 'Sistem Operasi',      'kelas' => '1C', 'tahun' => '2023/2024', 'semester' => 'Genap'],
-        ['matkul' => 'Internet of Things',  'kelas' => '2A', 'tahun' => '2023/2024', 'semester' => 'Ganjil'],
-    ];
-
-    // id tetap (1, 2, 3, ...) supaya tautan ke Detail / Edit tidak berubah saat tabel dicari, difilter, atau diurutkan.
-    foreach ($pengajaran as $n => &$d) { $d['id'] = $n + 1; }
-    unset($d);
-
-    $daftarKelas    = ['1A', '1B', '1C', '2A', '2B', '2C', '3A'];
-    $daftarTahun    = ['2025/2026', '2024/2025', '2023/2024'];
-    $daftarSemester = ['Ganjil', 'Genap'];
-
+    // Bagian @php lama (pengajaran, daftarKelas, dll) DIHAPUS karena data sekarang diambil lewat API.
     $selectClass = 'h-10 w-full appearance-none rounded-lg border border-gray-200 bg-white pr-9 pl-3.5 text-[15px] text-gray-900';
 @endphp
 
@@ -42,10 +21,9 @@
         </a>
     </div>
 
-    {{-- Pencarian, filter, urut kolom, dan pagination berjalan di browser (Alpine.js + quick sort pada data tiruan).
-         Kalau backend sudah ada, pencarian / filter / urutan bisa diganti parameter ?q=...&urut=... dan pagination dari Laravel. --}}
+    {{-- x-data sekarang dipanggil tanpa parameter PHP --}}
     <section class="flex flex-col gap-6 rounded-lg bg-white p-4 shadow-sm"
-             x-data="pengajaran(@js($pengajaran))">
+             x-data="pengajaran()">
 
         <div class="flex flex-wrap items-center gap-4">
             <div class="relative min-w-60 flex-[1_1_320px]">
@@ -55,42 +33,48 @@
                        class="h-10 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-10 text-[15px] placeholder:text-gray-400">
             </div>
 
-            <div class="relative w-full">
+            <div class="relative w-full sm:w-46">
                 <label for="kelas" class="sr-only">Filter kelas</label>
                 <select id="kelas" x-model="f.kelas" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Kelas</option>
-                    @foreach ($daftarKelas as $o)
-                        <option value="{{ $o }}">{{ $o }}</option>
-                    @endforeach
+                    {{-- Menggunakan template x-for bawaan Alpine, menggantikan @foreach PHP --}}
+                    <template x-for="o in opsiKelas" :key="o">
+                        <option :value="o" x-text="o"></option>
+                    </template>
                 </select>
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
-            <div class="relative w-full">
+            <div class="relative w-full sm:w-46">
                 <label for="tahun" class="sr-only">Filter tahun akademik</label>
                 <select id="tahun" x-model="f.tahun" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Tahun</option>
-                    @foreach ($daftarTahun as $o)
-                        <option value="{{ $o }}">{{ $o }}</option>
-                    @endforeach
+                    <template x-for="o in opsiTahun" :key="o">
+                        <option :value="o" x-text="o"></option>
+                    </template>
                 </select>
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
 
-            <div class="relative w-full">
+            <div class="relative w-full sm:w-46">
                 <label for="semester" class="sr-only">Filter semester</label>
                 <select id="semester" x-model="f.semester" x-on:change="halaman = 1" class="{{ $selectClass }}">
                     <option value="">Semua Semester</option>
-                    @foreach ($daftarSemester as $o)
-                        <option value="{{ $o }}">{{ $o }}</option>
-                    @endforeach
+                    <template x-for="o in opsiSemester" :key="o">
+                        <option :value="o" x-text="o"></option>
+                    </template>
                 </select>
                 <svg class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
         </div>
 
-        {{-- Tabel. Klik judul kolom untuk mengurutkan naik / turun. --}}
-        <div class="overflow-x-auto rounded-md border border-gray-300">
+        {{-- Indikator Loading (Opsional tapi bagus untuk UX API) --}}
+        <div x-show="isLoading" class="py-10 text-center text-sm text-gray-500">
+            Mengambil data dari server...
+        </div>
+
+        {{-- Tabel (Sama persis seperti kodemu, hanya dibungkus x-show agar disembunyikan saat loading) --}}
+        <div x-show="!isLoading" class="overflow-x-auto rounded-md border border-gray-300">
             <table class="w-full min-w-[900px] table-fixed border-collapse text-sm">
                 <thead>
                     <tr class="bg-gray-100 text-left">
@@ -125,7 +109,7 @@
                 </tbody>
             </table>
 
-            <p x-show="terfilter.length === 0" x-cloak class="px-4 py-10 text-center text-sm text-gray-500">
+            <p x-show="terfilter.length === 0 && !isLoading" x-cloak class="px-4 py-10 text-center text-sm text-gray-500">
                 Tidak ada pengajaran yang cocok dengan pencarian atau filter ini.
             </p>
         </div>
@@ -140,12 +124,17 @@
 @push('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('pengajaran', (daftar) => tabelData({
-            daftar,
+        Alpine.data('pengajaran', () => tabelData({
+            // Default awal berupa array kosong
+            daftar: [], 
+            opsiKelas: [],
+            opsiTahun: [],
+            opsiSemester: [],
+            isLoading: true, // Status untuk UX
+
             cari: '',
             f: { kelas: '', tahun: '', semester: '' },
 
-            // Daftar yang lolos pencarian dan filter. Dipakai tabel, pengurutan, dan pagination.
             get terfilter() {
                 const q = this.cari.trim().toLowerCase();
                 return this.daftar.filter(k => (q === '' || k.matkul.toLowerCase().includes(q) || k.kelas.toLowerCase().includes(q)) &&
@@ -153,6 +142,37 @@
                     (this.f.tahun === '' || k.tahun === this.f.tahun) &&
                     (this.f.semester === '' || k.semester === this.f.semester));
             },
+
+            // Fungsi init() akan dijalankan otomatis oleh Alpine saat komponen dimuat di browser
+            async init() {
+                try {
+                    // Ambil token dari localStorage (Sesuaikan jika token login disave di tempat lain oleh teman frontend-mu)
+                    const token = localStorage.getItem('token_auth_kelompok3') || '';
+
+                    // Prefix API proyek ini: /api/v1 (lihat bootstrap/app.php)
+                    const respon = await fetch('/api/v1/pengajaran', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        }
+                    });
+
+                    const json = await respon.json();
+
+                    if (json.status === 'success') {
+                        // Memasukkan data JSON dari Backend API ke dalam variabel Alpine Frontend
+                        this.daftar = json.data.pengajaran;
+                        this.opsiKelas = json.data.daftarKelas;
+                        this.opsiTahun = json.data.daftarTahun;
+                        this.opsiSemester = json.data.daftarSemester;
+                    }
+                } catch (error) {
+                    console.error("Gagal mengambil API Pengajaran:", error);
+                } finally {
+                    this.isLoading = false; // Matikan loading saat selesai
+                }
+            }
         }, { perHalaman: 5, kunci: {} }));
     });
 </script>

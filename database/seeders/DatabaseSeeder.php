@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->isProduction()) {
+            throw new RuntimeException('DatabaseSeeder berisi akun uji coba dan tidak boleh dijalankan di production.');
+        }
+
         $this->call([
             FormIsianKategoriSeeder::class,
             JenisDokumenSeeder::class,
@@ -36,29 +41,22 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // 2. Buat Akun Uji Coba untuk 4 Role (Password: password)
-        User::firstOrCreate(['email' => 'admin@trk.ac.id'], [
-            'id_role' => 1,
-            'password' => bcrypt('password'),
-            'status' => true,
-        ]);
+        $accounts = [
+            ['email' => 'admin@trk.ac.id', 'id_role' => 1],
+            ['email' => 'kaprodi@trk.ac.id', 'id_role' => 2],
+            ['email' => 'dosen@trk.ac.id', 'id_role' => 3],
+            ['email' => 'mahasiswa@trk.ac.id', 'id_role' => 4],
+        ];
 
-        User::firstOrCreate(['email' => 'kaprodi@trk.ac.id'], [
-            'id_role' => 2,
-            'password' => bcrypt('password'),
-            'status' => true,
-        ]);
-
-        User::firstOrCreate(['email' => 'dosen@trk.ac.id'], [
-            'id_role' => 3,
-            'password' => bcrypt('password'),
-            'status' => true,
-        ]);
-
-        User::firstOrCreate(['email' => 'mahasiswa@trk.ac.id'], [
-            'id_role' => 4,
-            'password' => bcrypt('password'),
-            'status' => true,
-        ]);
+        foreach ($accounts as $account) {
+            User::firstOrCreate(
+                ['email' => $account['email']],
+                [
+                    'id_role' => $account['id_role'],
+                    'password' => 'password',
+                    'status' => true,
+                ]
+            );
+        }
     }
 }

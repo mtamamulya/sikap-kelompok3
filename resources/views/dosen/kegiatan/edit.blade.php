@@ -5,7 +5,7 @@
 @php
     // DATA TIRUAN. $id berasal dari alamat (/kegiatan/{id}/edit).
     // Nanti diganti data kegiatan dari controller / database oleh tim backend.
-    $daftarKategori = ['Lomba', 'Kunjungan Industri', 'Seminar', 'Pelatihan'];
+    $daftarKategori = ['Lomba', 'Kunjungan Industri', 'Seminar', 'Pelatihan', 'Penelitian', 'Pengabdian'];
     $daftarJenis    = ['Kegiatan dosen', 'Kegiatan Prodi', 'Prodi dan mahasiswa', 'Kegiatan mahasiswa'];
 
     // Isian tambahan per kategori (edit daftarnya di _medan-kategori.php) dan nilai awal form (data tiruan).

@@ -16,7 +16,7 @@
 
     <!-- Logo & Brand Header -->
     <a href="{{ url('/') }}" class="flex items-center gap-2.5 px-2">
-        <img src="{{ Vite::asset('resources/images/logo-trk.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0" onerror="this.src='https://api.builder.io/api/v1/image/assets/TEMP/89ec6d5eff0263da1bc98643370f3576302d902a?width=92'">
+        <img src="{{ asset('images/logo_trk remove.png') }}" alt="Logo TRK" class="h-9 w-auto shrink-0">
         <span class="text-[13px] font-bold leading-[1.3] text-white">TEKNOLOGI<br>REKAYASA KOMPUTER</span>
     </a>
 

@@ -216,20 +216,46 @@ class MahasiswaController extends Controller
 
     public function prestasiTambah()
     {
+        $demoActivities = collect([
+            ['FKBSE 2025', 'Pengabdian', 'Himpunan Mahasiswa TRK'],
+            ['KMIPN VIII 2026', 'Lomba', 'Politeknik Negeri'],
+            ['IMAKEN Progress In Action 2026', 'Volunteer', 'IMAKEN'],
+            ['Google Singapura', 'Kunjungan Industri', 'Google Asia Pacific'],
+            ['KKL Schneider Electric', 'Kuliah Kerja Lapangan', 'Schneider Electric Indonesia'],
+            ['Amazon Web Service', 'Magang', 'Amazon Web Services'],
+            ['Hackathon Nasional 2025', 'Lomba', 'Kementerian Kominfo'],
+            ['Workshop IoT & Embedded System', 'Pelatihan', 'Lab Embedded TRK'],
+            ['Studi Independen AI Micro-Credential', 'Magang', 'Kampus Merdeka x AI Center'],
+            ['Pengabdian Desa Digital Banyumanik', 'Pengabdian', 'Jurusan Elektro Polines'],
+            ['Seminar International TRK Tech', 'Seminar', 'TRK Polines'],
+            ['Lomba Karya Tulis Ilmiah 2025', 'Penelitian', 'Universitas Indonesia'],
+            ['Lomba CTF Cyber Security 2024', 'Lomba', 'BSSN'],
+            ['Pelatihan Cloud Architecture AWS', 'Pelatihan', 'AWS Educate'],
+            ['Volunteer Mengajar AI Sekolah Dasar', 'Volunteer', 'Komunitas AI Semarang'],
+            ['Bootcamp Fullstack Web Developer', 'Pelatihan', 'Dicoding Indonesia'],
+            ['Kunjungan Industri Telkomsel Digital', 'Kunjungan Industri', 'Telkomsel Smart Office'],
+            ['Kompetisi Robotics & Automation', 'Lomba', 'ITB Robotics Club'],
+        ])->map(fn (array $activity) => [
+            'label' => $activity[0].' • '.$activity[1],
+            'nama' => $activity[0],
+            'penyelenggara' => $activity[2],
+        ]);
+        $submittedActivities = app(PengajuanController::class)->activityOptions()
+            ->map(fn (array $activity) => [
+                'label' => ($activity['title'] ?? 'Pengajuan').' • '.($activity['category'] ?? 'Kegiatan'),
+                'nama' => $activity['title'] ?? 'Pengajuan',
+                'penyelenggara' => $activity['penyelenggara'] ?? '',
+            ]);
+
         return view('mahasiswa.mahasiswa.prestasi-tambah', [
             'nama' => config('mahasiswa.nama'),
             'profil' => ['nim' => config('mahasiswa.nim'), 'prodi' => config('mahasiswa.prodi')],
             'tingkatList' => ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'],
-            'capaianList' => ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'],
             'jenisList' => ['Akademik', 'Nonakademik'],
             'jenisDokList' => ['Sertifikat', 'Dokumentasi kegiatan'],
             'daftarMahasiswa' => ['Ivan Sigit Santoso', 'Anisa Aulia Nurusyifa', config('mahasiswa.nama'), 'Dewi Lestari', 'Fajar Nugroho', 'Rizky Pratama', 'Salsabila Putri'],
             'peranList' => ['Ketua', 'Anggota'],
-            'kegiatanList' => [
-                ['label' => 'KMIPN VIII 2026 • Lomba',        'nama' => 'KMIPN VIII 2026',        'penyelenggara' => 'Puspresnas'],
-                ['label' => 'Lomba inovasi IoT 2026 • Lomba', 'nama' => 'Lomba Inovasi IoT 2026', 'penyelenggara' => 'Forum Inovasi Teknologi'],
-                ['label' => 'Gemastik 2025 • Lomba',          'nama' => 'Gemastik 2025',          'penyelenggara' => 'Puspresnas'],
-            ],
+            'kegiatanList' => $demoActivities->concat($submittedActivities)->unique('label')->values(),
         ]);
     }
 
@@ -286,7 +312,6 @@ class MahasiswaController extends Controller
     private function validasiPrestasi(Request $request): array
     {
         $tingkat = ['Internal', 'Kabupaten/Kota', 'Provinsi', 'Nasional', 'Internasional'];
-        $capaian = ['Juara 1', 'Juara 2', 'Juara 3', 'Harapan 1', 'Harapan 2', 'Harapan 3', 'Finalis', 'Peserta'];
         $jenisDok = ['Sertifikat', 'Dokumentasi kegiatan'];
 
         $validator = Validator::make($request->all(), [
@@ -297,7 +322,7 @@ class MahasiswaController extends Controller
             'lokasi' => ['required', 'string', 'max:150'],
             'dosen' => ['nullable', 'string', 'max:100'],
             'tingkat' => ['required', Rule::in($tingkat)],
-            'capaian' => ['required', Rule::in($capaian)],
+            'capaian' => ['required', 'string', 'max:100'],
             'jenis' => ['required', Rule::in(['Akademik', 'Nonakademik'])],
             'kategori' => ['nullable', 'string', 'max:100'],
             'tanggal_mulai' => ['required', 'date'],

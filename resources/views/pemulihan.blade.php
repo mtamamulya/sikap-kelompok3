@@ -47,6 +47,9 @@
 
     {{-- Pesan error (validasi / OTP salah) --}}
     @php $error = $errors->first(); @endphp
+    @if (session('status'))
+        <div class="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800" role="status">{{ session('status') }}</div>
+    @endif
 
     {{-- ============ TAHAP 1: EMAIL ============ --}}
     @if ($step === 1)
@@ -84,10 +87,6 @@
                 </div>
             </div>
             @if ($error)<div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700" role="alert">{{ $error }}</div>@endif
-            @if (! empty($otpSimulasi))
-                <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">Mode simulasi (APP_DEBUG): kode OTP = <b>{{ $otpSimulasi }}</b></div>
-            @endif
-
             <div class="flex flex-col gap-2">
                 <span class="{{ $label }}">Kode OTP</span>
                 <div class="flex justify-between gap-2" id="otp-boxes">
@@ -97,7 +96,7 @@
                     @endfor
                 </div>
                 <input type="hidden" name="otp" id="otp-value">
-                <span class="{{ $hint }}">Kode berlaku selama 5 menit.</span>
+                <span class="{{ $hint }}">Kode berlaku selama 5 menit. Maksimal 3 percobaan.</span>
             </div>
 
             <button type="submit" class="{{ $btn }}">Verifikasi kode OTP <x-icon name="arrow-right" :size="16" :stroke="2" /></button>

@@ -2,9 +2,10 @@
 
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\PengajuanController;
+use App\Http\Middleware\MahasiswaOnly;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('mahasiswa')->group(function () {
+Route::prefix('mahasiswa')->middleware(MahasiswaOnly::class)->group(function () {
     Route::get('/pengajuan/berita', [BeritaController::class, 'index'])->name('pengajuan.berita.index');
     Route::get('/pengajuan/berita/baru', [BeritaController::class, 'create'])->name('pengajuan.berita.create');
     Route::post('/pengajuan/berita', [BeritaController::class, 'store'])->name('pengajuan.berita.store');
