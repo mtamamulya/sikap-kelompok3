@@ -15,94 +15,94 @@
 
     <x-navbar-publik />
 
-    <main class="pb-16 mx-auto max-w-[1278px] px-4 pt-10 md:pt-14 sm:px-6 xl:px-0">
+    <main class="pb-16 mx-auto max-w-[1040px] px-5 pt-6 md:pt-8 sm:px-8">
 
         {{-- ===================== JUDUL HALAMAN ===================== --}}
         <div class="text-center">
-            <nav class="text-base text-[#6B7280]" aria-label="Breadcrumb">
+            <nav class="text-sm text-[#6B7280]" aria-label="Breadcrumb">
                 <a href="{{ route('home') }}" class="hover:text-[#2277FF]">Beranda</a> / <a href="{{ route('home') }}#tentang" class="hover:text-[#2277FF]">Tentang TRK</a> / {{ $title }}
             </nav>
-            <h1 class="mt-3 text-[40px] font-bold leading-[60px] tracking-[-0.5px] text-[#2277FF] sm:text-[50px]">{{ $title }}</h1>
-            <p class="mx-auto mt-1.5 max-w-[900px] text-[15px] font-medium text-[#1F2937] sm:text-[17px]">{{ $subtitle }}</p>
-            <div class="mx-auto mt-3 h-1 w-20 rounded-full bg-[#FFD121]"></div>
+            <h1 class="mt-2 text-[30px] font-bold leading-[42px] tracking-[-0.5px] text-[#2277FF] sm:text-[36px] sm:leading-[48px]">{{ $title }}</h1>
+            <p class="mx-auto mt-1 max-w-[820px] text-[14px] font-medium text-[#1F2937] sm:text-[15px]">{{ $subtitle }}</p>
+            <div class="mx-auto mt-2.5 h-1 w-16 rounded-full bg-[#FFD121]"></div>
         </div>
 
 
 @if ($pdfUrl)
         {{-- ===================== PDF VIEWER ===================== --}}
         <section id="viewer"
-                 class="mt-8 flex h-[560px] flex-col overflow-hidden rounded-[22px] border border-[#E4ECF9] bg-[#DFE8F6] shadow-[0_6px_20px_rgba(0,50,136,0.08)] sm:h-[654px] [&:fullscreen]:h-screen [&:fullscreen]:rounded-none [&:fullscreen]:border-0">
+                 class="mt-5 flex h-[clamp(380px,calc(100vh-330px),600px)] flex-col overflow-hidden rounded-[18px] border border-[#E4ECF9] bg-[#DFE8F6] shadow-[0_6px_20px_rgba(0,50,136,0.08)] [&:fullscreen]:!h-screen [&:fullscreen]:rounded-none [&:fullscreen]:border-0">
 
             {{-- Toolbar --}}
-            <div class="grid h-16 flex-none grid-cols-[1fr_auto_1fr] items-center bg-[#0B3A8C] px-3 text-white sm:px-5">
+            <div class="grid h-12 flex-none grid-cols-[1fr_auto_1fr] items-center bg-[#0B3A8C] px-3 text-white sm:px-5">
                 <div class="flex items-center gap-2.5 sm:gap-4">
                     <button id="btnSidebar" type="button" aria-label="Tampilkan atau sembunyikan thumbnail"
-                            class="inline-flex size-10 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
-                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></svg>
+                            class="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></svg>
                     </button>
-                    <span class="hidden text-lg font-medium md:inline">Halaman</span>
+                    <span class="hidden text-[15px] font-medium md:inline">Halaman</span>
                     <input id="pageInput" type="text" inputmode="numeric" value="1" aria-label="Nomor halaman"
-                           class="h-9 w-10 rounded-md bg-white/[0.17] text-center text-lg font-medium text-white outline-none focus:ring-2 focus:ring-white/60">
-                    <span class="text-lg font-medium">/ <span id="totalPages">…</span></span>
+                           class="h-7 w-9 rounded-md bg-white/[0.17] text-center text-[15px] font-medium text-white outline-none focus:ring-2 focus:ring-white/60">
+                    <span class="text-[15px] font-medium">/ <span id="totalPages">…</span></span>
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-4">
                     <button id="zoomOut" type="button" aria-label="Perkecil"
-                            class="inline-flex size-10 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40">
-                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg>
+                            class="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0" /></svg>
                     </button>
-                    <span id="zoomLabel" class="min-w-[52px] text-center text-lg font-medium">100%</span>
+                    <span id="zoomLabel" class="min-w-[46px] text-center text-[15px] font-medium">100%</span>
                     <button id="zoomIn" type="button" aria-label="Perbesar"
-                            class="inline-flex size-10 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40">
-                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            class="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                     </button>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 sm:gap-2.5">
                     <a href="{{ $pdfUrl }}" download="{{ $fileName }}" aria-label="Unduh PDF"
-                       class="inline-flex size-10 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
-                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                       class="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
                     </a>
                     <button id="btnPrint" type="button" aria-label="Cetak"
-                            class="hidden size-10 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20 sm:inline-flex">
-                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 15a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2l0 -4" /></svg>
+                            class="hidden size-8 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20 sm:inline-flex">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 15a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2l0 -4" /></svg>
                     </button>
                     <button id="btnFull" type="button" aria-label="Layar penuh"
-                            class="inline-flex size-10 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
-                        <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2" /><path d="M4 16v2a2 2 0 0 0 2 2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v2" /><path d="M16 20h2a2 2 0 0 0 2 -2v-2" /></svg>
+                            class="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white transition hover:bg-white/20">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8v-2a2 2 0 0 1 2 -2h2" /><path d="M4 16v2a2 2 0 0 0 2 2h2" /><path d="M16 4h2a2 2 0 0 1 2 2v2" /><path d="M16 20h2a2 2 0 0 0 2 -2v-2" /></svg>
                     </button>
                 </div>
             </div>
 
             {{-- Isi: thumbnail + halaman --}}
             <div class="flex min-h-0 flex-1">
-                <aside id="thumbs" class="thin-scroll w-[148px] flex-none overflow-y-auto bg-[#F1F6FE] px-[23px] py-7" aria-label="Thumbnail halaman"></aside>
+                <aside id="thumbs" class="thin-scroll w-[120px] flex-none overflow-y-auto bg-[#F1F6FE] px-[16px] py-5" aria-label="Thumbnail halaman"></aside>
 
                 <div id="scroller" class="thin-scroll relative min-w-0 flex-1 overflow-auto">
-                    <div id="pages" class="mx-auto flex w-max min-w-full flex-col items-center gap-6 px-10 py-12"></div>
+                    <div id="pages" class="mx-auto flex w-max min-w-full flex-col items-center gap-5 px-6 py-6"></div>
                     <div id="state" class="absolute inset-0 flex items-center justify-center px-6 text-center text-base font-medium text-[#0B3A8C]">Memuat dokumen…</div>
                 </div>
             </div>
         </section>
 
         {{-- ===================== BARIS BAWAH ===================== --}}
-        <div class="mt-8 flex flex-col items-start gap-5 lg:flex-row lg:items-center lg:gap-10">
+        <div class="mt-5 flex flex-col items-start gap-3 lg:flex-row lg:items-center lg:gap-10">
             <a href="{{ route('home') }}"
-               class="inline-flex flex-none items-center gap-1 rounded-full bg-[#2277FF] p-0.5 pr-4 text-2xl font-semibold text-white">
-                <span class="flex size-[42px] items-center justify-center rounded-full bg-[#5695FB]">
+               class="inline-flex flex-none items-center gap-1 rounded-full bg-[#2277FF] p-0.5 pr-3.5 text-base font-semibold text-white">
+                <span class="flex size-8 items-center justify-center rounded-full bg-[#5695FB]">
                     <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6" /></svg>
                 </span>
                 Kembali
             </a>
 
-            <p class="min-w-0 flex-1 text-base font-medium text-[#0B3A8C] sm:text-lg">
+            <p class="min-w-0 flex-1 text-[15px] font-medium text-[#0B3A8C]">
                 {{ $fileName }}
                 <span class="font-normal text-[#5B6B86]">· <span id="pageCount">…</span> halaman</span>
             </p>
 
             <a href="{{ $pdfUrl }}" download="{{ $fileName }}"
-               class="inline-flex h-[52px] w-full flex-none items-center justify-center gap-3 rounded-[10px] border border-[#2277FF] bg-white text-lg font-medium text-[#2277FF] transition hover:bg-[#EEF4FF] sm:w-[220px]">
-                <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+               class="inline-flex h-10 w-full flex-none items-center justify-center gap-3 rounded-[10px] border border-[#2277FF] bg-white text-[15px] font-medium text-[#2277FF] transition hover:bg-[#EEF4FF] sm:w-[170px]">
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
                 Unduh PDF
             </a>
         </div>
@@ -126,9 +126,9 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         var PDF_URL = @json($pdfUrl);
-        var BASE_W  = 704;                       // lebar halaman (px) pada zoom 100%
-        var PAD     = 80;                        // ruang kiri-kanan di area halaman
-        var THUMB_W = 98;                        // lebar gambar thumbnail (px)
+        var BASE_W  = 960;                       // batas lebar maksimum halaman (px) pada zoom 100%
+        var PAD     = 48;                        // ruang kiri-kanan di area halaman
+        var THUMB_W = 80;                        // lebar gambar thumbnail (px)
         var ZOOMS   = [0.5, 0.75, 1, 1.25, 1.5, 2, 3];
         var dpr     = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -140,7 +140,12 @@
         var pdf = null, total = 0, zoomIdx = 2, current = 1, ratio = 0.707;
         var ratios = [], pageEls = [], thumbEls = [], keys = [], tkeys = [], tasks = [], ticking = false;
 
-        function fitW()  { return Math.max(240, Math.min(BASE_W, scroller.clientWidth - PAD)); }
+        function fitW() {
+            // 100% = satu halaman utuh pas di area penampil (lebar, dan tinggi untuk halaman landscape)
+            var w = Math.min(BASE_W, scroller.clientWidth - PAD);
+            if (ratio <= 1) w = Math.min(w, (scroller.clientHeight - 48) / ratio);
+            return Math.max(240, w);
+        }
         function pageW() { return Math.round(fitW() * ZOOMS[zoomIdx]); }
 
         /* ---------- susun ukuran placeholder ---------- */

@@ -8,9 +8,12 @@
 @section('title', 'Detail Mahasiswa')
 
 @php
+    // Ambil email dari array $identity bawaan controller
+    $emailAkun = $identity[0][1] ?? '-';
+
+    // Hapus grup "Identitas dan akun", sisakan Informasi akademik saja
     $groups = [
         ['title' => 'Informasi akademik', 'items' => $academic],
-        ['title' => 'Identitas dan akun', 'items' => $identity],
     ];
 
     $tag        = 'inline-flex items-center rounded-lg border border-[#AAC8F8] bg-[#CDDEF9] px-2 py-0.5 text-xs font-medium leading-4 tracking-[-0.12px] text-[#2277FF]';
@@ -49,8 +52,11 @@
     {{-- Profil + informasi --}}
     <section class="flex flex-col gap-[42px] rounded-lg bg-white px-4 pb-6 pt-4">
         <div class="flex items-center gap-6">
-            {{-- Foto: ganti dengan <img src="..." class="size-16 shrink-0 rounded-full object-cover"> bila ada --}}
-            <div class="flex size-16 shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-2xl font-semibold text-[#6B6B6B]" aria-hidden="true">{{ mb_strtoupper(mb_substr($mahasiswa['nama'], 0, 1)) }}</div>
+            @if(!empty($mahasiswa['foto']))
+                <img src="{{ Storage::disk('public')->url($mahasiswa['foto']) }}" alt="Foto {{ $mahasiswa['nama'] }}" class="size-16 shrink-0 rounded-full object-cover border border-gray-200">
+            @else
+                <div class="flex size-16 shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-2xl font-semibold text-[#6B6B6B]" aria-hidden="true">{{ mb_strtoupper(mb_substr($mahasiswa['nama'], 0, 1)) }}</div>
+            @endif
             <div class="flex flex-col gap-1">
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="text-xl font-semibold leading-6">{{ $mahasiswa['nama'] }}</div>
@@ -66,13 +72,13 @@
         </div>
 
         @foreach ($groups as $g)
-            <div class="flex w-full max-w-[1120px] flex-col gap-3">
+            <div class="flex w-full flex-col gap-3">
                 <div class="text-base font-medium text-[#2E2E2E]">{{ $g['title'] }}</div>
-                <div class="grid grid-cols-1 gap-4 rounded bg-[rgba(34,119,255,0.06)] p-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-[46px]">
+                <div class="flex flex-col gap-6 rounded-lg bg-[rgba(34,119,255,0.06)] p-5 sm:flex-row sm:items-center sm:justify-between">
                     @foreach ($g['items'] as [$k, $v])
-                        <div class="flex min-w-0 flex-col gap-1.5">
+                        <div class="flex flex-col gap-1.5">
                             <div class="text-base font-medium text-[#A8A8A8]">{{ $k }}</div>
-                            <div class="break-words text-base font-semibold text-[#2E2E2E]">{{ $v }}</div>
+                            <div class="whitespace-nowrap text-base font-semibold text-[#2E2E2E]">{{ $v }}</div>
                         </div>
                     @endforeach
                 </div>

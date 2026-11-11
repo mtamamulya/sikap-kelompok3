@@ -21,6 +21,12 @@ class DatabaseSeeder extends Seeder
             throw new RuntimeException('DatabaseSeeder berisi akun uji coba dan tidak boleh dijalankan di production.');
         }
 
+        $this->call([
+            JenisDokumenSeeder::class,
+
+        ]);
+
+        // 1. Buat 4 Role Utama
         $roles = [
             ['id_role' => 1, 'nama_role' => 'admin'],
             ['id_role' => 2, 'nama_role' => 'kaprodi'],

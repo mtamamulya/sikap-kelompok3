@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
@@ -37,8 +39,8 @@ class AdminAuthController extends Controller
         $credentials['email'] = $email;
         $credentials['status'] = true;
 
-        // 2. Coba Auth via Database
-        if (Auth::attempt($credentials)) {
+        // 2. Coba Auth via Database (hanya akun aktif: users.status = 1; dosen/mahasiswa yang dinonaktifkan ditolak)
+        if (Auth::attempt($credentials + ['status' => true])) {
             $request->session()->regenerate();
             RateLimiter::clear($rateLimitKey);
 
@@ -62,11 +64,19 @@ class AdminAuthController extends Controller
             };
         }
 
+        // 4. Gagal: hitung percobaan dan catat ke login_logs
         RateLimiter::hit($rateLimitKey, 60);
-        $userId = DB::table('users')->where('email', $email)->value('id_user');
-        $this->recordLogin($request, $email, $userId ? (int) $userId : null, false);
+        $akun = User::query()->where('email', $email)->first();
+        $this->recordLogin($request, $email, $akun ? (int) $akun->getKey() : null, false);
 
-        // 4. Jika Gagal
+        // 5. Sandi benar tetapi akun dinonaktifkan: beri pesan yang jelas. Pesan ini hanya muncul bila sandi cocok,
+        //    jadi orang yang tidak tahu sandinya tidak bisa menebak status akun.
+        if ($akun && ! $akun->status && Hash::check($credentials['password'], $akun->password)) {
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Akun Anda dinonaktifkan. Hubungi admin.']);
+        }
+
+        // 6. Email atau sandi salah
         return back()->withInput($request->only('email'))
             ->withErrors(['email' => 'Email atau sandi yang Anda masukkan salah.']);
     }

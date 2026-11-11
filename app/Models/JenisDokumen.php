@@ -12,7 +12,7 @@ class JenisDokumen extends Model
     protected $primaryKey = 'id_jenis_dokumen';
 
     protected $fillable = [
-        'nama_jenis_dokumen',
+        'nama_jenis_dokumen', 'keterangan',
     ];
 
     public function dokumen(): HasMany

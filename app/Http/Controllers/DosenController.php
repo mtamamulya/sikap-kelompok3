@@ -11,6 +11,9 @@ use Illuminate\Validation\Rule;
 
 class DosenController extends Controller
 {
+    /** Email akun dosen harus email institusi: nama@polines.ac.id (tepat domain ini, bukan subdomain atau domain lain). */
+    private const ATURAN_EMAIL = 'regex:/^[A-Za-z0-9._%+\-]+@polines\.ac\.id$/i';
+
     public function __construct(private DosenStore $store) {}
 
     /** Daftar dosen. (Hanya kolom yang dibutuhkan tabel — tidak mengirim hash sandi dll.) */
@@ -25,7 +28,7 @@ class DosenController extends Controller
             'status' => $r['status'],
         ], $this->store->all());
 
-        return view('admin.dosen', ['dosen' => $dosen, 'jabatan' => DosenStore::JABATAN]);
+        return view('admin.dosen', ['dosen' => $dosen, 'jabatan' => $this->store->opsiPangkat()]);
     }
 
     /** Detail satu dosen: profil, riwayat pangkat, dan aktivitas (4 tab). */
@@ -72,8 +75,8 @@ class DosenController extends Controller
     public function create()
     {
         return view('admin.dosen-tambah', [
-            'jabatan' => DosenStore::JABATAN,
-            'golongan' => DosenStore::GOLONGAN,
+            'jabatan' => $this->store->opsiPangkat(),
+            'golongan' => $this->store->opsiGolongan(),
             'roles' => DosenStore::ROLE,
         ]);
     }
@@ -82,30 +85,32 @@ class DosenController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'nama_lengkap' => ['required', 'string', 'max:150'],
+            'nama_lengkap' => ['required', 'string', 'max:100'],
             'nip' => ['required', 'regex:/^\d{8,20}$/', function ($attr, $value, $fail) {
                 if ($this->store->exists('nip', $value)) {
                     $fail('NIP sudah terdaftar.');
                 }
             }],
             'status_dosen' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'email' => ['required', 'email', 'max:150', function ($attr, $value, $fail) {
+            'email' => ['required', 'email', 'max:150', self::ATURAN_EMAIL, function ($attr, $value, $fail) {
                 if ($this->store->exists('email', $value)) {
                     $fail('Email sudah dipakai akun lain.');
                 }
             }],
             'role' => ['required', Rule::in(array_keys(DosenStore::ROLE))],
             'password' => ['required', 'string', 'min:8'],
-            'pangkat' => ['required', Rule::in(DosenStore::JABATAN)],
-            'golongan' => ['required', Rule::in(DosenStore::GOLONGAN)],
+            'pangkat' => ['required', Rule::in($this->store->opsiPangkat())],
+            'golongan' => ['required', Rule::in($this->store->opsiGolongan())],
             'nomor_sk' => ['required', 'string', 'max:100'],
             'tanggal_sk' => ['required', 'date'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'nip.required' => 'NIP wajib diisi.',
             'nip.regex' => 'NIP harus berupa angka 8–20 digit.',
             'email.required' => 'Email akun wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.regex' => 'Email harus memakai email institusi @polines.ac.id.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'pangkat.required' => 'Pangkat wajib dipilih.',
@@ -113,21 +118,37 @@ class DosenController extends Controller
             'nomor_sk.required' => 'Nomor SK wajib diisi.',
             'tanggal_sk.required' => 'Tanggal SK wajib diisi.',
             'tanggal_sk.date' => 'Tanggal SK tidak valid.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Foto harus JPG, PNG, atau WebP.',
+            'foto.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
 
-        // TODO-DB: simpan ke database (satu transaksi: dosen + akun login + riwayat pangkat pertama).
-        $row = $this->store->create([
-            'nama' => $data['nama_lengkap'],
-            'nip' => $data['nip'],
-            'status' => $data['status_dosen'],
-            'email' => $data['email'],
-            'role' => $data['role'],
-            'password' => $data['password'],
-            'pangkat' => $data['pangkat'],
-            'golongan' => $data['golongan'],
-            'sk' => $data['nomor_sk'],
-            'tanggal' => $data['tanggal_sk'],
-        ]);
+        $data['email'] = strtolower($data['email']);
+
+        // Foto profil (opsional). Bila penyimpanan gagal, file yang sudah diunggah dibersihkan lagi.
+        $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('foto-dosen', 'public') : null;
+
+        try {
+            $row = $this->store->create([
+                'nama' => $data['nama_lengkap'],
+                'nip' => $data['nip'],
+                'status' => $data['status_dosen'],
+                'email' => $data['email'],
+                'role' => $data['role'],
+                'password' => $data['password'],
+                'pangkat' => $data['pangkat'],
+                'golongan' => $data['golongan'],
+                'sk' => $data['nomor_sk'],
+                'tanggal' => $data['tanggal_sk'],
+                'foto' => $fotoPath,
+            ]);
+        } catch (\Throwable $e) {
+            if ($fotoPath) {
+                Storage::disk('public')->delete($fotoPath);
+            }
+
+            throw $e;
+        }
 
         return redirect()->route('admin.dosen.show', $row['id'])->with('status', 'Dosen baru berhasil ditambahkan.');
     }
@@ -153,8 +174,8 @@ class DosenController extends Controller
                 'nomor_sk' => '',
                 'tanggal_sk' => '',
             ],
-            'jabatan' => DosenStore::JABATAN,
-            'golongan' => DosenStore::GOLONGAN,
+            'jabatan' => $this->store->opsiPangkat(),
+            'golongan' => $this->store->opsiGolongan(),
             'roles' => DosenStore::ROLE,
         ]);
     }
@@ -165,14 +186,14 @@ class DosenController extends Controller
         abort_unless($this->store->find($id), 404);
 
         $data = $request->validate([
-            'nama_lengkap' => ['required', 'string', 'max:150'],
+            'nama_lengkap' => ['required', 'string', 'max:100'],
             'nip' => ['required', 'regex:/^\d{8,20}$/', function ($attr, $value, $fail) use ($id) {
                 if ($this->store->usedByOther('nip', $value, $id)) {
                     $fail('NIP sudah dipakai dosen lain.');
                 }
             }],
             'status_dosen' => ['required', Rule::in(['aktif', 'nonaktif'])],
-            'email' => ['required', 'email', 'max:150', function ($attr, $value, $fail) use ($id) {
+            'email' => ['required', 'email', 'max:150', self::ATURAN_EMAIL, function ($attr, $value, $fail) use ($id) {
                 if ($this->store->usedByOther('email', $value, $id)) {
                     $fail('Email sudah dipakai akun lain.');
                 }
@@ -182,8 +203,8 @@ class DosenController extends Controller
             'password' => ['nullable', 'string', 'min:8'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             // riwayat pangkat baru: opsional, tetapi kalau diisi harus lengkap
-            'pangkat' => ['nullable', 'required_with:golongan,nomor_sk,tanggal_sk', Rule::in(DosenStore::JABATAN)],
-            'golongan' => ['nullable', 'required_with:pangkat,nomor_sk,tanggal_sk', Rule::in(DosenStore::GOLONGAN)],
+            'pangkat' => ['nullable', 'required_with:golongan,nomor_sk,tanggal_sk', Rule::in($this->store->opsiPangkat())],
+            'golongan' => ['nullable', 'required_with:pangkat,nomor_sk,tanggal_sk', Rule::in($this->store->opsiGolongan())],
             'nomor_sk' => ['nullable', 'required_with:pangkat,golongan,tanggal_sk', 'string', 'max:100'],
             'tanggal_sk' => ['nullable', 'required_with:pangkat,golongan,nomor_sk', 'date'],
         ], [
@@ -192,6 +213,7 @@ class DosenController extends Controller
             'nip.regex' => 'NIP harus berupa angka 8–20 digit.',
             'email.required' => 'Email akun wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.regex' => 'Email harus memakai email institusi @polines.ac.id.',
             'password.min' => 'Password baru minimal 8 karakter.',
             'foto.image' => 'File harus berupa gambar.',
             'foto.mimes' => 'Foto harus JPG, PNG, atau WebP.',
@@ -202,6 +224,8 @@ class DosenController extends Controller
             'tanggal_sk.required_with' => 'Tanggal SK wajib diisi bila menambah riwayat.',
             'tanggal_sk.date' => 'Tanggal SK tidak valid.',
         ]);
+
+        $data['email'] = strtolower($data['email']);
 
         $riwayatBaru = ! empty($data['pangkat'])
             ? ['pangkat' => $data['pangkat'], 'golongan' => $data['golongan'], 'sk' => $data['nomor_sk'], 'tanggal' => $data['tanggal_sk']]
@@ -232,8 +256,30 @@ class DosenController extends Controller
         return redirect()->route('admin.dosen.show', $id)->with('status', 'Perubahan data dosen berhasil disimpan.');
     }
 
-    /** Aktivitas dosen (4 tab). TODO-DB: ganti dengan query. */
+    /**
+     * Aktifkan / nonaktifkan dosen. Dosen tidak dihapus karena dipakai tabel lain.
+     * Dosen aktif tampil di landing page; yang nonaktif tidak.
+     */
+    public function toggleStatus(string $id): RedirectResponse
+    {
+        $row = $this->store->toggleStatus($id);
+        abort_unless($row, 404);
+
+        $pesan = $row['status'] === 'aktif'
+            ? "Dosen {$row['nama']} diaktifkan dan tampil di halaman depan."
+            : "Dosen {$row['nama']} dinonaktifkan dan tidak tampil di halaman depan.";
+
+        return redirect()->back()->with('status', $pesan);
+    }
+
+    /** Aktivitas dosen (4 tab): dari store; null (mode json) = data contoh. */
     private function aktivitas(array $row): array
+    {
+        return $this->store->aktivitas($row['id']) ?? $this->aktivitasContoh();
+    }
+
+    /** Data contoh (simulasi JSON), sama untuk semua dosen. */
+    private function aktivitasContoh(): array
     {
         return [
             'penelitian' => ['label' => 'Penelitian', 'items' => [

@@ -18,7 +18,15 @@ class Prestasi extends Model
         'bidang_lomba',
         'catatan',
         'capaian',
+        'form_data',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'form_data' => 'array',
+        ];
+    }
 
     public function kegiatan(): BelongsTo
     {

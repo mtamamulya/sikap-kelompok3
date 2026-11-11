@@ -52,6 +52,11 @@ class PdfTabel
 
     private float $y = 0;
 
+    /** @var array<int, array{id: int, width: int, height: int, data: string}> */
+    private array $images = [];
+
+    private int $imageCount = 0;
+
     public function __construct(
         private string $judul,
         private array $info,
@@ -111,10 +116,31 @@ class PdfTabel
         $this->y = self::MARGIN;   // jarak dari atas halaman
 
         if ($pertama) {
-            $this->teks(self::MARGIN, $this->y + 14, $this->judul, 14, true);
-            $this->y += 20;
+            // 1. Sisipkan Logo Kampus di tengah atas (jika file logo.png tersedia)
+            // $logoPath = public_path('images/logo.png');
+            // if (file_exists($logoPath)) {
+            //     $imgId = $this->tambahGambarPng($logoPath);
+            //     if ($imgId !== null) {
+            //         $imgW = 40; // Lebar logo dalam poin (pt)
+            //         $imgH = 40; // Tinggi logo
+            //         $centerX = (self::LEBAR - $imgW) / 2;
+            //         $yAtas = self::TINGGI - $this->y;
+            //         $this->isi .= sprintf("q %.2F 0 0 %.2F %.2F %.2F cm /Im%d Do Q\n", $imgW, $imgH, $centerX, $yAtas - $imgH, $imgId);
+            //         $this->y += $imgH + 6; // Geser ke bawah setelah logo
+            //     }
+            // }
+
+            // 2. Judul Utama Rata Tengah (Center)
+            $lebarJudul = $this->lebar($this->judul, 13, true);
+            $xJudul = (self::LEBAR - $lebarJudul) / 2;
+            $this->teks($xJudul, $this->y + 12, $this->judul, 13, true);
+            $this->y += 18;
+
+            // 3. Baris Info / Subjudul Rata Tengah (Center)
             foreach ($this->info as $baris) {
-                $this->teks(self::MARGIN, $this->y + 10, $baris, 9.5, false);
+                $lebarInfo = $this->lebar($baris, 9, false);
+                $xInfo = (self::LEBAR - $lebarInfo) / 2;
+                $this->teks($xInfo, $this->y + 10, $baris, 9, false, [0.3, 0.3, 0.3]);
                 $this->y += 13;
             }
             $this->y += 8;
@@ -175,6 +201,30 @@ class PdfTabel
             "BT %.3F %.3F %.3F rg /%s %.2F Tf %.2F %.2F Td (%s) Tj ET\n",
             $warna[0], $warna[1], $warna[2], $tebal ? 'F2' : 'F1', $ukuran, $x, self::TINGGI - $yDariAtas, $this->escape($teks)
         );
+    }
+
+    /* ---------- helper gambar png dasar ---------- */
+    private function tambahGambarPng(string $file): ?int
+    {
+        $info = @getimagesize($file);
+        if (! $info || $info[2] !== IMAGETYPE_PNG) {
+            return null;
+        }
+        $content = file_get_contents($file);
+        if ($content === false) {
+            return null;
+        }
+
+        $this->imageCount++;
+        $id = $this->imageCount;
+        $this->images[$id] = [
+            'id' => $id,
+            'width' => $info[0],
+            'height' => $info[1],
+            'data' => $content,
+        ];
+
+        return $id;
     }
 
     /* ---------- teks ---------- */
@@ -257,16 +307,31 @@ class PdfTabel
         $jumlah = count($this->halaman);
         $objek = [];
 
-        // 1 katalog, 2 daftar halaman, 3-4 font, lalu pasangan (halaman, isi) tiap halaman, terakhir info
+        // 1 katalog, 2 daftar halaman, 3-4 font, objek gambar, lalu pasangan (halaman, isi) tiap halaman, terakhir info
         $kids = [];
         for ($i = 0; $i < $jumlah; $i++) {
-            $kids[] = (5 + $i * 2).' 0 R';
+            $kids[] = (5 + count($this->images) + $i * 2).' 0 R';
         }
 
         $objek[1] = '<< /Type /Catalog /Pages 2 0 R >>';
         $objek[2] = '<< /Type /Pages /Kids ['.implode(' ', $kids).'] /Count '.$jumlah.' >>';
         $objek[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
         $objek[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+
+        // Daftarkan objek gambar XObject jika ada
+        $imageObjMap = [];
+        $nextId = 5;
+        foreach ($this->images as $img) {
+            $imgObjId = $nextId++;
+            $imageObjMap[$img['id']] = $imgObjId;
+            $objek[$imgObjId] = sprintf(
+                "<< /Type /XObject /Subtype /Image /Width %d /Height %d /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /Length %d >>\nstream\n%s\nendstream",
+                $img['width'],
+                $img['height'],
+                strlen(gzcompress($img['data'])),
+                gzcompress($img['data'])
+            );
+        }
 
         foreach ($this->halaman as $i => $isi) {
             // footer + nomor halaman
@@ -276,31 +341,42 @@ class PdfTabel
             $isi .= sprintf("BT 0.4 0.4 0.4 rg /F1 8 Tf %.2F %.2F Td (%s) Tj ET\n", self::MARGIN, 22, $kiri);
             $isi .= sprintf("BT 0.4 0.4 0.4 rg /F1 8 Tf %.2F %.2F Td (%s) Tj ET\n", self::LEBAR - self::MARGIN - $lebarKanan, 22, $kanan);
 
-            $idHal = 5 + $i * 2;
-            $idIsi = $idHal + 1;
+            $idHal = $nextId++;
+            $idIsi = $nextId++;
+
+            // Masukkan referensi gambar ke Resource halaman
+            $xobjRes = '';
+            if (! empty($imageObjMap)) {
+                $xobjRes = ' /XObject << ';
+                foreach ($imageObjMap as $imgId => $objId) {
+                    $xobjRes .= '/Im'.$imgId.' '.$objId.' 0 R ';
+                }
+                $xobjRes .= '>>';
+            }
+
             $objek[$idHal] = sprintf(
-                '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %.2F %.2F] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents %d 0 R >>',
-                self::LEBAR, self::TINGGI, $idIsi
+                '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %.2F %.2F] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>%s >> /Contents %d 0 R >>',
+                self::LEBAR, self::TINGGI, $xobjRes, $idIsi
             );
             $objek[$idIsi] = '<< /Length '.strlen($isi)." >>\nstream\n".$isi.'endstream';
         }
 
-        $idInfo = 5 + $jumlah * 2;
+        $idInfo = $nextId++;
         $objek[$idInfo] = '<< /Title ('.$this->escape($this->judul).') /Producer (SIKAP TRK) >>';
 
         $pdf = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";
         $offset = [];
-        for ($n = 1; $n <= $idInfo; $n++) {
+        for ($n = 1; $n < $nextId; $n++) {
             $offset[$n] = strlen($pdf);
             $pdf .= $n." 0 obj\n".$objek[$n]."\nendobj\n";
         }
 
         $xref = strlen($pdf);
-        $pdf .= "xref\n0 ".($idInfo + 1)."\n0000000000 65535 f \n";
-        for ($n = 1; $n <= $idInfo; $n++) {
+        $pdf .= "xref\n0 ".$nextId."\n0000000000 65535 f \n";
+        for ($n = 1; $n < $nextId; $n++) {
             $pdf .= sprintf("%010d 00000 n \n", $offset[$n]);
         }
-        $pdf .= 'trailer << /Size '.($idInfo + 1).' /Root 1 0 R /Info '.$idInfo." 0 R >>\nstartxref\n".$xref."\n%%EOF";
+        $pdf .= 'trailer << /Size '.$nextId.' /Root 1 0 R /Info '.$idInfo." 0 R >>\nstartxref\n".$xref."\n%%EOF";
 
         return $pdf;
     }

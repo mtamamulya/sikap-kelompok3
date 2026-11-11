@@ -59,9 +59,9 @@ class AkreditasiStore
         }
 
         $row = [
-            'id' => $this->uniqueId($data['lembaga'].' '.$data['peringkat'].' '.$data['year'], $rows),
+            'id' => $this->uniqueId($data['lembaga'].' '.$data['year'], $rows),
             'lembaga' => $data['lembaga'],
-            'peringkat' => $data['peringkat'],
+            'peringkat' => $data['peringkat'] ?? '',
             'nomor_sk' => $data['nomor_sk'] ?? '',
             'year' => $data['year'],
             'berlaku_sampai' => $data['berlaku_sampai'] ?? '',

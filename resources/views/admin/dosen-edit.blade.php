@@ -82,8 +82,8 @@
                 <div class="flex flex-col gap-4 md:flex-row md:items-start">
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
                         <label for="email" class="{{ $label }}">Email akun<span class="text-[#FF3F3F]"> *</span></label>
-                        <input id="email" name="email" type="email" required value="{{ old('email', $dosen['email']) }}" class="{{ $field }} h-[36px]">
-                        <p class="{{ $hint }}">Email harus unik dan dipakai untuk login.</p>
+                        <input id="email" name="email" type="email" placeholder="nama@polines.ac.id" pattern="[^@\s]+@polines\.ac\.id" title="Gunakan email institusi @polines.ac.id" required value="{{ old('email', $dosen['email']) }}" class="{{ $field }} h-[36px]">
+                        <p class="{{ $hint }}">Gunakan institusi (@polines.ac.id)</p>
                         @error('email') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
@@ -211,7 +211,7 @@
                         <label for="tanggal_sk" class="{{ $label }}">Tanggal SK</label>
                         <div class="relative">
                             <input id="tanggal_sk" name="tanggal_sk" type="date" value="{{ old('tanggal_sk', $dosen['tanggal_sk']) }}" class="{{ $field }} h-[36px] pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0">
-                            <svg class="pointer-events-none absolute right-4 top-1/2 size-6 -translate-y-1/2 text-[#A8A8A8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M11 15h1" /><path d="M12 15v3" /></svg>
+                            <button type="button" aria-label="Pilih tanggal" onclick="const i = document.getElementById('tanggal_sk'); try { i.showPicker(); } catch (e) { i.focus(); }" class="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-[#A8A8A8] hover:text-[#2277FF]"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M11 15h1" /><path d="M12 15v3" /></svg></button>
                         </div>
                         @error('tanggal_sk') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>

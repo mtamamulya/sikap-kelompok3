@@ -3,13 +3,13 @@
 namespace App\Support\Laporan;
 
 /**
- * Menyusun laporan data kegiatan (dosen / mahasiswa) per kurun waktu tahun,
+ * Menyusun laporan data kegiatan (dosen / mahasiswa / prodi) per kurun waktu tahun,
  * lalu mengubahnya menjadi PDF atau Excel.
  */
 class LaporanKegiatan
 {
     /**
-     * @param  string  $jenis  'dosen' | 'mahasiswa'
+     * @param  string  $jenis  'dosen' | 'mahasiswa' | 'prodi'
      * @param  array  $rows  baris dari KegiatanData
      * @param  string  $status  'Disetujui' | 'Diajukan' | ... | 'Semua'
      * @return array{judul: string, info: string[], kolom: array, data: array, nama_file: string, jumlah: int}
@@ -21,10 +21,33 @@ class LaporanKegiatan
 
         usort($rows, fn ($a, $b) => [$a['tanggal_iso'], $a['nama']] <=> [$b['tanggal_iso'], $b['nama']]);
 
+        $semua = $jenis === 'semua';
         $mhs = $jenis === 'mahasiswa';
+        $prodi = $jenis === 'prodi';
         $periode = $dari === $sampai ? "Tahun $dari" : "Tahun $dari – $sampai";
 
-        $kolom = $mhs
+        $kolom = $semua
+            ? [
+                ['label' => 'No', 'lebar' => 30, 'rata' => 'C', 'angka' => true, 'lebar_xls' => 6],
+                ['label' => 'Nama Kegiatan', 'lebar' => 210, 'lebar_xls' => 38],
+                ['label' => 'Jenis', 'lebar' => 65, 'rata' => 'C', 'lebar_xls' => 12],
+                ['label' => 'Kategori', 'lebar' => 90, 'lebar_xls' => 18],
+                ['label' => 'Pengaju / Penanggung Jawab', 'lebar' => 130, 'lebar_xls' => 28],
+                ['label' => 'Tanggal', 'lebar' => 80, 'lebar_xls' => 16],
+                ['label' => 'Semester', 'lebar' => 55, 'rata' => 'C', 'lebar_xls' => 11],
+                ['label' => 'Status', 'lebar' => 65, 'rata' => 'C', 'lebar_xls' => 12],
+            ]
+            : ($prodi
+            ? [
+                ['label' => 'No', 'lebar' => 30, 'rata' => 'C', 'angka' => true, 'lebar_xls' => 6],
+                ['label' => 'Nama Kegiatan', 'lebar' => 240, 'lebar_xls' => 40],
+                ['label' => 'Kategori', 'lebar' => 95, 'lebar_xls' => 18],
+                ['label' => 'Penanggung Jawab', 'lebar' => 130, 'lebar_xls' => 26],
+                ['label' => 'Tanggal', 'lebar' => 85, 'lebar_xls' => 16],
+                ['label' => 'Semester', 'lebar' => 60, 'rata' => 'C', 'lebar_xls' => 11],
+                ['label' => 'Status', 'lebar' => 70, 'rata' => 'C', 'lebar_xls' => 12],
+            ]
+            : ($mhs
             ? [
                 ['label' => 'No', 'lebar' => 30, 'rata' => 'C', 'angka' => true, 'lebar_xls' => 6],
                 ['label' => 'Nama Kegiatan', 'lebar' => 210, 'lebar_xls' => 38],
@@ -44,13 +67,17 @@ class LaporanKegiatan
                 ['label' => 'Tanggal', 'lebar' => 85, 'lebar_xls' => 16],
                 ['label' => 'Semester', 'lebar' => 60, 'rata' => 'C', 'lebar_xls' => 11],
                 ['label' => 'Status', 'lebar' => 70, 'rata' => 'C', 'lebar_xls' => 12],
-            ];
+            ]));
 
         $data = [];
         foreach ($rows as $i => $r) {
-            $data[] = $mhs
+            $data[] = $semua
+                ? [$i + 1, $r['nama'], $r['jenis'], $r['kategori'], $r['pelaku'], $r['tanggal'], $r['semester'], $r['status']]
+                : ($prodi
+                ? [$i + 1, $r['nama'], $r['kategori'], $r['penanggung_jawab'], $r['tanggal'], $r['semester'], $r['status']]
+                : ($mhs
                 ? [$i + 1, $r['nama'], $r['kategori'], $r['pengaju'], $r['tingkat'], $r['kelas'], $r['tanggal'], $r['semester'], $r['status']]
-                : [$i + 1, $r['nama'], $r['kategori'], $r['dosen'], $r['tanggal'], $r['semester'], $r['status']];
+                : [$i + 1, $r['nama'], $r['kategori'], $r['dosen'], $r['tanggal'], $r['semester'], $r['status']]));
         }
 
         // Ringkasan per kategori
@@ -68,7 +95,7 @@ class LaporanKegiatan
         ];
 
         return [
-            'judul' => 'LAPORAN DATA KEGIATAN '.($mhs ? 'MAHASISWA' : 'DOSEN'),
+            'judul' => $semua ? 'LAPORAN SELURUH DATA KEGIATAN' : 'LAPORAN DATA KEGIATAN '.($prodi ? 'PRODI' : ($mhs ? 'MAHASISWA' : 'DOSEN')),
             'info' => $info,
             'kolom' => $kolom,
             'data' => $data ?: [self::kosong(count($kolom))],

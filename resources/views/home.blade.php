@@ -79,23 +79,6 @@
     ],
 ];
 
-    $stats = [
-        ['50+', 'Total prestasi'],
-        ['20+', 'Juara nasional'],
-        ['10+', 'Juara internasional'],
-    ];
-
-    $achievements = [
-        ['slug' => 'fifa-asean-cup-2026', 'badge' => 'Juara 1', 'color' => '#FFCA00', 'title' => 'The Winner of FIFA ASEAN CUP 2026', 'sub' => 'Timnas Indonesia', 'img' => 'ebc028afee08adce8cf5861ee20aba78e53cdebe?width=990'],
-        ['slug' => 'juara-1-cybersecurity-olivia-2026', 'badge' => 'Juara 1', 'color' => '#FFCA00', 'title' => 'Juara 1 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026', 'sub' => 'Prestasi TRK', 'img' => '0e73c35db1e01f91b006db7ff31041acad798b8a?width=610'],
-        ['slug' => 'juara-2-elektro-expo-2026', 'badge' => 'Juara 2', 'color' => '#949494', 'title' => 'Juara 2 Elektro Expo 2026 IoT-Desain Produk Inovasi', 'sub' => 'Prestasi TRK', 'img' => 'b8cc31f5c40b1edb042ae90a5fa0f6f0d670fa43?width=610'],
-        ['slug' => 'juara-3-cybersecurity-olivia-2026', 'badge' => 'Juara 3', 'color' => '#AD5C00', 'title' => 'Juara 3 Cybersecurity Kategori BIdang Digital & Media Technology pada OLIVIA 2026', 'sub' => 'Prestasi TRK', 'img' => 'b225631a249c148729deae4d9bd444e5f998c573?width=670'],
-        ['slug' => 'juara-3-lomba-jaringan-nasional', 'badge' => 'Juara 3', 'color' => '#AD5C00', 'title' => 'Juara 3 Lomba Jaringan Komputer Nasional', 'sub' => 'Prestasi TRK', 'img' => null],
-        ['slug' => 'finalis-hackathon-jateng', 'badge' => 'Finalis', 'color' => '#0B3A8C', 'title' => 'Finalis Hackathon Jawa Tengah', 'sub' => 'Prestasi TRK', 'img' => null],
-        ['slug' => 'juara-1-lomba-uiux-regional', 'badge' => 'Juara 1', 'color' => '#FFCA00', 'title' => 'Juara 1 Lomba Desain UI/UX Regional', 'sub' => 'Prestasi TRK', 'img' => null],
-        ['slug' => 'medali-perak-pameran-inovasi', 'badge' => 'Medali perak', 'color' => '#949494', 'title' => 'Medali Perak Pameran Inovasi Internasional', 'sub' => 'Prestasi TRK', 'img' => null],
-    ];
-
     $facilities = [
         ['name' => 'LAB KOMPUTER', 'img' => 'd85de1fefd9f5de7f85646e5eae18e98f4154ff2?width=720', 'cls' => 'sm:row-span-2 min-h-[320px]'],
         ['name' => 'CO-WORKING SPACE', 'img' => 'd4d26540f985d832c65d0719054314a08b288e4a?width=920', 'cls' => 'lg:col-span-2 min-h-[220px]'],
@@ -266,7 +249,14 @@
         </div>
     </section>
 
- {{-- Dosen --}}
+{{-- Dosen --}}
+    @php
+        // Hitung total data dosen yang tampil
+        $kartuDosen = isset($dosen) && $dosen !== null
+            ? array_map(fn ($d) => ['nama' => $d['nama'], 'foto' => $d['foto']], $dosen)
+            : array_map(fn ($l) => ['nama' => $l[0], 'foto' => $A . $l[1]], $lecturers);
+        $totalDosen = count($kartuDosen);
+    @endphp
     <section id="dosen" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] bg-[#0043AD] px-5 py-8 text-white md:py-10">
         <div class="mx-auto max-w-[1000px]">
             <h2 class="text-2xl font-extrabold leading-tight md:text-4xl">
@@ -278,23 +268,32 @@
             </p>
 
             <div class="relative mt-6 md:mt-8">
-                <button type="button" aria-label="Sebelumnya" data-scroll="-300" class="absolute -left-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
-                    <x-icon name="chevron-left" />
-                </button>
-                <button type="button" aria-label="Berikutnya" data-scroll="300" class="absolute -right-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
-                    <x-icon name="chevron-right" />
-                </button>
+                {{-- Tombol scroll kanan-kiri HANYA tampil jika jumlah dosen > 5 --}}
+                @if ($totalDosen > 5)
+                    <button type="button" aria-label="Sebelumnya" data-scroll="-300" class="absolute -left-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
+                        <x-icon name="chevron-left" />
+                    </button>
+                    <button type="button" aria-label="Berikutnya" data-scroll="300" class="absolute -right-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
+                        <x-icon name="chevron-right" />
+                    </button>
+                @endif
 
-                {{-- snap-x dihapus --}}
-                <div id="dosen-scroller" class="flex gap-3.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    @foreach ($lecturers as [$name, $img])
-                        {{-- snap-start dihapus --}}
+                {{-- Kontainer card: diberi justify-center jika dosen <= 5 --}}
+                <div id="dosen-scroller" data-count="{{ $totalDosen }}" class="-mx-5 flex gap-3.5 overflow-x-auto px-5 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0 {{ $totalDosen <= 5 ? 'md:justify-center' : '' }}">
+                    @forelse ($kartuDosen as $d)
                         <div class="relative h-[240px] w-[170px] shrink-0 overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1 md:h-[260px] md:w-[185px]">
-                            <img src="{{ $A . $img }}" alt="{{ $name }}" class="h-full w-full object-cover">
+                            @if ($d['foto'])
+                                <img src="{{ $d['foto'] }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
+                            @else
+                                <img src="{{ asset('images/logo_trk remove.png') }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
+                            @endif
                             <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,254,254,0)_45%,#000_100%)]"></div>
-                            <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $name }}</div>
+                            <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $d['nama'] }}</div>
                         </div>
-                    @endforeach
+                    @empty
+                        {{-- Pesan kosongan dibuat full-width dan rata tengah --}}
+                        <p class="w-full py-8 text-center text-sm font-medium text-white/80">Belum ada data dosen.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -344,40 +343,35 @@
             </div>
 
             <div class="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($achievements as $a)
-                    @php
-                        // Judul jadi link hanya jika slug-nya ada di config/berita.php
-                        $punyaBerita = ! empty($a['slug']) && array_key_exists($a['slug'], config('berita', []));
-                    @endphp
-
-                    {{-- Tinggi kartu dipangkas ekstrim menjadi h-[180px] agar muat 1 layar --}}
-                    <div class="relative h-[180px] overflow-hidden rounded-[12px] bg-[#DCE8FA] font-['Poppins',sans-serif] shadow-sm transition-transform hover:-translate-y-1">
-                        @if ($a['img'])
-                            <img src="{{ $A . $a['img'] }}" alt="" class="absolute inset-0 h-full w-full object-cover">
-                        @else
-                            <svg class="absolute left-1/2 top-6 -translate-x-1/2" width="60" height="70" viewBox="0 0 120 140" fill="none" aria-hidden="true">
-                                <path d="M60 72C76.5685 72 90 58.5685 90 42C90 25.4315 76.5685 12 60 12C43.4315 12 30 25.4315 30 42C30 58.5685 43.4315 72 60 72Z" fill="#9DBFF0" />
-                                <path d="M8 140C8 106 32 84 60 84C88 84 112 106 112 140H8Z" fill="#9DBFF0" />
-                            </svg>
-                        @endif
+                @forelse ($prestasi as $a)
+                    <a href="{{ route('publik.prestasi.show', $a['id']) }}"
+                       aria-label="Lihat detail prestasi {{ $a['title'] }}"
+                       class="relative block h-[180px] overflow-hidden rounded-[12px] bg-[#DCE8FA] font-['Poppins',sans-serif] shadow-sm transition-transform hover:-translate-y-1">
+                        <svg class="absolute left-1/2 top-6 -translate-x-1/2" width="60" height="70" viewBox="0 0 120 140" fill="none" aria-hidden="true">
+                            <path d="M60 72C76.5685 72 90 58.5685 90 42C90 25.4315 76.5685 12 60 12C43.4315 12 30 25.4315 30 42C30 58.5685 43.4315 72 60 72Z" fill="#9DBFF0" />
+                            <path d="M8 140C8 106 32 84 60 84C88 84 112 106 112 140H8Z" fill="#9DBFF0" />
+                        </svg>
 
                         <span class="absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[9px] font-semibold text-white" style="background: {{ $a['color'] }}">{{ $a['badge'] }}</span>
 
                         <div class="absolute inset-x-0 bottom-0 flex min-h-[60px] flex-col justify-center gap-0.5 p-2.5 text-[#0B3A8C] {{ $a['img'] ? 'bg-[linear-gradient(180deg,rgba(153,125,20,0)_-70%,#FFD121_30%)]' : 'bg-[#F5C400]' }}">
                             <div class="line-clamp-2 text-xs font-bold leading-tight">
-                                @if ($punyaBerita)
-                                    <a href="{{ route('berita.show', $a['slug']) }}" class="hover:underline">{{ $a['title'] }}</a>
-                                @else
-                                    {{ $a['title'] }}
-                                @endif
+                                {{ $a['title'] }}
                             </div>
-                            <div class="text-[9px] font-medium">{{ $a['sub'] }}</div>
+                            <div class="truncate text-[9px] font-medium">
+                                {{ $a['badge'] }}{{ $a['sub'] ? ' · '.$a['sub'] : '' }}
+                            </div>
+                            @if ($a['catatan'])
+                                <div class="line-clamp-2 text-[9px] leading-3">{{ $a['catatan'] }}</div>
+                            @endif
                         </div>
-                    </div>
-                @endforeach
+                    </a>
+                @empty
+                    <p class="col-span-full py-8 text-center text-sm font-medium text-[#1F6FEB]">Belum ada data prestasi.</p>
+                @endforelse
             </div>
 
-            <a href="{{ route('prestasi.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
+            <a href="{{ route('publik.prestasi.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
         </div>
     </section>
 
@@ -556,28 +550,51 @@
 
 @push('scripts')
 <script>
-    // Slideshow hero: ganti slide tiap 5 detik (fade ease-out)
     (function () {
-        var INTERVAL = 5000;
-        var q = function (s) { return document.querySelectorAll(s); };
-        var imgs = q('[data-slide]'), caps = q('[data-caption]'), dots = q('[data-dot]');
-        var n = imgs.length, cur = 0, timer = null;
-        if (n < 2) return;
+        const scroller = document.getElementById('dosen-scroller');
+        if (!scroller) return;
 
-        function show(i) {
-            cur = (i + n) % n;
-            [imgs, caps, dots].forEach(function (list) {
-                list.forEach(function (el, k) { el.dataset.active = (k === cur) ? 'true' : 'false'; });
+        const totalDosen = Number(scroller.dataset.count || 0);
+
+        // Jika jumlah dosen <= 5, matikan slideshow otomatis dan handler tombol
+        if (totalDosen <= 5) return;
+
+        // Tombol panah manual
+        document.querySelectorAll('[data-scroll]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                scroller.scrollBy({ left: Number(btn.dataset.scroll), behavior: 'smooth' });
             });
-        }
-        function start() {
-            clearInterval(timer);
-            timer = setInterval(function () { show(cur + 1); }, INTERVAL);
-        }
-        dots.forEach(function (d) {
-            d.addEventListener('click', function () { show(parseInt(d.dataset.dot, 10)); start(); });
         });
-        start();
+
+        // Auto-roll bolak-balik
+        let isHovered = false;
+        let direction = 1; // 1 = geser ke kanan, -1 = geser ke kiri
+        const speed = 0.8;  // Kecepatan gulir
+
+        function autoRoll() {
+            if (!isHovered) {
+                scroller.scrollLeft += speed * direction;
+
+                // Jika sudah sampai paling kanan, balik arah ke kiri
+                if (Math.ceil(scroller.scrollLeft + scroller.clientWidth) >= scroller.scrollWidth - 1) {
+                    direction = -1;
+                } 
+                // Jika sudah sampai paling kiri, balik arah ke kanan
+                else if (scroller.scrollLeft <= 0) {
+                    direction = 1;
+                }
+            }
+            requestAnimationFrame(autoRoll);
+        }
+
+        requestAnimationFrame(autoRoll);
+
+        // Pause saat kursor berada di atas foto atau disentuh di HP
+        const container = scroller.parentElement;
+        container.addEventListener('mouseenter', () => isHovered = true);
+        container.addEventListener('mouseleave', () => isHovered = false);
+        container.addEventListener('touchstart', () => isHovered = true, { passive: true });
+        container.addEventListener('touchend', () => isHovered = false);
     })();
 </script>
 @endpush

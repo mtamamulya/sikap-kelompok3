@@ -22,7 +22,7 @@
         <x-admin.breadcrumb :items="[['Dashboard', 'admin.dashboard'], ['Data Dosen', 'admin.dosen'], ['Tambah']]" />
     </div>
 
-    <form method="POST" action="{{ route('admin.dosen.store') }}" class="flex flex-col items-end gap-6 rounded-lg bg-white px-4 pb-6 pt-4">
+    <form method="POST" action="{{ route('admin.dosen.store') }}" enctype="multipart/form-data" class="flex flex-col items-end gap-6 rounded-lg bg-white px-4 pb-6 pt-4">
         @csrf
 
         <div class="flex w-full flex-col gap-6">
@@ -80,8 +80,8 @@
                 <div class="flex flex-col gap-4 md:flex-row md:items-start">
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
                         <label for="email" class="{{ $label }}">Email akun<span class="text-[#FF3F3F]"> *</span></label>
-                        <input id="email" name="email" type="email" required value="{{ old('email') }}" class="{{ $field }} h-[36px]">
-                        <p class="{{ $hint }}">Email harus unik dan dipakai untuk login.</p>
+                        <input id="email" name="email" type="email" placeholder="nama@polines.ac.id" pattern="[^@\s]+@polines\.ac\.id" title="Gunakan email institusi @polines.ac.id" required value="{{ old('email') }}" class="{{ $field }} h-[36px]">
+                        <p class="{{ $hint }}">Email institusi (@polines.ac.id), harus unik, dan dipakai untuk login.</p>
                         @error('email') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>
                     <div class="flex min-w-0 flex-1 flex-col gap-2">
@@ -103,6 +103,36 @@
                     <input id="password" name="password" type="password" required autocomplete="new-password" placeholder="Minimal 8 karakter" class="{{ $field }} h-[36px]">
                     <p class="{{ $hint }}">Password awal untuk login dosen. Minimal 8 karakter.</p>
                     @error('password') <p class="{{ $error }}">{{ $message }}</p> @enderror
+                </div>
+
+                @php
+                    $inisial = strtoupper(mb_substr(trim(old('nama_lengkap', '')) ?: 'D', 0, 1));
+                @endphp
+
+                {{-- Foto profil (opsional): lingkaran + pensil. Tampil di halaman depan bila dosen aktif --}}
+                <div class="flex w-full flex-col gap-2 md:w-[535px] md:max-w-full">
+                    <span class="{{ $label }}">Foto profil<span class="text-[#A8A8A8]"> (opsional)</span></span>
+
+                    <div class="flex items-center gap-4">
+                        <div class="relative size-[96px] shrink-0">
+                            <div class="flex size-full items-center justify-center overflow-hidden rounded-full bg-[#E4C9AE] text-4xl font-semibold text-[#7A4A1E]">
+                                <img id="foto-preview" alt="Foto profil" class="hidden size-full object-cover">
+                                <span id="foto-placeholder">{{ $inisial }}</span>
+                            </div>
+
+                            <button type="button" onclick="document.getElementById('foto').click()" title="Pilih foto" aria-label="Pilih foto profil"
+                                class="absolute bottom-0 right-0 flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#2277FF] text-white shadow hover:bg-[#1A63D8]">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
+                            </button>
+                        </div>
+
+                        <p id="foto-info" class="{{ $hint }}">
+                            Klik pensil untuk memilih foto. JPG, PNG, atau WebP, maksimal 2 MB. Foto potret (tinggi lebih besar dari lebar) paling pas di halaman depan.
+                        </p>
+                    </div>
+
+                    <input id="foto" name="foto" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
+                    @error('foto') <p class="{{ $error }}">{{ $message }}</p> @enderror
                 </div>
             </section>
 
@@ -156,7 +186,7 @@
                         <label for="tanggal_sk" class="{{ $label }}">Tanggal SK<span class="text-[#FF3F3F]"> *</span></label>
                         <div class="relative">
                             <input id="tanggal_sk" name="tanggal_sk" required type="date" value="{{ old('tanggal_sk') }}" class="{{ $field }} h-[36px] pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0">
-                            <svg class="pointer-events-none absolute right-4 top-1/2 size-6 -translate-y-1/2 text-[#A8A8A8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M11 15h1" /><path d="M12 15v3" /></svg>
+                            <button type="button" aria-label="Pilih tanggal" onclick="const i = document.getElementById('tanggal_sk'); try { i.showPicker(); } catch (e) { i.focus(); }" class="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-[#A8A8A8] hover:text-[#2277FF]"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M11 15h1" /><path d="M12 15v3" /></svg></button>
                         </div>
                         @error('tanggal_sk') <p class="{{ $error }}">{{ $message }}</p> @enderror
                     </div>
@@ -172,3 +202,37 @@
     </form>
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        var input = document.getElementById('foto');
+        var img = document.getElementById('foto-preview');
+        var ph = document.getElementById('foto-placeholder');
+        var info = document.getElementById('foto-info');
+        var nama = document.getElementById('nama_lengkap');
+        if (!input) return;
+
+        // Inisial pada lingkaran mengikuti nama yang diketik (selama belum ada foto)
+        if (nama) nama.addEventListener('input', function () {
+            if (img.classList.contains('hidden')) ph.textContent = (nama.value.trim().charAt(0) || 'D').toUpperCase();
+        });
+
+        input.addEventListener('change', function () {
+            var f = input.files && input.files[0];
+            if (!f) return;
+            if (f.size > 2 * 1024 * 1024) {
+                info.textContent = 'Ukuran foto melebihi 2 MB. Pilih foto lain.';
+                info.classList.add('text-[#E11D2E]');
+                input.value = '';
+                return;
+            }
+            info.classList.remove('text-[#E11D2E]');
+            info.textContent = f.name;
+            img.src = URL.createObjectURL(f);
+            img.classList.remove('hidden');
+            ph.classList.add('hidden');
+        });
+    })();
+</script>
+@endpush

@@ -2,39 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\AdminBeritaStore;
+use App\Models\Berita;
+use App\Models\Kategori;
+use App\Models\Kegiatan;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
-/** Berita (admin): daftar, tambah, edit. Beda dengan BeritaController (halaman publik /kabar). */
 class AdminBeritaController extends Controller
 {
-    public function __construct(private AdminBeritaStore $store) {}
-
-    public function index()
+    private function opsi(): array
     {
-        return view('admin.berita', ['rows' => $this->store->all(), 'kegiatan' => AdminBeritaStore::KEGIATAN]);
+        // PERBAIKAN: Menggunakan relasi 'kategori', bukan 'kegiatan'
+        $kegiatanDariDB = Kegiatan::with('kategori')->get();
+
+        $kegiatanList = [];
+        foreach ($kegiatanDariDB as $k) {
+            $kegiatanList[] = [
+                'id' => $k->id_kegiatan,
+                'nama' => $k->nama_kegiatan,
+                'kategori' => $k->kategori ? $k->kategori->nama_kategori : 'Lainnya',
+            ];
+        }
+
+        $kategoriList = Kategori::pluck('nama_kategori')->toArray();
+
+        return [
+            'kategori' => ! empty($kategoriList) ? $kategoriList : ['Prestasi Mahasiswa', 'Prestasi Dosen', 'Kunjungan Industri', 'Info Akademik', 'Lomba', 'Magang'],
+            'kegiatanList' => $kegiatanList,
+        ];
     }
 
-    /** Detail berita. */
-    public function show(string $id)
+    public function index(Request $request)
     {
-        $berita = $this->store->find($id);
-        abort_unless($berita, 404);
+        $beritaDb = Berita::with('kegiatan')->orderBy('created_at', 'desc')->get();
 
-        $tanggal = $berita['tanggal'] ? Carbon::parse($berita['tanggal'])->locale('id') : null;
-        $kata = str_word_count(strip_tags($berita['isi']));
+        $rows = [];
+        foreach ($beritaDb as $b) {
+            $rows[] = [
+                'id' => $b->id_berita,
+                'judul' => $b->judul_berita,
+                'kegiatan' => $b->kegiatan ? $b->kegiatan->nama_kegiatan : 'Mandiri / Tanpa Kegiatan',
+                'tanggal' => $b->tanggal_publish ? Carbon::parse($b->tanggal_publish)->translatedFormat('d F Y') : '-',
+                'status' => ucfirst($b->status),
+            ];
+        }
 
-        return view('admin.berita-detail', [
-            'berita' => $berita,
-            'paragraf' => array_values(array_filter(preg_split('/\R{1,}/', trim($berita['isi'])))),
-            'foto' => $this->store->fotoUrl($berita),
-            'hariTanggal' => $tanggal ? $tanggal->translatedFormat('l, j F Y') : '-',
-            'tanggalPendek' => $tanggal ? $tanggal->format('d/m/Y') : '-',
-            'waktuBaca' => max(1, (int) ceil($kata / 200)).' menit',
-            'terkait' => $this->store->related($berita),
+        $kategoriKegiatan = Kategori::pluck('nama_kategori')->toArray();
+
+        return view('admin.berita', [
+            'rows' => $rows,
+            'kegiatan' => ! empty($kategoriKegiatan) ? $kategoriKegiatan : ['Prestasi Mahasiswa', 'Prestasi Dosen', 'Kunjungan Industri', 'Info Akademik', 'Lomba', 'Magang'],
         ]);
     }
 
@@ -43,78 +61,147 @@ class AdminBeritaController extends Controller
         return view('admin.berita-tambah', $this->opsi());
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        $data = $this->validasi($request, true);
+        $data = $request->validate([
+            'judul' => 'required|string|max:255',
+            'isi' => 'required|string',
+            'status' => 'required|in:publish,Publish,draft,Draft',
+            'kegiatan_id' => 'nullable|integer',
+            // PERBAIKAN: Ubah 'sampul' jadi 'foto', izinkan pdf, dan naikkan batas ke 5MB (5120 KB)
+            'foto' => 'nullable|mimes:jpeg,png,jpg,pdf|max:5120',
+        ]);
 
-        // TODO-DB: simpan ke tabel berita (foto: simpan path-nya).
-        $row = $this->store->create($data);
+        $status = strtolower($data['status']);
+        $sampulPath = null;
 
-        return redirect()->route('admin.berita')->with('status', 'Berita "'.$row['judul'].'" disimpan sebagai '.$row['status'].'.');
+        // PERBAIKAN: Deteksi file dengan nama 'foto', tapi tetap simpan jalurnya ke variabel sampulPath
+        if ($request->hasFile('foto')) {
+            $sampulPath = $request->file('foto')->store('berita', 'public');
+        }
+
+        Berita::create([
+            'judul_berita' => $data['judul'],
+            'isi_berita' => $data['isi'],
+            'status' => $status,
+            'id_kegiatan' => ! empty($data['kegiatan_id']) ? $data['kegiatan_id'] : 1,
+            'tanggal_publish' => $status === 'publish' ? now() : null,
+            // Simpan ke kolom 'sampul' di database
+            'sampul' => $sampulPath,
+        ]);
+
+        return redirect('/admin/berita')->with('status', 'Berita berhasil disimpan.');
+    }
+
+    public function show(string $id)
+    {
+        $beritaDb = Berita::with('kegiatan')->findOrFail($id);
+
+        // Siapkan variabel fotoUrl agar bisa dimasukkan ke dalam array $berita dan dikirim secara mandiri
+        $fotoUrl = $beritaDb->sampul ? asset('storage/'.$beritaDb->sampul) : null;
+
+        $berita = [
+            'id' => $beritaDb->id_berita,
+            'judul' => $beritaDb->judul_berita,
+            'isi' => $beritaDb->isi_berita,
+            'status' => ucfirst($beritaDb->status),
+            'kegiatan' => $beritaDb->kegiatan ? $beritaDb->kegiatan->nama_kegiatan : 'Mandiri / Tanpa Kegiatan',
+            'tanggal' => $beritaDb->tanggal_publish,
+            'foto' => $fotoUrl, // <-- PERBAIKAN: Kunci ini ditambahkan agar Blade tidak error
+        ];
+
+        $tanggal = $berita['tanggal'] ? Carbon::parse($berita['tanggal'])->locale('id') : null;
+        $kata = str_word_count(strip_tags($berita['isi']));
+
+        // PENTING: Untuk file KaprodiBeritaController, ganti 'admin.berita-detail' menjadi 'kaprodi.berita-detail'
+        return view('admin.berita-detail', [
+            'berita' => $berita,
+            'paragraf' => array_values(array_filter(preg_split('/\R{1,}/', trim($berita['isi'])))),
+            'foto' => $fotoUrl,
+            'hariTanggal' => $tanggal ? $tanggal->translatedFormat('l, j F Y') : '-',
+            'tanggalPendek' => $tanggal ? $tanggal->format('d/m/Y') : '-',
+            'waktuBaca' => max(1, (int) ceil($kata / 200)).' menit',
+            'terkait' => [],
+        ]);
     }
 
     public function edit(string $id)
     {
-        $berita = $this->store->find($id);
-        abort_unless($berita, 404);
+        $beritaDb = Berita::findOrFail($id);
+
+        $berita = [
+            'id' => $beritaDb->id_berita,
+            'judul' => $beritaDb->judul_berita,
+            'isi' => $beritaDb->isi_berita,
+            'status' => strtolower($beritaDb->status),
+            'kegiatan_id' => $beritaDb->id_kegiatan,
+            'sumber' => $beritaDb->id_kegiatan ? 'prev' : 'none',
+        ];
 
         return view('admin.berita-edit', $this->opsi() + ['berita' => $berita]);
     }
 
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(Request $request, string $id)
     {
-        abort_unless($this->store->find($id), 404);
-
-        $data = $this->validasi($request, false);
-
-        // TODO-DB: update tabel berita.
-        $row = $this->store->update($id, $data);
-
-        return redirect()->route('admin.berita')->with('status', 'Berita "'.$row['judul'].'" diperbarui ('.$row['status'].').');
-    }
-
-    private function opsi(): array
-    {
-        return ['kategori' => AdminBeritaStore::KEGIATAN, 'kegiatanList' => AdminBeritaStore::KEGIATAN_SEBELUMNYA];
-    }
-
-    /** Validasi + normalisasi input. $wajibFoto: foto wajib saat tambah, opsional saat edit. */
-    private function validasi(Request $request, bool $wajibFoto): array
-    {
-        $ids = array_column(AdminBeritaStore::KEGIATAN_SEBELUMNYA, 'id');
-        $prev = $request->input('sumber') === 'prev';
+        $beritaDb = Berita::findOrFail($id);
 
         $data = $request->validate([
-            'sumber' => ['required', Rule::in(['prev', 'none'])],
-            'kegiatan_id' => [$prev ? 'required' : 'nullable', Rule::in($ids)],
-            'kategori' => [$prev ? 'nullable' : 'required', Rule::in(AdminBeritaStore::KEGIATAN)],
-            'judul' => ['required', 'string', 'max:200'],
-            'isi' => ['required', 'string', 'max:1000'],
-            'foto' => [$wajibFoto ? 'required' : 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
-            'status' => ['required', Rule::in(AdminBeritaStore::STATUS)],
-        ], [
-            'kegiatan_id.required' => 'Pilih kegiatan sebelumnya.',
-            'kategori.required' => 'Pilih kategori kegiatan.',
-            'judul.required' => 'Judul berita wajib diisi.',
-            'isi.required' => 'Isi berita wajib diisi.',
-            'isi.max' => 'Isi berita maksimal 1.000 karakter.',
-            'foto.required' => 'Foto sampul wajib diunggah.',
-            'foto.mimes' => 'Berkas harus PDF, JPG, atau PNG.',
-            'foto.max' => 'Ukuran berkas maksimal 5 MB.',
+            'judul' => 'required|string|max:255',
+            'isi' => 'required|string',
+            'status' => 'required|in:publish,Publish,draft,Draft',
+            'kegiatan_id' => 'nullable|integer',
+            // PERBAIKAN: Sesuaikan juga di sini
+            'foto' => 'nullable|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
-        // Bila dari kegiatan sebelumnya, kategori mengikuti kegiatan itu.
-        if ($prev) {
-            foreach (AdminBeritaStore::KEGIATAN_SEBELUMNYA as $k) {
-                if ($k['id'] === $data['kegiatan_id']) {
-                    $data['kategori'] = $k['kategori'];
-                }
+        $status = strtolower($data['status']);
+
+        // PERBAIKAN: Deteksi input 'foto'
+        if ($request->hasFile('foto')) {
+            if ($beritaDb->sampul) {
+                Storage::disk('public')->delete($beritaDb->sampul);
             }
+            $beritaDb->sampul = $request->file('foto')->store('berita', 'public');
         }
 
-        // TODO-DB: simpan berkas ke storage final. Sementara: disk 'public' (butuh `php artisan storage:link`).
-        $data['foto'] = $request->hasFile('foto') ? $request->file('foto')->store('berita', 'public') : null;
+        $beritaDb->judul_berita = $data['judul'];
+        $beritaDb->isi_berita = $data['isi'];
+        $beritaDb->status = $status;
+        $beritaDb->id_kegiatan = ! empty($data['kegiatan_id']) ? $data['kegiatan_id'] : 1;
 
-        return $data;
+        if ($status === 'publish' && ! $beritaDb->tanggal_publish) {
+            $beritaDb->tanggal_publish = now();
+        } elseif ($status === 'draft') {
+            $beritaDb->tanggal_publish = null;
+        }
+
+        $beritaDb->save();
+
+        return redirect('/admin/berita')->with('status', 'Berita berhasil diperbarui.');
+    }
+
+    /**
+     * Tinjau & Review: Mengubah Draft menjadi Publish
+     */
+    public function approve(string $id)
+    {
+        $beritaDb = Berita::findOrFail($id);
+
+        $beritaDb->status = 'publish';
+        $beritaDb->tanggal_publish = now();
+        $beritaDb->save();
+
+        return redirect('/admin/berita')->with('status', 'Berita berhasil disetujui (Published).');
+    }
+
+    public function destroy(string $id)
+    {
+        $beritaDb = Berita::findOrFail($id);
+        if ($beritaDb->sampul) {
+            Storage::disk('public')->delete($beritaDb->sampul);
+        }
+        $beritaDb->delete();
+
+        return redirect('/admin/berita')->with('status', 'Berita berhasil dihapus.');
     }
 }

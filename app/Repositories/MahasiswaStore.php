@@ -26,6 +26,12 @@ class MahasiswaStore
 
     private const PATH = 'admin/mahasiswa.json';
 
+    /** Pilihan status untuk dropdown/validasi. Versi database menimpanya dengan status yang bisa disimpan. */
+    public function opsiStatus(): array
+    {
+        return self::STATUS;
+    }
+
     /** @return array<int, array<string, mixed>> */
     public function all(): array
     {
@@ -160,5 +166,15 @@ class MahasiswaStore
         }
 
         return $rows;
+    }
+
+    public function riwayatKelas(string $id): ?array
+    {
+        return null;
+    }
+
+    public function kegiatan(string $id): ?array
+    {
+        return null;
     }
 }

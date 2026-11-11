@@ -2,18 +2,20 @@
 
 use App\Http\Controllers\AdminAkreditasiController;
 // ---------- Controller Publik & Landing ----------
-use App\Http\Controllers\AdminAuthController; // Hasil rename dari BeritaController
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminBeritaController;
-use App\Http\Controllers\AdminKegiatanDosenDetailShowController;
+use App\Http\Controllers\AdminKegiatanController;
+use App\Http\Controllers\AdminKegiatanDosenDetailShowController; // <-- Controller Tambah Kegiatan
 use App\Http\Controllers\AdminKegiatanMahasiswaDetailShowController;
+use App\Http\Controllers\AdminKegiatanTambahController;
 use App\Http\Controllers\AdminKurikulumController;
 use App\Http\Controllers\AdminMataKuliahController;
 use App\Http\Controllers\AdminPengajuanController;
 use App\Http\Controllers\AdminPrestasiController;
 // ---------- Controller Admin ----------
 use App\Http\Controllers\AdminProfilController;
-use App\Http\Controllers\AdminTinjauPengajuanController; // Hasil rename dari DashboardController
-use App\Http\Controllers\AkreditasiController; // Hasil rename dari MahasiswaController
+use App\Http\Controllers\AdminTinjauPengajuanController;
+use App\Http\Controllers\AkreditasiController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\JenisDokumenController;
@@ -22,9 +24,8 @@ use App\Http\Controllers\KaprodiDashboardController;
 use App\Http\Controllers\KaprodiDosenController;
 use App\Http\Controllers\KaprodiJenisDokumenController;
 use App\Http\Controllers\KaprodiKategoriKegiatanController;
-use App\Http\Controllers\KaprodiKegiatanDosenController;
+use App\Http\Controllers\KaprodiKegiatanController;
 use App\Http\Controllers\KaprodiKegiatanDosenDetailShowController;
-use App\Http\Controllers\KaprodiKegiatanMahasiswaController;
 use App\Http\Controllers\KaprodiKegiatanMahasiswaDetailShowController;
 use App\Http\Controllers\KaprodiKurikulumController;
 use App\Http\Controllers\KaprodiMahasiswaController;
@@ -51,7 +52,6 @@ use App\Http\Middleware\KaprodiOnly;
 use Illuminate\Support\Facades\Route;
 
 // ---------- Publik ----------
-// Route::view('/trk', 'home')->name('home');
 Route::get('/mata-kuliah', [MataKuliahController::class, 'index'])->name('mata-kuliah');
 Route::get('/mata-kuliah/data', [MataKuliahController::class, 'data'])->name('mata-kuliah.data');
 Route::get('/akreditasi', [AkreditasiController::class, 'index'])->name('akreditasi');
@@ -60,6 +60,9 @@ Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas
 Route::get('/kabar', [PublicBeritaController::class, 'index'])->name('publik.berita.index');
 Route::get('/kabar/{slug}', [PublicBeritaController::class, 'show'])->name('publik.berita.show');
 Route::get('/prestasi-trk', [PrestasiController::class, 'index'])->name('publik.prestasi.index');
+Route::get('/prestasi-trk/{prestasi}', [PrestasiController::class, 'show'])
+    ->whereNumber('prestasi')
+    ->name('publik.prestasi.show');
 
 // ---------- Login & Pemulihan ----------
 Route::view('/login', 'login')->name('login');
@@ -102,6 +105,7 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     Route::get('/dosen/{id}', [DosenController::class, 'show'])->name('admin.dosen.show');
     Route::get('/dosen/{id}/edit', [DosenController::class, 'edit'])->name('admin.dosen.edit');
     Route::put('/dosen/{id}', [DosenController::class, 'update'])->name('admin.dosen.update');
+    Route::patch('/dosen/{id}/status', [DosenController::class, 'toggleStatus'])->name('admin.dosen.status');
 
     // Data Mahasiswa
     Route::get('/mahasiswa', [LandingMahasiswaController::class, 'index'])->name('admin.mahasiswa');
@@ -111,11 +115,17 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     Route::get('/mahasiswa/{id}/edit', [LandingMahasiswaController::class, 'edit'])->name('admin.mahasiswa.edit');
     Route::put('/mahasiswa/{id}', [LandingMahasiswaController::class, 'update'])->name('admin.mahasiswa.update');
 
-    // Kegiatan
+    // Kegiatan (Menggunakan AdminKegiatanTambahController untuk Create & Store)
+    Route::get('/kegiatan', [AdminKegiatanController::class, 'index'])->name('admin.kegiatan.index');
+    Route::get('/kegiatan/tambah', [AdminKegiatanTambahController::class, 'create'])->name('admin.kegiatan.create');
+    Route::post('/kegiatan', [AdminKegiatanTambahController::class, 'store'])->name('admin.kegiatan.store');
+
     Route::get('/kegiatan/mahasiswa', [KegiatanMahasiswaController::class, 'index'])->name('admin.kegiatan.mahasiswa');
     Route::get('/kegiatan/dosen', [KegiatanDosenController::class, 'index'])->name('admin.kegiatan.dosen');
     Route::get('/kegiatan/dosen/laporan', [KegiatanLaporanController::class, 'dosen'])->name('admin.kegiatan.dosen.laporan');
     Route::get('/kegiatan/mahasiswa/laporan', [KegiatanLaporanController::class, 'mahasiswa'])->name('admin.kegiatan.mahasiswa.laporan');
+    Route::get('/kegiatan/prodi/laporan', [KegiatanLaporanController::class, 'prodi'])->name('admin.kegiatan.prodi.laporan');
+    Route::get('/kegiatan/semua/laporan', [KegiatanLaporanController::class, 'semua'])->name('admin.kegiatan.semua.laporan');
     Route::get('/kegiatan/mahasiswa/{id}', [AdminKegiatanMahasiswaDetailShowController::class, 'show'])->name('admin.kegiatan.mahasiswa.detail.show');
     Route::get('/kegiatan/dosen/{id}', [AdminKegiatanDosenDetailShowController::class, 'show'])->name('admin.kegiatan.dosen.detail.show');
     Route::delete('/kegiatan/dosen/{id}', [KegiatanHapusController::class, 'dosen'])->name('admin.kegiatan.dosen.destroy');
@@ -163,6 +173,8 @@ Route::prefix('admin')->middleware(AdminOnly::class)->group(function () {
     // Placeholder otomatis dari config/admin.php
     $sudahAda = [
         'admin.dashboard',
+        'admin.kegiatan.index',
+        'admin.kegiatan.create',
         'admin.kurikulum.trk',
         'admin.kurikulum.mata-kuliah',
         'admin.dosen',
@@ -214,10 +226,17 @@ Route::prefix('kaprodi')->middleware(KaprodiOnly::class)->group(function () {
     Route::get('/mahasiswa', [KaprodiMahasiswaController::class, 'index'])->name('kaprodi.mahasiswa');
     Route::get('/dosen/{id}', [KaprodiDosenController::class, 'show'])->name('kaprodi.dosen.show');
     Route::get('/mahasiswa/{id}', [KaprodiMahasiswaController::class, 'show'])->name('kaprodi.mahasiswa.show');
-    Route::get('/kegiatan/dosen', [KaprodiKegiatanDosenController::class, 'index'])->name('kaprodi.kegiatan.dosen');
-    Route::get('/kegiatan/mahasiswa', [KaprodiKegiatanMahasiswaController::class, 'index'])->name('kaprodi.kegiatan.mahasiswa');
+    // Kegiatan gabungan (Dosen | Mahasiswa | Prodi). URL lama dialihkan ke tab yang sesuai.
+    Route::get('/kegiatan', [KaprodiKegiatanController::class, 'index'])->name('kaprodi.kegiatan.index');
+    Route::get('/kegiatan/tambah', [AdminKegiatanTambahController::class, 'create'])->name('kaprodi.kegiatan.create');
+    Route::post('/kegiatan', [AdminKegiatanTambahController::class, 'store'])->name('kaprodi.kegiatan.store');
+    Route::redirect('/kegiatan/dosen', '/kaprodi/kegiatan?tab=dosen')->name('kaprodi.kegiatan.dosen');
+    Route::redirect('/kegiatan/mahasiswa', '/kaprodi/kegiatan?tab=mahasiswa')->name('kaprodi.kegiatan.mahasiswa');
+
     Route::get('/kegiatan/dosen/laporan', [KegiatanLaporanController::class, 'dosen'])->name('kaprodi.kegiatan.dosen.laporan');
     Route::get('/kegiatan/mahasiswa/laporan', [KegiatanLaporanController::class, 'mahasiswa'])->name('kaprodi.kegiatan.mahasiswa.laporan');
+    Route::get('/kegiatan/prodi/laporan', [KegiatanLaporanController::class, 'prodi'])->name('kaprodi.kegiatan.prodi.laporan');
+    Route::get('/kegiatan/semua/laporan', [KegiatanLaporanController::class, 'semua'])->name('kaprodi.kegiatan.semua.laporan');
     Route::get('/kegiatan/mahasiswa/{id}', [KaprodiKegiatanMahasiswaDetailShowController::class, 'show'])->name('kaprodi.kegiatan.mahasiswa.show');
 
     Route::get('berita', [KaprodiBeritaController::class, 'index'])->name('kaprodi.berita');
@@ -252,6 +271,8 @@ Route::prefix('kaprodi')->middleware(KaprodiOnly::class)->group(function () {
         'kaprodi.kurikulum.mata-kuliah',
         'kaprodi.dosen',
         'kaprodi.mahasiswa',
+        'kaprodi.kegiatan.index',
+        'kaprodi.kegiatan.create',
         'kaprodi.kegiatan.dosen',
         'kaprodi.kegiatan.mahasiswa',
         'kaprodi.kegiatan.kategori-kegiatan',

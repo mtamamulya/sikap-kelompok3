@@ -2,15 +2,16 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenDashboardController;
-// use App\Http\Controllers\DosenPengajaranController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\LandingMahasiswaController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Middleware\MahasiswaOnly;
 use Illuminate\Support\Facades\Route;
 
-// Ganti redirect otomatis ini dengan Landing Page TRK
-Route::view('/', 'home')->name('home');
+// Landing Page TRK
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::redirect('/dashboard', '/mahasiswa/dashboard')->name('dashboard');
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])->name('dosen.dashboard');
@@ -127,4 +128,10 @@ Route::get('/pengajuan/{id}/edit', fn ($id) => redirect()->route('pengajuan.edit
 Route::get('/pengajuan/{id}', fn ($id) => redirect()->route('pengajuan.show', $id))->whereNumber('id');
 Route::get('/kegiatan/{id}/edit', fn ($id) => redirect()->route('kegiatan.edit', $id))->whereNumber('id');
 Route::get('/kegiatan/{id}', fn ($id) => redirect()->route('kegiatan.show', $id))->whereNumber('id');
+
+// Route Sinkronisasi Kelas
+Route::post('/admin/mahasiswa/buat-kelas', [LandingMahasiswaController::class, 'buatKelasSemester'])->name('admin.mahasiswa.buat-kelas');
+
+Route::patch('/admin/mahasiswa/{id}/toggle-status', [LandingMahasiswaController::class, 'toggleStatus'])->name('admin.mahasiswa.toggle-status');
+
 require __DIR__.'/admin-kaprodi.php';

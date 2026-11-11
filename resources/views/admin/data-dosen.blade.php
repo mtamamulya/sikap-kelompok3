@@ -124,10 +124,13 @@
         </nav>
 
         <div class="px-3 pb-[17px] pt-4">
-            <a href="{{ url('/logout') }}" class="flex h-10 items-center gap-3 rounded-lg px-3 text-base text-[#111] hover:bg-[#F3F7FF]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M9 12h12l-3 -3" /><path d="M18 15l3 -3" /></svg>
-                <span class="flex-1">Keluar</span>
-            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-base text-[#111] hover:bg-[#F3F7FF]">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M9 12h12l-3 -3" /><path d="M18 15l3 -3" /></svg>
+                    <span class="flex-1">Keluar</span>
+                </button>
+            </form>
         </div>
     </aside>
 

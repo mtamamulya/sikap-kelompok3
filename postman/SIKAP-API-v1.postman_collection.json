@@ -1,0 +1,888 @@
+{
+  "info": {
+    "name": "SIKAP Kelompok 3 - API v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Jalankan `php artisan serve` dan pastikan database terisi. Urutan: jalankan folder dari atas ke bawah (request daftar menyimpan id untuk request detail). Butuh migration usulan untuk kolom tahun_terbit, lembaga, status, dst. Auth: jalankan Login dulu; token tersimpan otomatis ke variabel koleksi."
+  },
+  "variable": [
+    {
+      "key": "id_kurikulum",
+      "value": "1"
+    },
+    {
+      "key": "id_mk",
+      "value": "1"
+    },
+    {
+      "key": "id_akreditasi",
+      "value": "1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": "admin@trk.ac.id"
+    },
+    {
+      "key": "password",
+      "value": "password"
+    }
+  ],
+  "item": [
+    {
+      "name": "Ping",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('Envelope + service', function () { pm.expect(json.success).to.eql(true); pm.expect(json.data.status).to.eql('ok'); pm.expect(json.data.service).to.eql('sikap-kelompok3'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/ping",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "ping"
+          ]
+        },
+        "description": ""
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Ada token Bearer', function () { pm.expect(json.success).to.eql(true); pm.expect(json.data.token).to.be.a('string'); pm.expect(json.data.token_type).to.eql('Bearer'); pm.expect(json.data.user).to.not.have.property('password'); });",
+                  "pm.collectionVariables.set('token', json.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"device_name\": \"postman\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Me (butuh token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Me 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Data user', function () { pm.expect(json.data.email).to.eql(pm.collectionVariables.get('email')); pm.expect(json.data).to.not.have.property('password'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Me tanpa token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Tanpa token -> 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login sandi salah",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Sandi salah -> 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Format gagal', function () { pm.expect(pm.response.json().success).to.eql(false); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"salah\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login input kosong",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Input kosong -> 422', function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Berhasil', function () { pm.expect(pm.response.json().success).to.eql(true); });",
+                  "pm.collectionVariables.unset('token');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kurikulum",
+      "item": [
+        {
+          "name": "Daftar kurikulum",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Ada meta paginasi', function () { pm.expect(json.meta).to.include.keys('current_page','per_page','total','last_page'); pm.expect(json.data).to.be.an('array'); pm.expect(json.data.length).to.be.at.most(json.meta.per_page); });",
+                  "pm.test('Setiap kurikulum punya kolom database', function () { json.data.forEach(function (k) { pm.expect(k).to.include.keys('id_kurikulum','nama_kurikulum','status','link'); pm.expect(k.status).to.be.a('boolean'); }); });",
+                  "if (json.data.length > 0) { pm.collectionVariables.set('id_kurikulum', json.data[0].id_kurikulum); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/kurikulum?per_page=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "kurikulum"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Daftar kurikulum aktif",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Ada meta paginasi', function () { pm.expect(json.meta).to.include.keys('current_page','per_page','total','last_page'); pm.expect(json.data).to.be.an('array'); pm.expect(json.data.length).to.be.at.most(json.meta.per_page); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/kurikulum?status=aktif",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "kurikulum"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detail kurikulum",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Detail kurikulum', function () { pm.expect(json.data.id_kurikulum).to.eql(Number(pm.collectionVariables.get('id_kurikulum'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/kurikulum/{{id_kurikulum}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "kurikulum",
+                "{{id_kurikulum}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mata kuliah satu kurikulum",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Data berupa array mata kuliah', function () { pm.expect(json.data).to.be.an('array'); json.data.forEach(function (m) { pm.expect(m).to.include.keys('id_mk','id_kurikulum','semester','kode_mk','nama_mk','sks_teori','sks_praktik','jam_teori','jam_praktek'); }); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/kurikulum/{{id_kurikulum}}/mata-kuliah",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "kurikulum",
+                "{{id_kurikulum}}",
+                "mata-kuliah"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Kurikulum tidak ada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 untuk id yang tidak ada', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Format gagal standar', function () { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j).to.have.property('message'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/kurikulum/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "kurikulum",
+                "999999"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mata Kuliah",
+      "item": [
+        {
+          "name": "Daftar mata kuliah",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Ada meta paginasi', function () { pm.expect(json.meta).to.include.keys('current_page','per_page','total','last_page'); pm.expect(json.data).to.be.an('array'); pm.expect(json.data.length).to.be.at.most(json.meta.per_page); });",
+                  "pm.test('Kunci mata kuliah sesuai kolom database', function () { json.data.forEach(function (m) { pm.expect(m).to.include.keys('id_mk','kode_mk','nama_mk','sks_praktik','jam_praktek'); }); });",
+                  "if (json.data.length > 0) { pm.collectionVariables.set('id_mk', json.data[0].id_mk); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mata-kuliah?per_page=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mata-kuliah"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Filter semester 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Ada meta paginasi', function () { pm.expect(json.meta).to.include.keys('current_page','per_page','total','last_page'); pm.expect(json.data).to.be.an('array'); pm.expect(json.data.length).to.be.at.most(json.meta.per_page); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mata-kuliah?semester=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mata-kuliah"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cari kode/nama",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Ada meta paginasi', function () { pm.expect(json.meta).to.include.keys('current_page','per_page','total','last_page'); pm.expect(json.data).to.be.an('array'); pm.expect(json.data.length).to.be.at.most(json.meta.per_page); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mata-kuliah?q=a",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mata-kuliah"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detail mata kuliah",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Detail mata kuliah', function () { pm.expect(json.data.id_mk).to.eql(Number(pm.collectionVariables.get('id_mk'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mata-kuliah/{{id_mk}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mata-kuliah",
+                "{{id_mk}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mata kuliah tidak ada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 untuk id yang tidak ada', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Format gagal standar', function () { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j).to.have.property('message'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mata-kuliah/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mata-kuliah",
+                "999999"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Validasi semester salah -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 validasi gagal', function () { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mata-kuliah?semester=99",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mata-kuliah"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Akreditasi",
+      "item": [
+        {
+          "name": "Daftar akreditasi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Ada meta paginasi', function () { pm.expect(json.meta).to.include.keys('current_page','per_page','total','last_page'); pm.expect(json.data).to.be.an('array'); pm.expect(json.data.length).to.be.at.most(json.meta.per_page); });",
+                  "if (json.data.length > 0) { pm.collectionVariables.set('id_akreditasi', json.data[0].id_akreditasi); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/akreditasi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "akreditasi"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Akreditasi aktif",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 (ada yang aktif) atau 404 (belum ada)', function () { pm.expect([200,404]).to.include(pm.response.code); });",
+                  "const json = pm.response.json();",
+                  "if (pm.response.code === 200) { pm.test('Akreditasi aktif bertipe status true', function () { pm.expect(json.data.status).to.eql(true); }); } else { pm.test('404 berformat gagal', function () { pm.expect(json.success).to.eql(false); }); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/akreditasi/aktif",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "akreditasi",
+                "aktif"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detail akreditasi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });",
+                  "const json = pm.response.json();",
+                  "pm.test('Envelope standar', function () { pm.expect(json).to.have.property('success', true); pm.expect(json).to.have.property('message'); pm.expect(json).to.have.property('data'); });",
+                  "pm.test('Detail akreditasi', function () { pm.expect(json.data.id_akreditasi).to.eql(Number(pm.collectionVariables.get('id_akreditasi'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/akreditasi/{{id_akreditasi}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "akreditasi",
+                "{{id_akreditasi}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Akreditasi tidak ada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 untuk id yang tidak ada', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Format gagal standar', function () { const j = pm.response.json(); pm.expect(j.success).to.eql(false); pm.expect(j).to.have.property('message'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/akreditasi/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "akreditasi",
+                "999999"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    }
+  ]
+}

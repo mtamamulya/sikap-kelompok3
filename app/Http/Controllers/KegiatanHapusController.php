@@ -33,8 +33,9 @@ class KegiatanHapusController extends Controller
 
         $this->data->hapus($jenis, $id);
 
+        // Kembali ke halaman Kegiatan gabungan, di tab jenis yang sama.
         return redirect()
-            ->route(($kaprodi ? 'kaprodi' : 'admin').'.kegiatan.'.$jenis)
+            ->route(($kaprodi ? 'kaprodi' : 'admin').'.kegiatan.index', ['tab' => $jenis])
             ->with('success', 'Kegiatan "'.$row['nama'].'" berhasil dihapus.');
     }
 }
