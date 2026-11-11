@@ -285,7 +285,7 @@
                             @if ($d['foto'])
                                 <img src="{{ $d['foto'] }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
                             @else
-                                <div class="flex h-full w-full items-center justify-center text-6xl font-extrabold text-white/90" style="background: linear-gradient(160deg, #1F6FEB, #0B3A8C);" aria-hidden="true">{{ mb_strtoupper(mb_substr(preg_replace('/^(Prof\.|Dr\.|Ir\.|\s)+/u', '', $d['nama']), 0, 1)) }}</div>
+                                <img src="{{ asset('images/logo_trk remove.png') }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
                             @endif
                             <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,254,254,0)_45%,#000_100%)]"></div>
                             <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $d['nama'] }}</div>
