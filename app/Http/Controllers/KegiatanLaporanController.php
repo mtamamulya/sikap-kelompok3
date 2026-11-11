@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Repositories\KegiatanData;
+use App\Repositories\KegiatanProdiData;
+use App\Support\Laporan\LaporanKegiatan;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * Unduh laporan data kegiatan semua / dosen / mahasiswa / prodi (PDF atau Excel) per kurun waktu tahun.
+ * Dipakai admin (/admin/kegiatan/{dosen|mahasiswa|prodi}/laporan) DAN kaprodi (/kaprodi/...).
+ *   - kaprodi : selalu hanya kegiatan yang sudah disetujui.
+ *   - admin   : boleh memilih status (bawaan: Disetujui).
+ *
+ * Parameter GET: dari (tahun), sampai (tahun), format (pdf | xlsx), status (khusus admin).
+ */
+class KegiatanLaporanController extends Controller
+{
+    public function __construct(private KegiatanData $data) {}
+
+    public function dosen(Request $request): Response
+    {
+        return $this->unduh($request, 'dosen');
+    }
+
+    public function mahasiswa(Request $request): Response
+    {
+        return $this->unduh($request, 'mahasiswa');
+    }
+
+    public function prodi(Request $request): Response
+    {
+        return $this->unduh($request, 'prodi');
+    }
+
+    public function semua(Request $request): Response
+    {
+        return $this->unduh($request, 'semua');
+    }
+
+    /** Gabungan dosen + mahasiswa + prodi dengan kolom seragam (jenis, pelaku). */
+    private function gabungan(): array
+    {
+        $ambil = fn (array $rows, string $jenis, string $pelaku) => array_map(fn ($r) => [
+            'nama' => $r['nama'],
+            'kategori' => $r['kategori'],
+            'jenis' => $jenis,
+            'pelaku' => $r[$pelaku] ?? '-',
+            'tanggal' => $r['tanggal'],
+            'tanggal_iso' => $r['tanggal_iso'],
+            'tahun' => $r['tahun'],
+            'semester' => $r['semester'],
+            'status' => $r['status'],
+        ], $rows);
+
+        return array_merge(
+            $ambil($this->data->dosen(), 'Dosen', 'dosen'),
+            $ambil($this->data->mahasiswa(), 'Mahasiswa', 'pengaju'),
+            $ambil(KegiatanProdiData::semua(), 'Prodi', 'penanggung_jawab'),
+        );
+    }
+
+    private function unduh(Request $request, string $jenis): Response
+    {
+        $kaprodi = $request->routeIs('kaprodi.*');
+        $rows = match ($jenis) {
+            'dosen' => $this->data->dosen(),
+            'mahasiswa' => $this->data->mahasiswa(),
+            'semua' => $this->gabungan(),
+            default => KegiatanProdiData::semua(),
+        };
+
+        // Tahun: bila kosong/tidak valid pakai tahun terbaru; bila terbalik ditukar.
+        $tahunList = in_array($jenis, ['prodi', 'semua'], true) ? KegiatanProdiData::tahun($rows) : $this->data->tahun($rows);
+        $terbaru = end($tahunList) ?: (int) date('Y');
+        $dari = (int) $request->query('dari', $terbaru);
+        $sampai = (int) $request->query('sampai', $terbaru);
+        $dari = in_array($dari, $tahunList, true) ? $dari : $terbaru;
+        $sampai = in_array($sampai, $tahunList, true) ? $sampai : $terbaru;
+        if ($dari > $sampai) {
+            [$dari, $sampai] = [$sampai, $dari];
+        }
+
+        // Status: kaprodi dikunci "Disetujui".
+        $status = KegiatanData::DISETUJUI;
+        if (! $kaprodi && in_array($request->query('status'), ['Semua', ...KegiatanData::STATUS], true)) {
+            $status = $request->query('status');
+        }
+
+        $format = $request->query('format') === 'xlsx' ? 'xlsx' : 'pdf';
+
+        $laporan = LaporanKegiatan::susun($jenis, $rows, $dari, $sampai, $status);
+        $oleh = (string) session($kaprodi ? 'kaprodi.nama' : 'admin.nama', $kaprodi ? 'Kaprodi' : 'Admin');
+        $waktu = now()->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i').' WIB';
+
+        $isi = $format === 'pdf'
+            ? LaporanKegiatan::pdf($laporan, $oleh, $waktu)
+            : LaporanKegiatan::xlsx($laporan, $oleh, $waktu);
+
+        $mime = $format === 'pdf'
+            ? 'application/pdf'
+            : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+        return response($isi, 200, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'attachment; filename="'.$laporan['nama_file'].'.'.$format.'"',
+            'Content-Length' => (string) strlen($isi),
+            'Cache-Control' => 'no-store',
+        ]);
+    }
+}

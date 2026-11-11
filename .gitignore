@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+composer-setup.php
+
+.env.lokal.bak
+*.bak
+
+.env.lokal.bak
+*.bak

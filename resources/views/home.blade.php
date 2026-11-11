@@ -1,0 +1,717 @@
+@extends('layouts.publik')
+
+@section('title', 'Teknologi Rekayasa Komputer - POLINES')
+@section('description', 'Program Studi Teknologi Rekayasa Komputer, Politeknik Negeri Semarang')
+
+@php
+    /*
+     * DATA SEMENTARA (hardcode). Nanti pindahkan ke controller / database
+     * lalu kirim lewat return view('home', compact(...)).
+     *
+     * GAMBAR: URL Builder.io di bawah ini bersifat sementara (TEMP).
+     * Unduh gambarnya, simpan di public/images/, lalu ganti $A dan
+     * nama file dengan asset('images/nama-file.jpg').
+     */
+    $A = 'https://api.builder.io/api/v1/image/assets/TEMP/';
+    $ph = 'a0aec7389b59c267fe9e6cb147a75e605ac97963?width=718';
+
+    /*
+     * SLIDESHOW HERO (4 slide, pindah otomatis tiap 5 detik).
+     * Taruh foto di public/images/slides/ lalu isi nama filenya di 'img'.
+     * Ubah 'title' dan 'text' sesuai keterangan yang diinginkan.
+     */
+    $heroSlides = [
+        ['img' => 'images/slides/PBL.jpeg', 'title' => 'Pembelajaran Based-Learning (PBL)', 'text' => 'Mahasiswa Teknologi Rekayasa Komputer mengimplementasikan Kecerdasan Buatan dengan meciptakan Alat Pendeteksi Suhu & Kelembapan dan Program monitoring berbasis website  yang bekerjasama dengan Rumah Sakit Nasional Diponegoro (RSND).'],
+        ['img' => 'images/slides/KKL.jpg', 'title' => 'Kuliah Kerja Lapangan (KKL)', 'text' => 'Mahasiswa Teknologi Rekayasa Komputer melaksanakan Kuliah Kerja Lapangan (KKL) dengan mengunjungi AirNav Indonesia Kantor Cabang Denpasar untuk mempelajari sistem navigasi penerbangan dan teknologi komunikasi udara berbasis industri.'],
+        ['img' => 'images/slides/tefa.jpg', 'title' => 'Teaching Factory (TeFa)', 'text' => 'Mahasiswa Teknologi Rekayasa Komputer melaksanakan kegiatan Teaching Factory (TeFa) melalui praktik langsung pengembangan perangkat lunak dan manajemen sistem jaringan untuk mempersiapkan keterampilan teknis yang siap kerja di industri.'],
+        ['img' => 'images/slides/magang.jpg', 'title' => 'Magang Industri', 'text' => 'Mahasiswa Teknologi Rekayasa Komputer melaksanakan kegiatan Magang di Paragon Technology and Innovation untuk mendapatkan pengalaman kerja nyata dan mengimplementasikan solusi teknologi dalam mendukung inovasi perusahaan.'],
+    ];
+
+    $lecturers = [
+        ['Kuwat Santoso, S.T., M.Kom.', '9567e6964bd3f0ffce100af25b3aba8273c8b22e?width=718'],
+        ['Ir. Prayitno, S.ST., M.T., P.hD', '37e57644e7c31fe78dcebb67c48693f8ba12eadd?width=704'],
+        ['Prof. Dr. Ir. Kurnianingsih, S.T., M.T.', 'ac5345d8f63cfaad34306016a6f9a652872dbc58?width=700'],
+        ['Muttabik Fathul Lathief S.Kom., M.Eng', '330414d78f05ef9846ac2f31eb9a77c6427b2203?width=700'],
+        ['Tahan Prahara, S.T., M.Kom.', $ph],
+        ['Wiktasari, S.T., M.Kom.', $ph],
+        ['Nurseno Bayu Aji, S.Kom., M.Kom.', $ph],
+        ['Tri Raharjo Yudantoro, S.Kom., M.Kom.', $ph],
+        ['Muhammad Irwan Yanwari, S.Kom., M.Eng.', $ph],
+        ['Mardiyono, S.Kom., M.Sc.', $ph],
+    ];
+
+    $news = [
+    [
+        'slug'  => 'pelatihan-sensor-sma-alam-ar-ridho',
+        'img'   => 'eea1dae43f4c4adec94cdca526899e7374b5d9b4?width=1760',
+        'title' => 'Pengabdian',
+        'text'  => 'Tim Pengabdian Prodi Teknologi Rekayasa Komputer Jurusan Teknik Elektro Polines Memberikan Pelatihan Penggunaan Sensor Sederhana Pada Sistem Terbenam Di SMP Alam Ar-Ridho Kota Semarang',
+    ],
+    [
+        'slug'  => 'deputy-director-seameo-seamolec',
+        'img'   => 'c03aeabc41a38010ff1ed3bb6aa5185ef5db5a31?width=974',
+        'title' => 'Penugasan sebagai Deputy Director Program SEAMEO SEAMOLEC',
+        'text'  => 'SEMARANG – Politeknik Negeri Semarang (Polines) kembali memperkuat jejaring internasional melalui',
+    ],
+    [
+        'slug'  => 'pengabdian-umkm-gemah-ripah',
+        'img'   => 'fa2d7ab93ba4ebffe1bef04b7fdc1fd74963cae8?width=1024',
+        'title' => 'Tim Pengabdian Prodi Teknologi Rekayasa Komputer Untuk UMKM Gemah Ripah',
+        'text'  => 'Pelatihan Penerapan IoT Untuk Sistem Pengasap Telur Asin Dan Pelatihan Digital Marketing ...',
+    ],
+    [
+        'slug'  => 'deputy-director-seameo-seamolec-2',
+        'img'   => 'be0a1bcac500d7ee3265969f939ef4dcbf5f4065?width=820',
+        'title' => 'Penugasan sebagai Deputy Director Program SEAMEO SEAMOLEC',
+        'text'  => 'SEMARANG – Politeknik Negeri Semarang (Polines) kembali memperkuat jejaring internasional melalui',
+    ],
+    [
+        'slug'  => 'pengukuhan-guru-besar-polines',
+        'img'   => '3b6a6f87a3cafeffaa2d1a16bea075664fcb7385?width=974',
+        'title' => 'Pengukuhan Guru Besar POLINES',
+        'text'  => 'SEMARANG – Politeknik Negeri Semarang (Polines) kembali memperkuat pendidikan melalui....',
+    ],
+    [   // BERITA BARU (ganti judul, teks, dan gambarnya)
+        'slug'  => 'berita-keenam',
+        'img'   => $ph,
+        'title' => 'Judul Berita Keenam',
+        'text'  => 'Isi ringkas berita keenam. Ganti dengan berita yang sebenarnya.',
+    ],
+];
+
+    $facilities = [
+        ['name' => 'LAB KOMPUTER', 'img' => 'd85de1fefd9f5de7f85646e5eae18e98f4154ff2?width=720', 'cls' => 'sm:row-span-2 min-h-[320px]'],
+        ['name' => 'CO-WORKING SPACE', 'img' => 'd4d26540f985d832c65d0719054314a08b288e4a?width=920', 'cls' => 'lg:col-span-2 min-h-[220px]'],
+        ['name' => 'DISCUSS ROOM', 'img' => 'ef269c73505424833dd0b3a65b588799a0a7b9bd?width=640', 'cls' => 'min-h-[220px]'],
+        ['name' => 'PRIVATE ROOM', 'img' => 'b85fffdbc922839aff2a4e96209ccefe9ac73fd6?width=640', 'cls' => 'min-h-[240px]'],
+        ['name' => 'RUANG KELAS GEDUNG GKT', 'img' => '9cb23edb5c694e6944be6e883ae4547b5a1f42a7?width=920', 'cls' => 'lg:col-span-2 min-h-[240px]'],
+    ];
+
+    $services = [
+        ['title' => 'Mahasiswa', 'kicker' => 'LAYANAN AKADEMIK', 'desc' => 'Akses informasi akademik, kegiatan, dan layanan pendukung selama masa studi di TRK', 'bg' => 'linear-gradient(108deg,#0A5BE0 1.5%,#0647B8 99%)'],
+        ['title' => 'Dosen', 'kicker' => 'LAYANAN PENGAJARAN', 'desc' => 'Kelola kegiatan pengajaran dan layanan administrasi program studi dengan lebih mudah', 'bg' => 'linear-gradient(108deg,#0443AE 1.5%,#022F80 99%)'],
+    ];
+@endphp
+
+@section('content')
+<style>
+    /* Efek masuk section saat navbar diklik: isi section naik + memudar bergantian */
+    [data-reveal].reveal-hide > * { opacity: 0; transform: translateY(36px); }
+    [data-reveal].reveal-play > * { animation: revealUp .8s cubic-bezier(.16, 1, .3, 1) both; }
+    [data-reveal].reveal-play > *:nth-child(2) { animation-delay: .12s; }
+    [data-reveal].reveal-play > *:nth-child(3) { animation-delay: .24s; }
+    [data-reveal].reveal-play > *:nth-child(4) { animation-delay: .36s; }
+    @keyframes revealUp { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+        [data-reveal].reveal-hide > * { opacity: 1; transform: none; }
+        [data-reveal].reveal-play > * { animation: none; }
+    }
+</style>
+<div class="font-['Plus_Jakarta_Sans',sans-serif] text-black">
+
+    <x-navbar-publik />
+
+    {{-- Hero (slideshow) --}}
+    <section id="hero" class="flex h-[calc(100svh-64px)] min-h-[520px] flex-col bg-[#0043AD] md:h-[calc(100svh-70px)]" aria-roledescription="carousel" aria-label="Kegiatan TRK">
+
+        {{-- Area foto: foto bertumpuk, yang aktif tampil (fade) --}}
+        <div class="relative min-h-0 flex-1 overflow-hidden bg-[linear-gradient(135deg,#0043AD,#001B47)]">
+            @foreach ($heroSlides as $i => $s)
+                <img src="{{ asset($s['img']) }}" alt="{{ $s['title'] }}" data-slide data-active="{{ $i === 0 ? 'true' : 'false' }}"
+                     onerror="this.style.visibility='hidden'"
+                     class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-1000 ease-out data-[active=true]:opacity-100">
+            @endforeach
+
+            <div class="absolute inset-0 bg-[linear-gradient(90deg,#003385_0%,rgba(34,119,255,0.05)_100%)] opacity-30"></div>
+
+            {{-- Teks TRK (tetap, tidak ikut berganti) --}}
+            
+
+            {{-- Titik indikator --}}
+            <div class="absolute inset-x-0 bottom-4 flex justify-center gap-2.5">
+                @foreach ($heroSlides as $i => $s)
+                    <button type="button" data-dot="{{ $i }}" data-active="{{ $i === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $i + 1 }}"
+                            class="h-2.5 w-2.5 rounded-full bg-white/50 transition-all duration-300 ease-out data-[active=true]:w-7 data-[active=true]:bg-[#FFD121]"></button>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Keterangan: semua ditumpuk di satu sel grid, tinggi mengikuti yang terpanjang --}}
+        <div class="grid bg-[linear-gradient(90deg,#0043AD,#001B47)] text-[#FFD121]">
+            @foreach ($heroSlides as $i => $s)
+                <div data-caption data-active="{{ $i === 0 ? 'true' : 'false' }}"
+                     class="col-start-1 row-start-1 flex flex-col gap-3 px-6 py-5 opacity-0 transition-opacity duration-1000 ease-out data-[active=true]:opacity-100 md:px-10">
+                    <h2 class="text-xl font-bold tracking-tight md:text-3xl md:leading-[40px]">{{ $s['title'] }}</h2>
+                    <p class="text-sm font-medium tracking-tight md:text-xl md:leading-[28px]">{{ $s['text'] }}</p>
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+    {{-- Tentang --}}
+    <section id="tentang" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] border-t-[8px] border-[#FFD121] bg-white px-5 py-12 md:py-20">
+        <div class="mx-auto max-w-[1050px]">
+            
+            {{-- Header Judul --}}
+            <div class="mb-12 flex flex-col items-center text-center md:mb-16">
+                <h2 class="text-3xl font-bold text-[#27F] md:text-5xl">Tentang TRK</h2>
+                <p class="mt-2.5 text-xs font-semibold text-gray-500 md:text-sm">Teknologi Rekayasa Komputer · Politeknik Negeri Semarang</p>
+                <div class="mt-3 h-1 w-12 rounded-full bg-[#FFD121]"></div>
+            </div>
+
+            {{-- Apa itu TRK --}}
+            <div class="mb-12 grid items-center gap-8 md:grid-cols-2 md:gap-12">
+                <div>
+                    <h3 class="mb-4 text-2xl font-bold text-[#0B3A8C] md:text-3xl">Apa itu TRK?</h3>
+                    <p class="text-sm leading-relaxed text-gray-600 md:text-[15px]">
+                        TRK (Teknologi Rekayasa Komputer) adalah program studi yang mempelajari perangkat keras & lunak komputer dan elektronika. Mengedepankan inovasi dan karakter, kami menumbuhkan generasi pelopor teknologi dan informasi untuk Indonesia Emas 2045.
+                    </p>
+                </div>
+                <div class="relative aspect-[16/6] w-full overflow-hidden rounded-[20px] bg-[#E4EDFB] shadow-md">
+    <img src="{{ asset('images/mahasiswa trk.jpeg') }}" alt="Mahasiswa TRK"
+         onerror="this.style.visibility='hidden'"
+         class="absolute inset-0 h-full w-full object-cover object-center">
+</div>
+            </div>
+
+            {{-- 4 Kartu Statistik --}}
+            <div class="mb-12 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
+                <div class="flex flex-col items-center justify-center rounded-2xl bg-[#E4EDFB] p-5 text-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 text-[#0B3A8C]"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <div class="text-xl font-black text-[#0B3A8C] md:text-2xl">400+</div>
+                    <div class="mt-1 text-xs font-semibold text-gray-700">Mahasiswa aktif</div>
+                </div>
+                <div class="flex flex-col items-center justify-center rounded-2xl bg-[#E4EDFB] p-5 text-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 text-[#0B3A8C]"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <div class="text-xl font-black text-[#0B3A8C] md:text-2xl">20+</div>
+                    <div class="mt-1 text-xs font-semibold text-gray-700">Dosen tetap</div>
+                </div>
+                <div class="flex flex-col items-center justify-center rounded-2xl bg-[#E4EDFB] p-5 text-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 text-[#0B3A8C]"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    <div class="text-[10px] font-semibold text-gray-600">Ruang pembelajaran terapan</div>
+                    <div class="mt-0.5 text-sm font-bold text-[#0B3A8C] md:text-base">Laboratorium</div>
+                </div>
+                <div class="flex flex-col items-center justify-center rounded-2xl bg-[#E4EDFB] p-5 text-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 text-[#0B3A8C]"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+                    <div class="text-sm font-bold text-[#0B3A8C] md:text-base">Akreditasi</div>
+                    <div class="mt-1 text-[11px] font-semibold text-gray-700">Baik Sekali</div>
+                </div>
+            </div>
+
+            {{-- Visi & Misi --}}
+            <div class="flex flex-col gap-4">
+                {{-- Visi --}}
+                <div class="relative overflow-hidden rounded-[20px] bg-[#0B3A8C] px-6 py-8 text-center shadow-md md:py-10">
+                    {{-- Ornamen Lingkaran Kanan --}}
+                    <div class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 opacity-20">
+                        <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="150" cy="100" r="99.5" stroke="white"/>
+                            <circle cx="150" cy="100" r="69.5" stroke="white"/>
+                            <circle cx="150" cy="100" r="39.5" stroke="white"/>
+                        </svg>
+                    </div>
+                    <h4 class="relative z-10 mb-3 text-lg font-bold text-[#FFD121] md:text-xl">Visi Program Studi</h4>
+                    <p class="relative z-10 mx-auto max-w-[800px] text-[13px] font-medium leading-relaxed text-white md:text-[15px]">
+                        Program Studi Teknologi Rekayasa Komputer Politeknik Negeri Semarang menjadi program studi yang unggul, inovatif, dan berkarakter dalam penerapan Ilmu Pengetahuan dan Teknologi Informatika
+                    </p>
+                </div>
+
+                {{-- Misi --}}
+                <div class="grid gap-4 md:grid-cols-[1fr_2.5fr]">
+                    <div class="flex flex-col items-center justify-center rounded-[20px] bg-[#E4EDFB] px-6 py-8 text-center shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#27F]"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                        <div class="mt-4 text-[15px] font-bold text-[#0B3A8C]">Misi program studi</div>
+                        <div class="mt-1 text-5xl font-black text-[#27F]">5</div>
+                        <div class="mt-1 text-xs font-semibold text-gray-500">poin misi</div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-5 rounded-[20px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+                        @php
+                            $misiList = [
+                                'Melaksanakan pendidikan tinggi vokasi bidang teknologi informatika yang unggul, inovatif dan berkarakter.',
+                                'Melaksanakan dan mengembangkan penelitian terapan dan pengabdian kepada masyarakat dalam bidang teknologi informatika yang relevan dengan kebutuhan industri dan masyarakat.',
+                                'Melaksanakan tata kelola program studi melalui perbaikan berkelanjutan.',
+                                'Menerapkan budaya akademik yang berkarakter.',
+                                'Mengembangkan kerjasama dengan pemangku kepentingan.'
+                            ];
+                        @endphp
+                        
+                        @foreach($misiList as $index => $misi)
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E4EDFB] text-xs font-bold text-[#0B3A8C]">{{ $index + 1 }}</div>
+                                <p class="mt-1 text-xs font-medium leading-relaxed text-gray-700 md:text-[13px]">{{ $misi }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{{-- Dosen --}}
+    @php
+        // Hitung total data dosen yang tampil
+        $kartuDosen = isset($dosen) && $dosen !== null
+            ? array_map(fn ($d) => ['nama' => $d['nama'], 'foto' => $d['foto']], $dosen)
+            : array_map(fn ($l) => ['nama' => $l[0], 'foto' => $A . $l[1]], $lecturers);
+        $totalDosen = count($kartuDosen);
+    @endphp
+    <section id="dosen" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] bg-[#0043AD] px-5 py-8 text-white md:py-10">
+        <div class="mx-auto max-w-[1000px]">
+            <h2 class="text-2xl font-extrabold leading-tight md:text-4xl">
+                DOSEN
+                <span class="mt-1 block text-xl md:text-2xl">Teknologi Rekayasa Komputer</span>
+            </h2>
+            <p class="mt-2 max-w-[700px] text-xs font-medium leading-relaxed text-white/80 md:text-sm">
+                Mari mengenal lebih dekat dengan para tenaga pendidik yang ada di Program Studi Teknologi Rekayasa Komputer.
+            </p>
+
+            <div class="relative mt-6 md:mt-8">
+                {{-- Tombol scroll kanan-kiri HANYA tampil jika jumlah dosen > 5 --}}
+                @if ($totalDosen > 5)
+                    <button type="button" aria-label="Sebelumnya" data-scroll="-300" class="absolute -left-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
+                        <x-icon name="chevron-left" />
+                    </button>
+                    <button type="button" aria-label="Berikutnya" data-scroll="300" class="absolute -right-4 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white bg-[#0043AD]/80 transition-colors hover:bg-[#0043AD] md:flex">
+                        <x-icon name="chevron-right" />
+                    </button>
+                @endif
+
+                {{-- Kontainer card: diberi justify-center jika dosen <= 5 --}}
+                <div id="dosen-scroller" data-count="{{ $totalDosen }}" class="-mx-5 flex gap-3.5 overflow-x-auto px-5 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0 {{ $totalDosen <= 5 ? 'md:justify-center' : '' }}">
+                    @forelse ($kartuDosen as $d)
+                        <div class="relative h-[240px] w-[170px] shrink-0 overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1 md:h-[260px] md:w-[185px]">
+                            @if ($d['foto'])
+                                <img src="{{ $d['foto'] }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
+                            @else
+                                <img src="{{ asset('images/logo_trk remove.png') }}" alt="{{ $d['nama'] }}" loading="lazy" class="h-full w-full object-cover">
+                            @endif
+                            <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,254,254,0)_45%,#000_100%)]"></div>
+                            <div class="absolute inset-x-0 bottom-2.5 px-2.5 text-center font-['Poppins',sans-serif] text-[10px] font-bold leading-tight md:text-[11px]">{{ $d['nama'] }}</div>
+                        </div>
+                    @empty
+                        {{-- Pesan kosongan dibuat full-width dan rata tengah --}}
+                        <p class="w-full py-8 text-center text-sm font-medium text-white/80">Belum ada data dosen.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Kabar --}}
+<section id="kabar" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] border-t-[8px] border-[#FFD121] bg-[#E4EDFB] px-5 py-8 md:py-10">
+    <div class="mx-auto flex max-w-[1000px] flex-col gap-4 md:gap-5">
+        <x-section-header title="Kabar Terbaru TRK" subtitle="Ikuti perkembangan terkini seputar penelitian, kegiatan akademik, dan seputar informasi penting lainnya" />
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach ($news as $n)
+                <article class="relative h-[200px] overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1">
+                    <img src="{{ $A . $n['img'] }}" alt="{{ $n['title'] }}" class="absolute inset-0 h-full w-full object-cover">
+                    
+                    {{-- Tinggi kotak dikurangi menjadi 80px agar foto lebih lega --}}
+                    <div class="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-[linear-gradient(180deg,rgba(153,125,20,0)_-70%,#FFD121_30%)] px-4 pb-2.5 pt-2.5">
+                        
+                        <h3 class="line-clamp-2 text-[13px] font-bold leading-tight text-black md:text-sm">{{ $n['title'] }}</h3>
+                        
+                        {{-- Teks deskripsi dihapus/disembunyikan di sini --}}
+                        
+                        <a href="{{ route('berita.show', $n['slug']) }}" class="mt-1 text-[10px] font-bold text-black hover:underline md:text-[11px]">Baca Selengkapnya</a>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        <a href="{{ route('berita.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
+    </div>
+</section>
+
+    {{-- Prestasi --}}
+    <section id="prestasi" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] border-b-[8px] border-[#FFD121] bg-white px-5 py-8 md:py-10">
+        <div class="mx-auto flex max-w-[1000px] flex-col items-center gap-5 md:gap-6">
+            <x-section-header title="Prestasi" subtitle="Capaian mahasiswa Teknologi Rekayasa Komputer · Politeknik Negeri Semarang" />
+
+            {{-- Jarak padding dalam kotak statistik dikurangi --}}
+            <div class="grid w-full grid-cols-3 rounded-xl bg-[#CDDEF9] py-3 font-['Poppins',sans-serif] shadow-sm">
+
+                @foreach ($stats as $i => [$num, $label])
+                    <div class="flex flex-col items-center gap-0.5 py-1 {{ $i === 1 ? 'sm:border-x sm:border-[#DCE6F7]' : '' }} text-center">
+                        <div class="text-xl font-bold text-[#0B3A8C] md:text-3xl">{{ $num }}</div>
+                        <div class="text-[10px] font-medium text-[#1F6FEB] md:text-xs">{{ $label }}</div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                @forelse ($prestasi as $a)
+                    <a href="{{ route('publik.prestasi.show', $a['id']) }}"
+                       aria-label="Lihat detail prestasi {{ $a['title'] }}"
+                       class="relative block h-[180px] overflow-hidden rounded-[12px] bg-[#DCE8FA] font-['Poppins',sans-serif] shadow-sm transition-transform hover:-translate-y-1">
+                        <svg class="absolute left-1/2 top-6 -translate-x-1/2" width="60" height="70" viewBox="0 0 120 140" fill="none" aria-hidden="true">
+                            <path d="M60 72C76.5685 72 90 58.5685 90 42C90 25.4315 76.5685 12 60 12C43.4315 12 30 25.4315 30 42C30 58.5685 43.4315 72 60 72Z" fill="#9DBFF0" />
+                            <path d="M8 140C8 106 32 84 60 84C88 84 112 106 112 140H8Z" fill="#9DBFF0" />
+                        </svg>
+
+                        <span class="absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[9px] font-semibold text-white" style="background: {{ $a['color'] }}">{{ $a['badge'] }}</span>
+
+                        <div class="absolute inset-x-0 bottom-0 flex min-h-[60px] flex-col justify-center gap-0.5 p-2.5 text-[#0B3A8C] {{ $a['img'] ? 'bg-[linear-gradient(180deg,rgba(153,125,20,0)_-70%,#FFD121_30%)]' : 'bg-[#F5C400]' }}">
+                            <div class="line-clamp-2 text-xs font-bold leading-tight">
+                                {{ $a['title'] }}
+                            </div>
+                            <div class="truncate text-[9px] font-medium">
+                                {{ $a['badge'] }}{{ $a['sub'] ? ' · '.$a['sub'] : '' }}
+                            </div>
+                            @if ($a['catatan'])
+                                <div class="line-clamp-2 text-[9px] leading-3">{{ $a['catatan'] }}</div>
+                            @endif
+                        </div>
+                    </a>
+                @empty
+                    <p class="col-span-full py-8 text-center text-sm font-medium text-[#1F6FEB]">Belum ada data prestasi.</p>
+                @endforelse
+            </div>
+
+            <a href="{{ route('publik.prestasi.index') }}" class="mt-1 self-center rounded-lg border-2 border-[#1F6FEB] px-5 py-2 font-['Poppins',sans-serif] text-xs font-semibold text-[#1F6FEB] transition-colors hover:bg-[#1F6FEB] hover:text-white">Muat lebih banyak</a>
+        </div>
+    </section>
+
+    {{-- Fasilitas --}}
+    <section id="fasilitas" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] bg-[#0043AD] px-5 py-8 text-white md:py-10">
+        <div class="mx-auto max-w-[900px]">
+            <h2 class="text-2xl font-extrabold leading-tight md:text-3xl">
+                FASILITAS
+                <span class="mt-1 block text-lg md:text-1xl">Teknologi Rekayasa Komputer</span>
+            </h2>
+            <p class="mt-1.5 max-w-[600px] text-xs font-medium leading-relaxed text-white/80 md:text-sm">
+                Bukan sekadar ruang belajar biasa, tempat ini dirancang untuk mewadahi setiap ide dan potensi besar mahasiswa.
+            </p>
+
+            {{-- Bento Grid Desktop (md ke atas) --}}
+            <div class="mt-5 hidden gap-3 sm:grid-cols-2 md:grid md:grid-cols-3">
+                @foreach ($facilities as $i => $f)
+                    {{-- Tinggi kartu fasilitas diturunkan ke 110px agar barisnya menyempit --}}
+                    <a href="{{ route('fasilitas', ['f' => $i]) }}" class="relative block overflow-hidden rounded-[12px] bg-white shadow-sm transition-transform hover:-translate-y-1 {{ $i === 0 ? 'md:row-span-2 min-h-[160px] md:min-h-full' : 'h-[100px] md:h-[110px]' }}">
+                        <img src="{{ $A . $f['img'] }}" alt="{{ $f['name'] }}" class="absolute inset-0 h-full w-full object-cover">
+                        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,254,254,0)_40%,#000_100%)] opacity-90"></div>
+                        <div class="absolute bottom-2.5 left-3 text-[8px] font-bold tracking-wide md:text-[9px]">{{ $f['name'] }}</div>
+                    </a>
+                @endforeach
+            </div>
+
+            {{-- Expandable Accordion Mobile (< md) --}}
+            <div id="fasilitas-accordion" class="mt-5 flex flex-col gap-2.5 md:hidden">
+                @foreach ($facilities as $i => $f)
+                    <a href="{{ route('fasilitas', ['f' => $i]) }}"
+                       role="button"
+                       tabindex="0"
+                       data-accordion-item
+                       data-index="{{ $i }}"
+                       aria-expanded="{{ $i === 0 ? 'true' : 'false' }}"
+                       class="group relative block overflow-hidden rounded-[12px] bg-[#002D75] shadow-sm cursor-pointer select-none transition-all duration-300 ease-in-out {{ $i === 0 ? 'h-[220px]' : 'h-[72px]' }}">
+
+                        {{-- Gambar latar --}}
+                        <img src="{{ $A . $f['img'] }}" alt="{{ $f['name'] }}" class="absolute inset-0 h-full w-full object-cover">
+
+                        {{-- Gradient overlay dari bawah --}}
+                        <div data-overlay class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-opacity duration-300"></div>
+
+                        {{-- Konten: judul dan ikon --}}
+                        <div data-content class="relative flex h-full justify-between {{ $i === 0 ? 'items-end p-3.5' : 'items-center pl-4 pr-2' }}">
+                            <span data-title class="tracking-wide text-white transition-all duration-300 {{ $i === 0 ? 'text-base sm:text-lg font-bold' : 'text-sm font-semibold' }}">
+                                {{ $f['name'] }}
+                            </span>
+
+                            {{-- Ikon penanda di pojok kanan (minimal 40x40px): panah bawah saat tertutup, panah kanan saat terbuka --}}
+                            <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-xs transition-transform duration-300">
+                                {{-- Ikon saat tertutup (chevron down) --}}
+                                <svg data-icon-closed xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="{{ $i === 0 ? 'hidden' : 'block' }}">
+                                    <path d="M6 9l6 6l6 -6"/>
+                                </svg>
+                                {{-- Ikon saat terbuka (arrow right petunjuk masuk detail) --}}
+                                <svg data-icon-open xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="{{ $i === 0 ? 'block' : 'hidden' }}">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <a href="{{ route('fasilitas') }}" class="inline-flex items-center gap-1.5 rounded-lg bg-[#27F] px-5 py-2 text-[11px] font-semibold tracking-wide transition-colors hover:bg-blue-600 md:text-[12px]">
+                    Selengkapnya <x-icon name="arrow-right" :size="14" :stroke="2.5" />
+                </a>
+            </div>
+        </div>
+    </section>
+
+{{-- Layanan --}}
+    <section id="layanan" data-reveal class="scroll-mt-16 md:scroll-mt-[70px] border-t-[8px] border-[#FFD121] bg-[#F2F6FD] px-5 py-8 md:py-10">
+        <div class="mx-auto flex max-w-[850px] flex-col gap-4">
+            <x-section-header title="Layanan" subtitle="Pusat layanan terpadu Teknologi Rekayasa Komputer · Politeknik Negeri Semarang" />
+
+            {{-- Banner Kuning --}}
+            <div class="flex flex-col items-start gap-2 rounded-[12px] bg-[#FFC928] px-5 py-4 shadow-sm transition-transform hover:-translate-y-1">
+                <h3 class="text-lg font-extrabold text-[#023389] md:text-xl">Ingin kuliah di Teknologi Rekayasa Komputer?</h3>
+                <p class="max-w-[700px] text-[10px] font-semibold leading-relaxed text-[#043DA0] md:text-[11px]">
+                    Informasi mengenai program studi, persyaratan, dan tahapan pendaftaran dapat Anda pelajari terlebih dahulu sebelum mengajukan pendaftaran sebagai mahasiswa baru.
+                </p>
+                <a href="https://pmb.polines.ac.id" class="mt-1 inline-flex items-center gap-1.5 rounded-md bg-[#0442AC] px-4 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-blue-800 md:text-xs">
+                    Daftar Sekarang <x-icon name="arrow-right" :size="14" :stroke="2.5" />
+                </a>
+            </div>
+
+            {{-- Kartu Biru --}}
+            <div class="grid gap-3 md:grid-cols-2">
+                @foreach ($services as $s)
+                    <a href="{{ route('login') }}" class="relative flex flex-col justify-between overflow-hidden rounded-[12px] px-4 py-3 text-white shadow-sm transition-transform hover:-translate-y-1" style="background: {{ $s['bg'] }}">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#FFC928] text-[#023389]">
+                                    @if($s['title'] == 'Mahasiswa')
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9L4 10.63V17.5C4 18.88 7.58 20 12 20C16.42 20 20 18.88 20 17.5V10.63L23 9L12 3ZM12 18C8.69 18 6 17.1 6 16V11.72L12 15L18 11.72V16C18 17.1 15.31 18 12 18ZM12 13L3.72 8.5L12 4L20.28 8.5L12 13Z"/></svg>
+                                    @else
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4C2.9 3 2 3.9 2 5V15C2 16.1 2.9 17 4 17H8V19H16V17H20C21.1 17 22 16.1 22 15V5C22 3.9 21.1 3 20 3ZM20 15H4V5H20V15ZM12 11L15.5 15H8.5L12 11Z"/></svg>
+                                    @endif
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold leading-none md:text-base">{{ $s['title'] }}</div>
+                                    <div class="mt-0.5 text-[8px] font-bold uppercase tracking-wider text-blue-200">{{ $s['kicker'] }}</div>
+                                </div>
+                            </div>
+                            <p class="text-[9px] leading-relaxed text-blue-100 md:text-[10px]">{{ $s['desc'] }}</p>
+                        </div>
+                        
+                        <div class="mt-3 flex flex-col gap-1.5">
+                            <div class="relative flex items-center justify-between">
+                                <div class="h-1 w-1 rounded-full bg-white"></div>
+                                <div class="h-px flex-1 bg-white/40"></div>
+                                <div class="h-1 w-1 rounded-full bg-white"></div>
+                            </div>
+                            <div class="flex items-center justify-end gap-1 text-[9px] font-bold tracking-wide hover:underline md:text-[10px]">
+                                Masuk Layanan <x-icon name="arrow-right" :size="10" :stroke="2.5" />
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <x-footer />
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const scroller = document.getElementById('dosen-scroller');
+        if (!scroller) return;
+
+        // Tombol panah manual
+        document.querySelectorAll('[data-scroll]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                scroller.scrollBy({ left: Number(btn.dataset.scroll), behavior: 'smooth' });
+            });
+        });
+
+        // Auto-roll bolak-balik
+        let isHovered = false;
+        let direction = 1; // 1 = geser ke kanan, -1 = geser ke kiri
+        const speed = 0.8;  // Kecepatan gulir (ubah misal ke 0.5 jika ingin lebih pelan)
+
+        function autoRoll() {
+            if (!isHovered) {
+                scroller.scrollLeft += speed * direction;
+
+                // Jika sudah sampai paling kanan, balik arah ke kiri
+                if (Math.ceil(scroller.scrollLeft + scroller.clientWidth) >= scroller.scrollWidth - 1) {
+                    direction = -1;
+                } 
+                // Jika sudah sampai paling kiri, balik arah ke kanan
+                else if (scroller.scrollLeft <= 0) {
+                    direction = 1;
+                }
+            }
+            requestAnimationFrame(autoRoll);
+        }
+
+        requestAnimationFrame(autoRoll);
+
+        // Pause saat kursor berada di atas foto atau disentuh di HP
+        const container = scroller.parentElement;
+        container.addEventListener('mouseenter', () => isHovered = true);
+        container.addEventListener('mouseleave', () => isHovered = false);
+        container.addEventListener('touchstart', () => isHovered = true, { passive: true });
+        container.addEventListener('touchend', () => isHovered = false);
+    })();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+    (function () {
+        const scroller = document.getElementById('dosen-scroller');
+        if (!scroller) return;
+
+        const totalDosen = Number(scroller.dataset.count || 0);
+
+        // Jika jumlah dosen <= 5, matikan slideshow otomatis dan handler tombol
+        if (totalDosen <= 5) return;
+
+        // Tombol panah manual
+        document.querySelectorAll('[data-scroll]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                scroller.scrollBy({ left: Number(btn.dataset.scroll), behavior: 'smooth' });
+            });
+        });
+
+        // Auto-roll bolak-balik
+        let isHovered = false;
+        let direction = 1; // 1 = geser ke kanan, -1 = geser ke kiri
+        const speed = 0.8;  // Kecepatan gulir
+
+        function autoRoll() {
+            if (!isHovered) {
+                scroller.scrollLeft += speed * direction;
+
+                // Jika sudah sampai paling kanan, balik arah ke kiri
+                if (Math.ceil(scroller.scrollLeft + scroller.clientWidth) >= scroller.scrollWidth - 1) {
+                    direction = -1;
+                } 
+                // Jika sudah sampai paling kiri, balik arah ke kanan
+                else if (scroller.scrollLeft <= 0) {
+                    direction = 1;
+                }
+            }
+            requestAnimationFrame(autoRoll);
+        }
+
+        requestAnimationFrame(autoRoll);
+
+        // Pause saat kursor berada di atas foto atau disentuh di HP
+        const container = scroller.parentElement;
+        container.addEventListener('mouseenter', () => isHovered = true);
+        container.addEventListener('mouseleave', () => isHovered = false);
+        container.addEventListener('touchstart', () => isHovered = true, { passive: true });
+        container.addEventListener('touchend', () => isHovered = false);
+    })();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+    // Klik menu navbar -> scroll ke section, lalu isinya masuk dengan animasi
+    (function () {
+        function play(sec) {
+            if (!sec || sec.dataset.revealing) return;
+            sec.dataset.revealing = '1';
+            var done = false;
+            function go() {
+                if (done) return; done = true;
+                sec.classList.remove('reveal-hide');
+                void sec.offsetWidth; // restart animasi
+                sec.classList.add('reveal-play');
+                setTimeout(function () { sec.classList.remove('reveal-play'); delete sec.dataset.revealing; }, 1300);
+            }
+            sec.classList.remove('reveal-play');
+            sec.classList.add('reveal-hide');
+            // tunggu scroll berhenti (scrollend), cadangan 900 ms jika tidak ada scroll
+            window.addEventListener('scrollend', go, { once: true });
+            setTimeout(go, 900);
+        }
+
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href*="#"]');
+            if (!a || a.pathname !== location.pathname) return;
+            var sec = a.hash.length > 1 && document.querySelector('[data-reveal]' + a.hash);
+            if (!sec) return;
+            var menu = a.closest('details'); // tutup menu hamburger di layar kecil
+            document.querySelectorAll('header details[open]').forEach(function (d) { d.open = false; });
+            play(sec);
+        });
+
+        // Datang dari halaman lain dengan alamat /#dosen dst.
+        if (location.hash.length > 1) {
+            var s = document.querySelector('[data-reveal]' + location.hash);
+            if (s) window.addEventListener('load', function () { play(s); });
+        }
+    })();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+    // Expandable accordion fasilitas pada mobile (< md)
+    (function () {
+        var accordion = document.getElementById('fasilitas-accordion');
+        if (!accordion) return;
+
+        var items = accordion.querySelectorAll('[data-accordion-item]');
+
+        function openItem(selected) {
+            items.forEach(function (item) {
+                var isOpen = (item === selected);
+                var content = item.querySelector('[data-content]');
+                var title = item.querySelector('[data-title]');
+                var iconClosed = item.querySelector('[data-icon-closed]');
+                var iconOpen = item.querySelector('[data-icon-open]');
+
+                item.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+                if (isOpen) {
+                    item.classList.remove('h-[72px]');
+                    item.classList.add('h-[220px]');
+                    if (content) {
+                        content.classList.remove('items-center', 'pl-4', 'pr-2');
+                        content.classList.add('items-end', 'p-3.5');
+                    }
+                    if (title) {
+                        title.classList.remove('text-sm', 'font-semibold');
+                        title.classList.add('text-base', 'sm:text-lg', 'font-bold');
+                    }
+                    if (iconClosed) iconClosed.classList.add('hidden');
+                    if (iconOpen) iconOpen.classList.remove('hidden');
+                } else {
+                    item.classList.remove('h-[220px]');
+                    item.classList.add('h-[72px]');
+                    if (content) {
+                        content.classList.remove('items-end', 'p-3.5');
+                        content.classList.add('items-center', 'pl-4', 'pr-2');
+                    }
+                    if (title) {
+                        title.classList.remove('text-base', 'sm:text-lg', 'font-bold');
+                        title.classList.add('text-sm', 'font-semibold');
+                    }
+                    if (iconClosed) iconClosed.classList.remove('hidden');
+                    if (iconOpen) iconOpen.classList.add('hidden');
+                }
+            });
+        }
+
+        items.forEach(function (item) {
+            item.addEventListener('click', function (e) {
+                var isExpanded = item.getAttribute('aria-expanded') === 'true';
+                if (!isExpanded) {
+                    // Tap kartu TERTUTUP: buka kartu, cegah navigasi halaman
+                    e.preventDefault();
+                    openItem(item);
+                }
+                // Tap kartu yang SEDANG TERBUKA: izinkan navigasi normal ke href /fasilitas?f=i
+            });
+
+            item.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    var isExpanded = item.getAttribute('aria-expanded') === 'true';
+                    if (!isExpanded) {
+                        openItem(item);
+                    } else {
+                        window.location.href = item.href;
+                    }
+                }
+            });
+        });
+    })();
+</script>
+@endpush
