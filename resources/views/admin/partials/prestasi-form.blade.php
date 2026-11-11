@@ -7,7 +7,6 @@
     $hint  = 'text-xs text-[#6B7280]';
     $wajib = '<span class="text-[#FF3F3F]">*</span>';
     $chev  = '<svg class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6l6-6"/></svg>';
-    $cert  = '<svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/><path d="M13 17.5v4.5l2-1.5l2 1.5v-4.5"/><path d="M10 19h-5a2 2 0 0 1-2-2v-10a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-1 1.73"/><path d="M6 9l12 0"/><path d="M6 12l3 0"/><path d="M6 15l2 0"/></svg>';
     $cardCls = 'rounded-xl border border-[#E5E7EB] bg-white shadow-[1px_0_3px_rgba(0,0,0,0.02),5px_2px_6px_rgba(0,0,0,0.02)]';
     $radioCls = 'flex cursor-pointer items-center gap-2.5 text-sm';
 
@@ -32,7 +31,7 @@
 
 <div class="flex flex-col gap-6">
 
-    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div class="grid items-start gap-6">
 
         {{-- ================= FORMULIR ================= --}}
         <form method="POST" action="{{ $action }}" novalidate
@@ -113,6 +112,18 @@
                     <div class="flex flex-col gap-1">
                         <h2 class="text-lg font-semibold">Informasi prestasi</h2>
                         <p class="text-[13px] text-[#6B7280]">Isikan nama lomba dan capaian sesuai dokumen bukti.</p>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <label for="pemilik" class="{{ $label }}">Nama pemilik prestasi {!! $wajib !!}</label>
+                        <input id="pemilik" name="pemilik" list="daftar-pemilik" autocomplete="off" value="{{ $v('pemilik') }}"
+                               placeholder="Nama pemilik prestasi (individu atau ketua tim)" class="{{ $in('pemilik') }}">
+                        <datalist id="daftar-pemilik">
+                            @foreach ($daftarMahasiswa as $n)
+                                <option value="{{ $n }}"></option>
+                            @endforeach
+                        </datalist>
+                        {!! $galat('pemilik') ?: '<span class="' . $hint . '">Ketik nama atau pilih dari daftar. Untuk tim, isi nama ketua; anggota lain ditambahkan di bawah.</span>' !!}
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -397,29 +408,6 @@
                         class="flex h-[38px] items-center rounded-lg bg-[#2277FF] px-5 text-sm font-semibold text-white transition hover:bg-[#1A63D9]">{{ $edit ? 'Simpan perubahan' : 'Simpan' }}</button>
             </div>
         </form>
-
-        {{-- ================= PANEL SAMPING ================= --}}
-        <aside class="flex flex-col gap-4 lg:sticky lg:top-24">
-            <div class="{{ $cardCls }} flex flex-col gap-4 p-5">
-                <h2 class="text-lg font-semibold">Panduan pengisian</h2>
-                @foreach ([
-                    ['Kegiatan tidak wajib',      'Pilih Tanpa kegiatan sebelumnya untuk mengisi lomba dan penyelenggara secara mandiri.'],
-                    ['Gunakan data sesuai bukti', 'Nama prestasi, peringkat, dan tanggal harus sesuai sertifikat atau dokumen pendukung.'],
-                    ['Tentukan tingkat dan jenis', 'Pilih cakupan lomba dan kategori akademik atau nonakademik.'],
-                ] as [$judul, $isi])
-                    <div class="flex flex-col gap-1">
-                        <h3 class="text-[13px] font-semibold text-[#111827]">{{ $judul }}</h3>
-                        <p class="text-[13px] leading-5 text-[#6B7280]">{{ $isi }}</p>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="flex flex-col gap-2 rounded-xl bg-[#EEF4FF] p-4 text-[#003385]">
-                <span class="text-[#0162DD]">{!! $cert !!}</span>
-                <h3 class="text-sm font-semibold">Bukti yang dapat digunakan</h3>
-                <p class="text-[13px] leading-5">Sertifikat, piagam penghargaan, atau surat resmi penyelenggara yang memuat identitas dan capaian.</p>
-            </div>
-        </aside>
     </div>
 </div>
 
