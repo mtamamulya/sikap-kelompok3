@@ -16,18 +16,18 @@ return new class extends Migration
             $table->foreignId('id_user')
                 ->constrained('users', 'id_user')
                 ->restrictOnDelete();
-            $table->foreignId('id_kegiatan_sebelumnya')
+            $table->foreignId('id_skim')
                 ->nullable()
-                ->constrained('kegiatan', 'id_kegiatan')
-                ->nullOnDelete();
+                ->constrained('skim', 'id_skim')
+                ->restrictOnDelete();
+            $table->foreignId('id_kelompok_bidang')
+                ->nullable()
+                ->constrained('kelompok_bidang', 'id_kelompok_bidang')
+                ->restrictOnDelete();
 
             $table->string('nama_kegiatan', 255);
-            $table->string('lokasi', 150)->nullable();
-            $table->text('deskripsi')->nullable();
             $table->string('nomor_sk', 100)->nullable();
             $table->date('tanggal_sk')->nullable();
-            $table->date('tanggal_mulai')->nullable();
-            $table->date('tanggal_selesai')->nullable();
             $table->timestamps();
         });
     }

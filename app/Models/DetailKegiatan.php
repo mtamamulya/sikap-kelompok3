@@ -28,7 +28,7 @@ class DetailKegiatan extends Model
         static::saving(function (self $detail) {
             $activity = Kegiatan::whereKey($detail->id_kegiatan)->lockForUpdate()->first();
             $field = IsianKategori::whereKey($detail->id_isian_kategori)->lockForUpdate()->first();
-            if (! $field || ! $activity || $field->id_kategori !== $activity->id_kategori) {
+            if (! $field || ! $activity || (int) $field->id_kategori !== (int) $activity->id_kategori) {
                 throw ValidationException::withMessages(['id_isian_kategori' => 'Isian harus berasal dari kategori kegiatan yang sama.']);
             }
             if ($detail->exists && ($detail->isDirty('id_kegiatan') || $detail->isDirty('id_isian_kategori')) && $detail->dokumen()->exists()) {
@@ -39,7 +39,7 @@ class DetailKegiatan extends Model
                 'tanggal' => 'date_format:Y-m-d',
                 default => 'string',
             };
-            Validator::make(['isian' => $detail->isian], ['isian' => ['nullable', $rule]])->validate();
+            Validator::make(['isian' => $detail->isian], ['isian' => ['required', $rule]])->validate();
             $count = self::where('id_kegiatan', $activity->getKey())->where('id_isian_kategori', $field->getKey())
                 ->when($detail->exists, fn ($query) => $query->whereKeyNot($detail->getKey()))->count();
             if ($field->jumlah_isian !== null && $count >= $field->jumlah_isian) {

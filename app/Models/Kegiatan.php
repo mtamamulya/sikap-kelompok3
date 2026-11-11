@@ -16,17 +16,14 @@ class Kegiatan extends Model
     protected $primaryKey = 'id_kegiatan';
 
     protected $fillable = [
-        'id_kategori', 'id_user', 'id_kegiatan_sebelumnya',
-        'nama_kegiatan', 'lokasi', 'deskripsi', 'nomor_sk',
-        'tanggal_sk', 'tanggal_mulai', 'tanggal_selesai',
+        'id_kategori', 'id_user', 'id_skim', 'id_kelompok_bidang',
+        'nama_kegiatan', 'nomor_sk', 'tanggal_sk',
     ];
 
     protected function casts(): array
     {
         return [
             'tanggal_sk' => 'date',
-            'tanggal_mulai' => 'date',
-            'tanggal_selesai' => 'date',
         ];
     }
 
@@ -64,6 +61,16 @@ class Kegiatan extends Model
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(Kategori::class, 'id_kategori');
+    }
+
+    public function skim(): BelongsTo
+    {
+        return $this->belongsTo(Skim::class, 'id_skim', 'id_skim');
+    }
+
+    public function kelompokBidang(): BelongsTo
+    {
+        return $this->belongsTo(KelompokBidang::class, 'id_kelompok_bidang', 'id_kelompok_bidang');
     }
 
     public function detail(): HasMany

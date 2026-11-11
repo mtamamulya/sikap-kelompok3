@@ -9,19 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detail_kegiatan', function (Blueprint $table) {
+            $table->id('id_detail_kegiatan');
             $table->foreignId('id_kegiatan')
-                ->primary()
                 ->constrained('kegiatan', 'id_kegiatan')
                 ->cascadeOnDelete();
-            $table->foreignId('id_dosen')
-                ->nullable()
-                ->constrained('dosen', 'id_dosen')
-                ->nullOnDelete();
+            $table->foreignId('id_isian_kategori')
+                ->constrained('isian_kategori', 'id_isian_kategori')
+                ->restrictOnDelete();
 
-            $table->enum('tingkat_kejuaraan', ['kabupaten/kota', 'provinsi', 'nasional', 'internasional'])->nullable();
-            $table->string('penyelenggara', 150)->nullable();
-            $table->string('link_website', 255)->nullable();
-            $table->string('posisi_dalam_kegiatan', 100)->nullable();
+            $table->text('isian');
             $table->timestamps();
         });
     }
