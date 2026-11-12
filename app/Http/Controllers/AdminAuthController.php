@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\ApiTokenSesi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,7 @@ class AdminAuthController extends Controller
             RateLimiter::clear($rateLimitKey);
 
             $user = Auth::user();
+            ApiTokenSesi::terbitkan($user);
             $this->recordLogin($request, $email, (int) $user->getKey(), true);
 
             // Sesi kompatibilitas untuk middleware lama
@@ -98,6 +100,7 @@ class AdminAuthController extends Controller
      */
     public function logout(Request $request): RedirectResponse
     {
+        ApiTokenSesi::cabut();
         Auth::logout();
 
         $request->session()->forget(['admin', 'kaprodi']);
