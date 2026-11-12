@@ -10,17 +10,31 @@ return new class extends Migration
     {
         Schema::create('anggota_kegiatan', function (Blueprint $table) {
             $table->id('id_anggota_kegiatan');
+            
+            // id_kegiatan harus nullable karena bisa jadi ini anggota prestasi
             $table->foreignId('id_kegiatan')
+                ->nullable()
                 ->constrained('kegiatan', 'id_kegiatan')
                 ->cascadeOnDelete();
+                
+            // Tambahkan id_prestasi (nullable) sesuai dengan Model
+            $table->foreignId('id_prestasi')
+                ->nullable()
+                ->constrained('prestasi', 'id_prestasi')
+                ->cascadeOnDelete();
+
             $table->foreignId('id_user')
                 ->constrained('users', 'id_user')
                 ->restrictOnDelete();
+                
             $table->string('peran', 50);
             $table->timestamps();
 
-            // UNIQUE gabungan untuk mencegah duplikasi anggota di kegiatan yang sama
+            // Mencegah duplikasi user yang sama di 1 kegiatan
             $table->unique(['id_kegiatan', 'id_user']);
+            
+            // Mencegah duplikasi user yang sama di 1 prestasi
+            $table->unique(['id_prestasi', 'id_user']);
         });
     }
 
