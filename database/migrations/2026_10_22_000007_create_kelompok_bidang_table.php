@@ -10,6 +10,11 @@ return new class extends Migration
     {
         Schema::create('kelompok_bidang', function (Blueprint $table) {
             $table->id('id_kelompok_bidang');
+            $table->foreignId('id_rujukan')
+                ->nullable()
+                ->constrained('kelompok_bidang', 'id_kelompok_bidang')
+                ->nullOnDelete();
+
             $table->string('nama_kelompok_bidang', 100)->unique();
             $table->timestamps();
         });

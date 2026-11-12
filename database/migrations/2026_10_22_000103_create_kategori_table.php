@@ -13,8 +13,12 @@ return new class extends Migration
             $table->foreignId('id_jenis_kegiatan')
                 ->constrained('jenis_kegiatan', 'id_jenis_kegiatan')
                 ->restrictOnDelete();
+
             $table->string('nama_kategori', 100);
             $table->text('deskripsi')->nullable();
+            $table->text('isi_surat')->nullable();
+            $table->boolean('lampiran_peserta')->default(false);
+            $table->enum('kebutuhan', ['kegiatan', 'surat'])->default('kegiatan');
             $table->timestamps();
         });
     }

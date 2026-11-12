@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('skim', function (Blueprint $table) {
             $table->id('id_skim');
             $table->string('nama_skim', 100);
-            $table->enum('ranah', ['penelitian', 'pengabdian']);
             $table->timestamps();
         });
     }

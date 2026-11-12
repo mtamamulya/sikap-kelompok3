@@ -13,11 +13,13 @@ class Berita extends Model
 
     protected $fillable = [
         'id_kegiatan',
+        'id_user',
         'judul_berita',
         'isi_berita',
         'status',
         'tanggal_publish',
         'sampul',
+        'catatan_revisi',
     ];
 
     protected $casts = [
@@ -27,5 +29,10 @@ class Berita extends Model
     public function kegiatan(): BelongsTo
     {
         return $this->belongsTo(Kegiatan::class, 'id_kegiatan', 'id_kegiatan');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 }
